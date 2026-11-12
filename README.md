@@ -1,0 +1,134 @@
+# Vela
+
+A workspace-oriented browser interface built around **Spaces → Groups → Tabs and Dashboards**.
+
+This is milestone 0.1: a local web application that runs inside an existing browser. It is structured so a native shell (WebView2) can later host it and supply real browser views.
+
+## Getting started
+
+Requires Node.js 20.19+ (developed on Node 24).
+
+```bash
+npm install
+npm run dev        # http://localhost:5173 (bound to localhost only)
+```
+
+| Script              | Purpose                                 |
+| ------------------- | --------------------------------------- |
+| `npm run dev`       | Vite dev server on `localhost:5173`     |
+| `npm run build`     | Type-check and build to `dist/`         |
+| `npm run typecheck` | TypeScript project check                |
+| `npm run lint`      | ESLint (typescript-eslint, React hooks) |
+| `npm test`          | Vitest unit tests                       |
+| `npm run format`    | Prettier                                |
+
+If port 5173 is taken, Vite picks the next free port and prints it.
+
+## Features
+
+- **Spaces**: Work and Personal by default. Create, rename, recolor, re-icon and delete spaces (with confirmation). Each space remembers its selected tab, dashboard or start page, and switching restores it.
+- **Groups**: create, edit, collapse, reorder by drag, delete (tabs move to the ungrouped section, or are closed if you tick the option).
+- **Tabs**: create, select, close, duplicate, pin/unpin, inline rename (F2 or the context menu), move between groups and spaces, reorder by drag, open in your real browser. Middle-click closes a tab. You can also drop a tab on a space icon to move it there.
+- **Bookmark library** per space: folders nested to any depth, shown as a tile grid (small, medium or large cards) or a compact list, with a collapsible folder tree on the left and clickable breadcrumbs. Turn on _Show subfolder contents inline_ to see every subfolder's bookmarks as sections on one page. Search (`/` or `Ctrl+F`) covers titles, addresses and folder names below the open folder. Drag bookmarks to reorder them or drop them on a folder card, tree row or breadcrumb. Drag folders onto other folders to nest them, or near a card's edge to reorder. Open a folder's bookmarks as a tab group, middle-click or `Ctrl`+click for a background tab, and import an HTML bookmarks export from Chrome, Edge or Firefox with its folder structure kept. Folders also show in the sidebar, on the start page, in the palette and in the dashboard bookmarks widget (choose its folder in the widget menu).
+- **Start page** per space: quick search over tabs and bookmarks (or enter an address), pinned sites, recent tabs, group overview, quick actions.
+- **Dashboards**: create, rename, delete. Widgets: bookmarks, quick links, recent tabs and group launcher. You can add, remove, rename, widen and reorder widgets (drag the grip handle).
+- **Command palette** (`Ctrl+K`): searches tabs, groups, spaces, dashboards and bookmarks across every space, runs actions, and opens addresses or searches.
+- **Settings**: accent (per space or fixed), density, reduced motion, sidebar width, default space, startup behavior, search engine, a shortcut reference, and JSON export, import and reset.
+- **Persistence**: everything is kept in `localStorage` and survives a refresh.
+
+### Keyboard shortcuts
+
+| Shortcut               | Action                                |
+| ---------------------- | ------------------------------------- |
+| `Ctrl+L`               | Focus address bar                     |
+| `Ctrl+T` / `Alt+T`     | New tab                               |
+| `Ctrl+W` / `Alt+W`     | Close selected tab                    |
+| `Ctrl+1…9` / `Alt+1…9` | Switch space (1 = Work, 2 = Personal) |
+| `Ctrl+B`               | Toggle sidebar                        |
+| `Ctrl+K`               | Command palette                       |
+| `Ctrl+R`               | Reload tab preview                    |
+| `Alt+←` / `Alt+→`      | Back / forward                        |
+| `Ctrl+,`               | Settings                              |
+| `Esc`                  | Close menu / dialog / palette         |
+
+In the bookmark library: arrow keys move between tiles, `Enter` opens, `F2` edits, `Delete` removes (with undo), `Backspace` or `Alt+↑` goes to the parent folder.
+
+On a focused sidebar tab: `Enter` opens it, `F2` renames it, `Delete` closes it, and `Space` picks it up so you can move it with the arrow keys.
+
+Chrome and Edge reserve `Ctrl+T`, `Ctrl+W` and `Ctrl+N`, so a web page never receives them. Use the `Alt` variants in the dev build. Shortcuts also don't fire while focus is inside an embedded page's iframe. Single-key shortcuts never fire while you are typing in a text field.
+
+## Known limitations of the web build
+
+These are limits of running inside a normal browser tab. Vela states them in the UI rather than hiding them.
+
+- **Embedding.** Pages are shown in a sandboxed `<iframe>` only as a preview. Many sites send `X-Frame-Options` or CSP `frame-ancestors` headers that forbid this. For well-known sites that do (`src/host/embedPolicy.ts`), Vela skips the attempt and shows a fallback with **Open in browser**. Other sites are attempted with a visible note that they may refuse. An iframe `load` event does not prove the page rendered, so Vela never reports a page as "supported" because of it. Vela does not use a proxy or scraping to get around these restrictions.
+- **History.** Cross-origin iframe history can't be observed. Back and forward follow Vela's own per-tab history of the addresses you navigated to. Clicks inside an embedded page are not tracked.
+- **Background tabs.** Only the visible tab is mounted. Inactive tabs and spaces keep their state (URL, title, history, position), but their pages are not kept running. Vela does not fake background playback.
+- **Titles and favicons.** Cross-origin page titles can't be read. Titles come from the hostname, or from your rename. Favicons are loaded from `<origin>/favicon.ico`, with a letter tile as fallback. Local URLs are not probed.
+
+## Architecture
+
+```text
+src/
+├── app/                App root and providers (browser host + navigation context)
+├── components/
+│   ├── layout/         AppShell, TopBar, ContentArea, view registry
+│   ├── sidebar/        Sidebar, space switcher, tab/group tree, drag-and-drop
+│   ├── tabs/           TabView (iframe preview / blocked fallback)
+│   ├── start/          Start page and quick search
+│   ├── dashboard/      Dashboard view, widget cards, widget bodies
+│   └── common/         Buttons, tooltip, menus, dialogs, favicon, error boundary
+├── features/
+│   ├── workspace/      Seed data, selectors, dialog-driven flows, context menu builders
+│   ├── navigation/     Navigation controller + omnibox
+│   ├── bookmarks/      Bookmark folder workflows, menus, HTML import
+│   ├── command-palette/
+│   └── settings/       Settings view, export/import, startup behavior
+├── host/               BrowserHost interface, WebBrowserHost, embed policy
+├── stores/             Zustand stores and persistence (validation, migration)
+├── hooks/              Global shortcuts, appearance
+├── types/              Domain model
+└── utils/              URL normalisation, validation helpers
+```
+
+- **State.** `workspaceStore` holds normalised entities (`spaces`, `groups`, `tabs`, `bookmarks`, `dashboards`, each keyed by stable ID) plus `activeSpaceId` and `spaceViews` (the selected view per space). `settingsStore` holds preferences. `uiStore` holds transient state (menus, dialogs, palette, reload keys) and is never persisted.
+- **Persistence.** Persisted data is versioned (`WORKSPACE_SCHEMA_VERSION`) with a migration table in `stores/persistence.ts`. On load and on import, every record is validated on its own. Invalid records are dropped and broken references are repaired (for example, a tab whose group no longer exists becomes ungrouped), so one bad entry never wipes the workspace. Unparseable JSON is copied to `vela:workspace:corrupt-backup` before falling back to defaults. Only `http:`/`https:` URLs are accepted. No credentials, cookies or tokens are stored.
+- **View routing.** `components/layout/viewRegistry.tsx` maps view kinds (`start`, `tab`, `dashboard`, `settings`) to renderers. To add a view, add a kind to `ContentView` and a renderer.
+- **Dashboards.** Widgets are a discriminated union with a `layout` object. v0.1 uses only `colSpan`; the optional `x/y/w/h` fields are reserved for drag-resize layouts. New widget kinds (for example an embedded web panel) slot into the same union.
+
+## Migrating to a native browser host
+
+All page rendering and navigation goes through `BrowserHost` (`src/host/types.ts`):
+
+```ts
+interface BrowserHost {
+  kind: 'web' | 'native';
+  capabilities: { nativeViews; persistentBackgroundTabs; engineHistory };
+  navigate(tabId, url);
+  reload(tabId);
+  goBack(tabId);
+  goForward(tabId);
+  openExternal(url);
+  disposeTab(tabId);
+  getEmbedSupport(url);
+}
+```
+
+`WebBrowserHost` is the development implementation. A future `NativeBrowserHost` would work as follows:
+
+1. Wrap this UI in a native shell (for example WinUI 3 or WPF with WebView2) that loads the built `dist/` as the chrome UI.
+2. Have the shell own one WebView2 controller per tab, positioned over the content area's bounds. The bounds are reported from the UI over `window.chrome.webview.postMessage`.
+3. Implement `NativeBrowserHost` by forwarding `navigate`, `reload`, `goBack`, `goForward` and `disposeTab` as bridge messages. Return `{ mode: 'native' }` from `getEmbedSupport`, so `TabView` renders a placeholder slot instead of an iframe.
+4. Feed engine events (`NavigationCompleted`, `DocumentTitleChanged`, `FaviconChanged`, history changes) back into `workspaceStore` (`recordNavigation`, title and favicon updates). This replaces Vela-managed history with `engineHistory: true`.
+5. Keep WebView2 instances alive for inactive tabs and spaces (`persistentBackgroundTabs: true`), optionally with one WebView2 profile per space for cookie isolation.
+6. Choose the host in `src/host/createHost.ts` by detecting the bridge.
+
+The stores, sidebar, start page, dashboards and command palette do not change.
+
+## Tests
+
+`npm test` runs the Vitest suites:
+
+- `src/stores/workspaceStore.test.ts`: space switching restores each space's view, space deletion, group deletion (ungroup or close tabs), tab movement between groups and spaces, reordering, pinning, closing with neighbour selection, history, persistence round-trip, per-record sanitising, and recovery from corrupted storage.
+- `src/stores/bookmarkFolders.test.ts`: nested folders, moving with cycle prevention, deleting (contents move up, or everything is deleted), bookmark reordering, revealing a folder, HTML import, the v1 to v2 migration, and repair of folder cycles and dangling references.
+- `src/utils/url.test.ts`: omnibox normalisation (URLs, localhost, IPs, searches, blocked schemes).

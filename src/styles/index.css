@@ -1,0 +1,153 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #101016;
+  --sidebar: #15151c;
+  --surface: #1c1c25;
+  --surface-raised: #22222d;
+  --surface-hover: #2b2a37;
+  --surface-active: #332e42;
+  --border: #2a2a36;
+  --border-strong: #3a3948;
+
+  --text-primary: #f2f0f7;
+  --text-secondary: #aaa6b8;
+  --text-muted: #777386;
+
+  --accent: #a78bfa;
+  --accent-hover: color-mix(in oklab, var(--accent) 82%, white);
+  --accent-soft: color-mix(in oklab, var(--accent) 16%, transparent);
+  --accent-ring: color-mix(in oklab, var(--accent) 55%, transparent);
+
+  --success: #5bc69d;
+  --warning: #e6ae68;
+  --danger: #e47786;
+
+  --row-h: 32px;
+  --radius: 8px;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur: 150ms;
+
+  color-scheme: dark;
+}
+
+:root[data-density='compact'] {
+  --row-h: 28px;
+}
+
+:root[data-reduce-motion='true'] {
+  --dur: 0ms;
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Cascadia Code', 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-canvas: var(--background);
+  --color-sidebar: var(--sidebar);
+  --color-surface: var(--surface);
+  --color-raised: var(--surface-raised);
+  --color-hover: var(--surface-hover);
+  --color-active: var(--surface-active);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-fg: var(--text-primary);
+  --color-fg-2: var(--text-secondary);
+  --color-fg-3: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --animate-pop: pop var(--dur) var(--ease);
+  --animate-fade: fade var(--dur) var(--ease);
+  --animate-progress: progress 1.4s ease-in-out infinite;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    overflow: hidden;
+  }
+
+  button {
+    cursor: default;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-ring);
+    outline-offset: 1px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+}
+
+@layer utilities {
+  .transition-ui {
+    transition-property: background-color, color, border-color, opacity, box-shadow, transform;
+    transition-duration: var(--dur);
+    transition-timing-function: var(--ease);
+  }
+
+  .h-row {
+    height: var(--row-h);
+  }
+
+  .shadow-pop {
+    box-shadow:
+      0 0 0 1px var(--border-strong),
+      0 12px 32px -8px rgb(0 0 0 / 0.6),
+      0 4px 12px -4px rgb(0 0 0 / 0.4);
+  }
+
+  .shadow-card {
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.03) inset,
+      0 1px 2px rgb(0 0 0 / 0.25);
+  }
+}
