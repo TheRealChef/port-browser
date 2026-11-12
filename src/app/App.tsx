@@ -4,7 +4,7 @@ import { AppProviders } from './providers/AppProviders';
 
 export function App() {
   return (
-    <ErrorBoundary label="Vela">
+    <ErrorBoundary label="Port">
       <AppProviders>
         <AppShell />
       </AppProviders>

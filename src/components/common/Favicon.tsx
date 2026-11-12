@@ -6,7 +6,15 @@ import { cn } from '../../utils/misc';
 /** Origins whose /favicon.ico failed this session, so we don't retry and flicker. */
 const failed = new Set<string>();
 
-const PALETTE = ['#a78bfa', '#7aa2f7', '#4fd1c5', '#5bc69d', '#e6ae68', '#f0956a', '#f08ba0'];
+const PALETTE = [
+  'var(--port-mauve)',
+  'var(--port-steel)',
+  'var(--port-teal)',
+  'var(--port-sage)',
+  'var(--port-amber)',
+  'var(--port-clay)',
+  'var(--port-rose)',
+];
 
 function letterColor(seed: string): string {
   let hash = 0;
@@ -52,7 +60,7 @@ export function Favicon({
       <span
         aria-hidden
         className={cn(
-          'flex shrink-0 items-center justify-center rounded-[4px] font-semibold text-[#14121c]',
+          'flex shrink-0 items-center justify-center rounded-[4px] font-semibold text-on-brand',
           className,
         )}
         style={{ ...box, fontSize: size * 0.62, background: letterColor(host) }}

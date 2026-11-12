@@ -103,7 +103,7 @@ function MenuList({ items, onClose, onBack, autoFocus, className, style }: MenuL
       role="menu"
       onKeyDown={onKeyDown}
       className={cn(
-        'min-w-[200px] max-w-[300px] animate-pop rounded-lg bg-raised p-1 shadow-pop',
+        'min-w-[200px] max-w-[300px] animate-pop rounded-xl bg-elevated p-1 shadow-pop',
         className,
       )}
       style={style}
@@ -146,7 +146,7 @@ function MenuList({ items, onClose, onBack, autoFocus, className, style }: MenuL
             >
               <span className="flex w-4 shrink-0 justify-center text-fg-2">
                 {entry.type === 'item' && entry.checked ? (
-                  <Check size={14} className="text-accent" />
+                  <Check size={14} className="text-brand" />
                 ) : (
                   Icon && (
                     <Icon

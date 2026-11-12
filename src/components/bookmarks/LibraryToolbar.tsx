@@ -66,7 +66,7 @@ function Crumb({
         current
           ? 'text-[18px] font-semibold tracking-tight text-fg'
           : 'text-[13px] text-fg-3 hover:bg-hover hover:text-fg',
-        isOver && 'bg-[var(--accent-soft)] text-fg ring-1 ring-[var(--accent-ring)]',
+        isOver && 'bg-drop-soft text-fg ring-1 ring-[var(--focus-ring)]',
       )}
     >
       {label}
@@ -94,7 +94,7 @@ export const LibraryControls = forwardRef<HTMLInputElement, ControlsProps>(funct
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <label className="flex h-8 min-w-[220px] flex-1 items-center gap-2 rounded-lg border border-line bg-surface px-2.5 focus-within:border-[var(--accent-ring)] md:max-w-[380px]">
+      <label className="flex h-8 min-w-[220px] flex-1 items-center gap-2 rounded-lg border border-line bg-surface px-2.5 focus-within:border-focus/70 md:max-w-[380px]">
         <Search size={14} className="shrink-0 text-fg-3" />
         <input
           ref={searchRef}

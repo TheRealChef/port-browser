@@ -7,7 +7,7 @@ import { Dialog } from './Dialog';
 import { AccentPicker, IconPicker } from './Pickers';
 
 const inputClass =
-  'h-8 w-full rounded-md border border-line-strong bg-surface px-2.5 text-[13px] text-fg outline-none transition-ui placeholder:text-fg-3 focus:border-accent';
+  'h-8 w-full rounded-md border border-line-strong bg-surface px-2.5 text-[13px] text-fg outline-none transition-ui placeholder:text-fg-3 focus:border-focus/80 focus:shadow-[0_0_0_3px_var(--focus-soft)]';
 
 export function DialogHost() {
   const dialog = useUI((s) => s.dialog);

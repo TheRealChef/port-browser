@@ -83,9 +83,9 @@ function DashboardRow({ dashboard, active }: { dashboard: Dashboard; active: boo
       }}
       onContextMenu={(e) => showContextMenu(e, buildDashboardMenu(dashboard.id))}
       className={cn(
-        'flex h-row items-center gap-2 rounded-md px-2 text-left text-[13px] outline-none transition-ui',
-        'focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)]',
-        active ? 'bg-active text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+        'flex h-row items-center gap-2 rounded-lg px-2 text-left text-[13px] outline-none transition-ui',
+        'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+        active ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
         isDragging && 'opacity-40',
       )}
     >

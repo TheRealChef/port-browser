@@ -51,7 +51,7 @@ function DropZone({
       ref={setNodeRef}
       className={cn(
         'rounded-lg transition-ui',
-        highlighted && 'bg-accent-soft ring-1 ring-[var(--accent-ring)]',
+        highlighted && 'bg-drop-soft ring-1 ring-[var(--focus-ring)]',
         className,
       )}
     >

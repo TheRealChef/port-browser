@@ -65,7 +65,7 @@ export function Tooltip({ label, shortcut, side = 'bottom', children }: TooltipP
         createPortal(
           <div
             role="tooltip"
-            className="pointer-events-none fixed z-[100] flex animate-fade items-center gap-2 whitespace-nowrap rounded-md border border-line-strong bg-raised px-2 py-1 text-xs text-fg shadow-pop"
+            className="pointer-events-none fixed z-[100] flex animate-fade items-center gap-2 whitespace-nowrap rounded-md bg-elevated px-2 py-1 text-[11.5px] text-fg shadow-pop"
             style={{
               left: Math.max(8, Math.min(pos.x, window.innerWidth - 8)),
               top: pos.y,

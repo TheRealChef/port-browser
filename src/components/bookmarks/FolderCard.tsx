@@ -91,14 +91,14 @@ export function FolderCard({ folder, size, layout, path }: FolderCardProps) {
       }}
       className={cn(
         'group/tile relative cursor-default select-none outline-none transition-ui',
-        'focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)]',
+        'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
         drag.isDragging && 'opacity-40',
         layout === 'list'
           ? 'flex h-10 items-center gap-3 rounded-lg px-3 hover:bg-hover'
           : 'rounded-xl border bg-raised/70 shadow-card hover:bg-hover',
         layout === 'grid' &&
-          (zone === 'into' ? 'border-accent' : 'border-line hover:border-line-strong'),
-        zone === 'into' && 'bg-[var(--accent-soft)] ring-2 ring-[var(--accent-ring)]',
+          (zone === 'into' ? 'border-drop' : 'border-line hover:border-line-strong'),
+        zone === 'into' && 'bg-drop-soft ring-2 ring-[var(--focus-ring)]',
         layout === 'grid' &&
           size === 'sm' &&
           'flex h-[84px] flex-col items-center justify-center gap-2 px-2',
@@ -110,7 +110,7 @@ export function FolderCard({ folder, size, layout, path }: FolderCardProps) {
         <span
           aria-hidden
           className={cn(
-            'pointer-events-none absolute rounded-full bg-accent',
+            'pointer-events-none absolute rounded-full bg-drop',
             layout === 'list'
               ? cn('inset-x-2 h-0.5', zone === 'before' ? '-top-px' : '-bottom-px')
               : cn('inset-y-2 w-0.5', zone === 'before' ? '-left-1.5' : '-right-1.5'),

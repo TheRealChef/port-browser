@@ -24,8 +24,8 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
         aria-label={label}
         aria-pressed={active}
         className={cn(
-          'inline-flex shrink-0 items-center justify-center rounded-md text-fg-2 transition-ui',
-          'hover:bg-hover hover:text-fg active:bg-active disabled:pointer-events-none disabled:opacity-35',
+          'inline-flex shrink-0 items-center justify-center rounded-md text-fg-3 transition-ui',
+          'hover:bg-hover hover:text-fg active:bg-active disabled:pointer-events-none disabled:text-fg-disabled',
           size === 'md' ? 'size-8' : 'size-6',
           active && 'bg-hover text-fg',
           className,

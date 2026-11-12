@@ -8,10 +8,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS = {
-  primary: 'bg-accent text-[#14121c] hover:bg-accent-hover font-medium',
-  secondary: 'bg-raised text-fg border border-line-strong hover:bg-hover',
+  primary: 'bg-brand text-on-brand hover:bg-brand-hover active:bg-brand-pressed font-medium',
+  secondary:
+    'bg-elevated text-fg border border-line hover:border-line-strong hover:bg-[color-mix(in_oklab,var(--surface-raised),white_5%)]',
   ghost: 'text-fg-2 hover:bg-hover hover:text-fg',
-  danger: 'bg-danger/15 text-danger border border-danger/30 hover:bg-danger/25',
+  danger: 'bg-danger/14 text-danger border border-danger/35 hover:bg-danger/22',
 };
 
 export function Button({
@@ -26,8 +27,8 @@ export function Button({
     <button
       type={type}
       className={cn(
-        'inline-flex h-8 items-center justify-center gap-1.5 rounded-md px-3 text-[13px] transition-ui',
-        'disabled:pointer-events-none disabled:opacity-40',
+        'inline-flex h-8 items-center justify-center gap-1.5 rounded-lg px-3 text-[13px] transition-ui',
+        'disabled:pointer-events-none disabled:opacity-45 disabled:saturate-50',
         VARIANTS[variant],
         className,
       )}

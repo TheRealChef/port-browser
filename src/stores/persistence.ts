@@ -31,7 +31,7 @@ import { createId } from '../utils/misc';
 
 export const WORKSPACE_STORAGE_KEY = 'vela:workspace';
 export const SETTINGS_STORAGE_KEY = 'vela:settings';
-export const WORKSPACE_SCHEMA_VERSION = 2;
+export const WORKSPACE_SCHEMA_VERSION = 3;
 export const SETTINGS_SCHEMA_VERSION = 1;
 
 export const SIDEBAR_MIN = 200;
@@ -98,6 +98,23 @@ const WORKSPACE_MIGRATIONS: Record<number, Migration> = {
       ]),
     ),
   }),
+  // v3 (Mineral Slate): the seeded spaces move to their semantic colors (Work = sage,
+  // Personal = clay). Only spaces still on the old default color are changed.
+  2: (state) => {
+    if (!isRecord(state.spaces)) return state;
+    const recolor: Record<string, [string, string]> = {
+      Work: ['violet', 'green'],
+      Personal: ['teal', 'orange'],
+    };
+    const spaces = Object.fromEntries(
+      Object.entries(state.spaces).map(([id, space]) => {
+        if (!isRecord(space) || typeof space.name !== 'string') return [id, space];
+        const rule = recolor[space.name];
+        return [id, rule && space.accent === rule[0] ? { ...space, accent: rule[1] } : space];
+      }),
+    );
+    return { ...state, spaces };
+  },
 };
 
 export function migrateWorkspace(persisted: unknown, fromVersion: number): unknown {
@@ -413,7 +430,7 @@ export const DEFAULT_SETTINGS: Settings = {
   sidebarWidth: SIDEBAR_DEFAULT,
   sidebarCollapsed: false,
   accentMode: 'space',
-  fixedAccent: 'violet',
+  fixedAccent: 'green',
   density: 'comfortable',
   reduceMotion: false,
   defaultSpaceId: null,
@@ -486,12 +503,12 @@ export function parseImport(text: string): ImportResult {
     return { ok: false, error: 'The file is not valid JSON.' };
   }
   if (!isRecord(parsed) || parsed.app !== 'vela') {
-    return { ok: false, error: 'This file is not a Vela configuration export.' };
+    return { ok: false, error: 'This file is not a Port configuration export.' };
   }
   const version = asNumber(parsed.schemaVersion, -1);
   if (version < 0) return { ok: false, error: 'The export is missing its schema version.' };
   if (version > WORKSPACE_SCHEMA_VERSION) {
-    return { ok: false, error: 'This export was created by a newer version of Vela.' };
+    return { ok: false, error: 'This export was created by a newer version of Port.' };
   }
   const result = sanitizeWorkspace(migrateWorkspace(parsed.workspace, version));
   if (!result) return { ok: false, error: 'The export does not contain any valid spaces.' };

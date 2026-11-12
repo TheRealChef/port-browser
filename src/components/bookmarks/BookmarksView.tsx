@@ -406,7 +406,7 @@ export function BookmarksView({ folderId }: { folderId: ID | null }) {
                       No bookmarks directly in this folder.{' '}
                       <button
                         type="button"
-                        className="text-accent hover:underline"
+                        className="text-focus hover:underline"
                         onClick={() => useSettings.getState().update({ bookmarkShowNested: true })}
                       >
                         Show subfolder contents inline

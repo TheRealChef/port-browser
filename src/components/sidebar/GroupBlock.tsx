@@ -47,7 +47,7 @@ export function GroupBlock({ group, tabs, activeTabId }: GroupBlockProps) {
       style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
         'rounded-lg transition-ui',
-        isDropTarget && 'bg-accent-soft ring-1 ring-[var(--accent-ring)]',
+        isDropTarget && 'bg-drop-soft ring-1 ring-[var(--focus-ring)]',
         isDragging && 'opacity-40',
       )}
     >
@@ -66,7 +66,7 @@ export function GroupBlock({ group, tabs, activeTabId }: GroupBlockProps) {
           if (e.key === 'ArrowLeft' && !group.collapsed) toggle();
         }}
         onContextMenu={(e) => showContextMenu(e, buildGroupMenu(group.id, nav))}
-        className="group/header flex h-row items-center gap-1.5 rounded-md pl-1 pr-1 text-[13px] text-fg-2 outline-none transition-ui hover:bg-hover hover:text-fg focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)]"
+        className="group/header flex h-row items-center gap-1.5 rounded-lg pl-1 pr-1 text-[13px] text-fg-2 outline-none transition-ui hover:bg-hover hover:text-fg focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
       >
         <ChevronRight
           size={13}

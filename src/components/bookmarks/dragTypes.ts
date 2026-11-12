@@ -20,7 +20,15 @@ export const GRID_COLUMNS: Record<TileSize, string> = {
   lg: 'grid-cols-[repeat(auto-fill,minmax(248px,1fr))]',
 };
 
-const PALETTE = ['#a78bfa', '#7aa2f7', '#4fd1c5', '#5bc69d', '#e6ae68', '#f0956a', '#f08ba0'];
+const PALETTE = [
+  'var(--port-mauve)',
+  'var(--port-steel)',
+  'var(--port-teal)',
+  'var(--port-sage)',
+  'var(--port-amber)',
+  'var(--port-clay)',
+  'var(--port-rose)',
+];
 
 /** Stable per-host tint used for large card covers. */
 export function hostTint(host: string): string {

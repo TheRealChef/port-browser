@@ -1,32 +1,101 @@
 @import 'tailwindcss';
 
+/*
+ * Mineral Slate design tokens.
+ *
+ * Layer 1 (--port-*) is the raw palette. Layer 2 maps it to semantic roles that
+ * components use (through the Tailwind colors declared in @theme below).
+ * A light theme only needs to redefine these two layers.
+ */
 :root {
-  --background: #101016;
-  --sidebar: #15151c;
-  --surface: #1c1c25;
-  --surface-raised: #22222d;
-  --surface-hover: #2b2a37;
-  --surface-active: #332e42;
-  --border: #2a2a36;
-  --border-strong: #3a3948;
+  /* ---- Layer 1: palette ---------------------------------------------------- */
+  --port-canvas: #111619;
+  --port-sidebar: #1a2226;
+  --port-surface: #242d32;
+  --port-elevated: #303a40;
+  --port-border: #465057;
 
-  --text-primary: #f2f0f7;
-  --text-secondary: #aaa6b8;
-  --text-muted: #777386;
+  --port-text-primary: #e9e7e0;
+  --port-text-secondary: #b4bab8;
+  --port-text-muted: #899398;
 
-  --accent: #a78bfa;
-  --accent-hover: color-mix(in oklab, var(--accent) 82%, white);
-  --accent-soft: color-mix(in oklab, var(--accent) 16%, transparent);
-  --accent-ring: color-mix(in oklab, var(--accent) 55%, transparent);
+  --port-sage: #87b996;
+  --port-clay: #c98d73;
+  --port-steel: #83a9c5;
+  --port-amber: #d9b36f;
+  --port-mauve: #b29bb6;
+  --port-teal: #69b7ae;
+  --port-rose: #cb8793;
+  --port-stone: #9da7ab;
+  --port-ivory: #e9e7e0;
 
-  --success: #5bc69d;
-  --warning: #e6ae68;
-  --danger: #e47786;
+  /* Ink used on top of light accent fills (primary buttons, letter avatars). */
+  --port-ink: #12191c;
+
+  /* ---- Layer 2: semantic roles -------------------------------------------- */
+  --background: var(--port-canvas);
+  --chrome: var(--port-sidebar);
+  --sidebar: var(--port-sidebar);
+  --surface: var(--port-surface);
+  --surface-raised: var(--port-elevated);
+  --surface-hover: rgb(233 231 224 / 0.055);
+  --surface-active: rgb(233 231 224 / 0.09);
+  --border: color-mix(in oklab, var(--port-border) 58%, transparent);
+  --border-strong: var(--port-border);
+
+  --text-primary: var(--port-text-primary);
+  --text-secondary: var(--port-text-secondary);
+  --text-muted: var(--port-text-muted);
+  --text-disabled: color-mix(in oklab, var(--port-text-muted) 70%, var(--port-surface));
+
+  /* Brand: primary actions and the Port identity. Fixed, never per-space. */
+  --brand: var(--port-sage);
+  --brand-hover: color-mix(in oklab, var(--port-sage) 86%, white);
+  --brand-pressed: color-mix(in oklab, var(--port-sage) 88%, black);
+  --brand-soft: color-mix(in oklab, var(--port-sage) 15%, transparent);
+  --on-brand: var(--port-ink);
+
+  /* Space accent: set at runtime from the active space (selected states, indicators). */
+  --accent: var(--port-sage);
+  --accent-hover: color-mix(in oklab, var(--accent) 84%, white);
+  --accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+
+  /* Selected navigation rows: a quiet tint of the space accent. */
+  --selected-bg: color-mix(in oklab, var(--accent) 13%, rgb(233 231 224 / 0.035));
+
+  /* Focus, keyboard navigation and drop targets: steel blue everywhere. */
+  --focus: var(--port-steel);
+  --focus-ring: color-mix(in oklab, var(--port-steel) 75%, transparent);
+  --focus-soft: color-mix(in oklab, var(--port-steel) 18%, transparent);
+  --accent-ring: var(--focus-ring);
+  --drop: var(--port-steel);
+  --drop-soft: color-mix(in oklab, var(--port-steel) 13%, transparent);
+
+  /* Status and meaning. */
+  --success: var(--port-sage);
+  --info: var(--port-steel);
+  --warning: var(--port-amber);
+  --hint: var(--port-amber);
+  --danger: var(--port-rose);
+  --dev: var(--port-teal);
+  --category: var(--port-mauve);
+  --warm: var(--port-clay);
+
+  /* Selectable accents for spaces, groups and folders (keys are persisted). */
+  --tone-violet: var(--port-mauve);
+  --tone-blue: var(--port-steel);
+  --tone-teal: var(--port-teal);
+  --tone-green: var(--port-sage);
+  --tone-amber: var(--port-amber);
+  --tone-orange: var(--port-clay);
+  --tone-rose: var(--port-rose);
+  --tone-slate: var(--port-stone);
 
   --row-h: 32px;
   --radius: 8px;
   --ease: cubic-bezier(0.2, 0, 0, 1);
-  --dur: 150ms;
+  --dur: 140ms;
+  --dur-slow: 200ms;
 
   color-scheme: dark;
 }
@@ -37,6 +106,14 @@
 
 :root[data-reduce-motion='true'] {
   --dur: 0ms;
+  --dur-slow: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur: 0ms;
+    --dur-slow: 0ms;
+  }
 }
 
 @theme inline {
@@ -44,22 +121,42 @@
   --font-mono: 'Cascadia Code', 'JetBrains Mono', ui-monospace, monospace;
 
   --color-canvas: var(--background);
+  --color-chrome: var(--chrome);
   --color-sidebar: var(--sidebar);
   --color-surface: var(--surface);
   --color-raised: var(--surface-raised);
+  --color-elevated: var(--surface-raised);
   --color-hover: var(--surface-hover);
   --color-active: var(--surface-active);
+  --color-selected: var(--selected-bg);
   --color-line: var(--border);
   --color-line-strong: var(--border-strong);
   --color-fg: var(--text-primary);
   --color-fg-2: var(--text-secondary);
   --color-fg-3: var(--text-muted);
+  --color-fg-disabled: var(--text-disabled);
+
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-pressed: var(--brand-pressed);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
+  --color-focus: var(--focus);
+  --color-focus-soft: var(--focus-soft);
+  --color-drop: var(--drop);
+  --color-drop-soft: var(--drop-soft);
+
   --color-success: var(--success);
+  --color-info: var(--info);
   --color-warning: var(--warning);
+  --color-hint: var(--hint);
   --color-danger: var(--danger);
+  --color-dev: var(--dev);
+  --color-category: var(--category);
+  --color-warm: var(--warm);
 
   --animate-pop: pop var(--dur) var(--ease);
   --animate-fade: fade var(--dur) var(--ease);
@@ -69,7 +166,7 @@
 @keyframes pop {
   from {
     opacity: 0;
-    transform: scale(0.97) translateY(-2px);
+    transform: scale(0.985) translateY(-2px);
   }
 }
 
@@ -97,7 +194,7 @@
 
   body {
     margin: 0;
-    background: var(--background);
+    background: var(--chrome);
     color: var(--text-primary);
     font-family: var(--font-sans);
     font-size: 13px;
@@ -112,18 +209,18 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent-ring);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 1px;
     border-radius: 6px;
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--accent) 35%, transparent);
+    background: color-mix(in oklab, var(--port-steel) 38%, transparent);
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--border-strong) transparent;
+    scrollbar-color: color-mix(in oklab, var(--port-border) 80%, transparent) transparent;
   }
 }
 
@@ -138,16 +235,34 @@
     height: var(--row-h);
   }
 
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Menus, popovers, palettes, toasts. */
   .shadow-pop {
     box-shadow:
       0 0 0 1px var(--border-strong),
-      0 12px 32px -8px rgb(0 0 0 / 0.6),
-      0 4px 12px -4px rgb(0 0 0 / 0.4);
+      0 16px 36px -12px rgb(4 8 10 / 0.55),
+      0 4px 10px -4px rgb(4 8 10 / 0.35);
   }
 
+  /* Cards resting on the canvas: a hairline top light and a soft contact shadow. */
   .shadow-card {
     box-shadow:
-      0 1px 0 0 rgb(255 255 255 / 0.03) inset,
-      0 1px 2px rgb(0 0 0 / 0.25);
+      inset 0 1px 0 0 rgb(233 231 224 / 0.04),
+      0 1px 2px rgb(4 8 10 / 0.3);
+  }
+
+  /* Active tab / pressed segment: slightly lifted. */
+  .shadow-lift {
+    box-shadow:
+      inset 0 1px 0 0 rgb(233 231 224 / 0.06),
+      0 1px 3px rgb(4 8 10 / 0.35);
+  }
+
+  .ring-focus-visible:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--focus-ring);
   }
 }

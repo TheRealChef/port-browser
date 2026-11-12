@@ -5,7 +5,7 @@ export function ContentArea() {
   const view = useContentView();
   const key = viewKey(view);
   return (
-    <main className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-line bg-surface shadow-card">
+    <main className="relative min-h-0 flex-1 overflow-hidden rounded-[14px] border border-line bg-canvas shadow-[inset_0_1px_0_rgb(233_231_224/0.03)]">
       <ErrorBoundary key={key} label="This view">
         {renderView(view)}
       </ErrorBoundary>

@@ -5,7 +5,7 @@ import { useWorkspace } from '../stores/workspaceStore';
 
 /** Applies theme preferences (accent, density, motion) to the document root. */
 export function useAppearance(): void {
-  const spaceAccent = useWorkspace((s) => s.spaces[s.activeSpaceId]?.accent ?? 'violet');
+  const spaceAccent = useWorkspace((s) => s.spaces[s.activeSpaceId]?.accent ?? 'green');
   const accentMode = useSettings((s) => s.accentMode);
   const fixedAccent = useSettings((s) => s.fixedAccent);
   const density = useSettings((s) => s.density);

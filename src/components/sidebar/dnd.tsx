@@ -195,7 +195,7 @@ function DragPreview({ data }: { data: DragData | null }) {
   if (space) {
     return (
       <div
-        className="flex size-8 items-center justify-center rounded-lg bg-active shadow-pop"
+        className="flex size-8 items-center justify-center rounded-lg bg-elevated shadow-pop"
         style={{ color: ACCENTS[space.accent].value }}
       >
         <EntityIcon name={space.icon} size={16} strokeWidth={2} />
@@ -204,7 +204,7 @@ function DragPreview({ data }: { data: DragData | null }) {
   }
   if (dashboard) {
     return (
-      <div className="flex h-row w-[220px] items-center gap-2 rounded-md bg-active px-2 text-[13px] shadow-pop">
+      <div className="flex h-row w-[220px] items-center gap-2 rounded-lg bg-elevated px-2 text-[13px] shadow-pop">
         <EntityIcon name={dashboard.icon} size={15} className="text-accent" />
         <span className="truncate">{dashboard.name}</span>
       </div>
@@ -212,7 +212,7 @@ function DragPreview({ data }: { data: DragData | null }) {
   }
   if (tab) {
     return (
-      <div className="flex h-row w-[220px] items-center gap-2 rounded-md bg-active px-2 text-[13px] shadow-pop">
+      <div className="flex h-row w-[220px] items-center gap-2 rounded-lg bg-elevated px-2 text-[13px] shadow-pop">
         <Favicon url={tab.url} />
         <span className="truncate">{tabDisplayTitle(tab)}</span>
       </div>
@@ -220,7 +220,7 @@ function DragPreview({ data }: { data: DragData | null }) {
   }
   if (group) {
     return (
-      <div className="flex h-row w-[220px] items-center gap-2 rounded-md bg-active px-2 text-[13px] font-medium shadow-pop">
+      <div className="flex h-row w-[220px] items-center gap-2 rounded-lg bg-elevated px-2 text-[13px] font-medium shadow-pop">
         <EntityIcon name={group.icon} size={14} style={{ color: ACCENTS[group.accent].value }} />
         <span className="truncate">{group.name}</span>
       </div>

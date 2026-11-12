@@ -13,28 +13,13 @@ import { cn, MOD_LABEL } from '../../utils/misc';
 import { clamp } from '../../utils/validate';
 import { IconButton } from '../common/IconButton';
 import { Kbd } from '../common/Kbd';
+import { PortLogo } from '../common/PortLogo';
 import { showContextMenu, showMenuAt } from '../common/menu';
 import { BookmarkList } from './BookmarkList';
 import { DashboardList } from './DashboardList';
 import { SidebarDnd } from './dnd';
 import { SidebarTree } from './SidebarTree';
 import { SpaceSwitcher } from './SpaceSwitcher';
-
-function Logo() {
-  return (
-    <svg viewBox="0 0 32 32" className="size-[22px]" aria-hidden>
-      <rect width="32" height="32" rx="9" fill="var(--surface-active)" />
-      <path
-        d="M9.5 10l6.5 13 6.5-13"
-        fill="none"
-        stroke="var(--accent)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 function ResizeHandle({ onResize }: { onResize: (width: number | null) => void }) {
   const start = useRef<{ x: number; width: number } | null>(null);
@@ -77,7 +62,7 @@ function ResizeHandle({ onResize }: { onResize: (width: number | null) => void }
       }}
       className="group absolute inset-y-0 -right-1.5 z-10 flex w-3 cursor-col-resize justify-center outline-none"
     >
-      <span className="h-full w-[2px] rounded-full transition-ui group-hover:bg-accent/50 group-focus-visible:bg-accent/70 group-active:bg-accent" />
+      <span className="h-full w-[2px] rounded-full transition-ui group-hover:bg-focus/45 group-focus-visible:bg-focus/70 group-active:bg-focus" />
     </div>
   );
 }
@@ -106,9 +91,9 @@ export function Sidebar() {
       style={{ width }}
     >
       <SidebarDnd spaceId={space.id}>
-        <div className="flex h-11 items-center gap-2 pl-3.5 pr-1.5">
-          <Logo />
-          <span className="flex-1 text-[14px] font-semibold tracking-tight">Vela</span>
+        <div className="flex h-12 items-center gap-2.5 pl-3.5 pr-1.5">
+          <PortLogo size={24} />
+          <span className="flex-1 text-[15px] font-semibold tracking-[-0.01em] text-fg">Port</span>
           <IconButton
             icon={Search}
             label="Command palette"
@@ -122,14 +107,17 @@ export function Sidebar() {
         </div>
 
         <div className="flex items-center gap-2 px-3.5 pb-1 pt-1">
-          <EntityIcon
-            name={space.icon}
-            size={14}
-            style={{ color: ACCENTS[space.accent].value }}
-            strokeWidth={2.2}
-          />
+          <span
+            className="flex size-5 items-center justify-center rounded-md"
+            style={{
+              color: ACCENTS[space.accent].value,
+              background: `color-mix(in oklab, ${ACCENTS[space.accent].value} 16%, transparent)`,
+            }}
+          >
+            <EntityIcon name={space.icon} size={12} strokeWidth={2.3} />
+          </span>
           <h2
-            className="min-w-0 flex-1 truncate text-[13px] font-semibold"
+            className="min-w-0 flex-1 truncate text-[13.5px] font-semibold text-fg"
             onContextMenu={(e) => showContextMenu(e, buildSpaceMenu(space.id))}
           >
             {space.name}
@@ -146,7 +134,7 @@ export function Sidebar() {
           <button
             type="button"
             onClick={() => nav.newTab()}
-            className="flex h-row items-center gap-2 rounded-md px-2 text-[13px] text-fg-2 transition-ui hover:bg-hover hover:text-fg"
+            className="flex h-row items-center gap-2 rounded-lg px-2 text-[13px] text-fg-2 transition-ui hover:bg-hover hover:text-fg"
           >
             <Plus size={15} strokeWidth={2} className="text-fg-3" />
             <span className="flex-1 text-left">New tab</span>
@@ -160,8 +148,8 @@ export function Sidebar() {
               showStart();
             }}
             className={cn(
-              'flex h-row items-center gap-2 rounded-md px-2 text-[13px] transition-ui',
-              startActive ? 'bg-active text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+              'flex h-row items-center gap-2 rounded-lg px-2 text-[13px] transition-ui',
+              startActive ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
             )}
           >
             <Compass
@@ -173,7 +161,7 @@ export function Sidebar() {
           </button>
         </div>
 
-        <div className="mx-3 h-px bg-line" />
+        <div className="mx-3.5 h-px bg-line" />
 
         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2.5 pb-4 pt-3">
           <SidebarTree spaceId={space.id} />
@@ -186,14 +174,14 @@ export function Sidebar() {
         </div>
       </SidebarDnd>
 
-      <div className="flex items-center gap-1 border-t border-line px-2 py-1.5">
+      <div className="flex items-center gap-1 border-t border-line px-2.5 py-2">
         <button
           type="button"
           onClick={() => setSettingsOpen(!settingsOpen)}
           aria-pressed={settingsOpen}
           className={cn(
-            'flex h-8 flex-1 items-center gap-2 rounded-md px-2 text-[13px] transition-ui',
-            settingsOpen ? 'bg-active text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+            'flex h-8 flex-1 items-center gap-2 rounded-lg px-2 text-[13px] transition-ui',
+            settingsOpen ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
           )}
         >
           <Settings size={15} strokeWidth={1.9} />
@@ -201,8 +189,12 @@ export function Sidebar() {
         </button>
         <span
           title={`Browser host: ${host.label}`}
-          className="rounded-md border border-line px-1.5 py-0.5 text-[10.5px] text-fg-3"
+          className="flex items-center gap-1.5 rounded-md border border-line px-1.5 py-0.5 text-[10.5px] text-fg-3"
         >
+          <span
+            aria-hidden
+            className={cn('size-1.5 rounded-full', host.kind === 'web' ? 'bg-hint' : 'bg-dev')}
+          />
           {host.kind === 'web' ? 'Web preview' : 'Native'}
         </span>
       </div>

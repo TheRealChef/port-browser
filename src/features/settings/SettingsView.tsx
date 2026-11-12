@@ -73,7 +73,7 @@ function Segmented<T extends string>({
           onClick={() => onChange(o.value)}
           className={cn(
             'h-7 rounded-md px-3 text-[12.5px] transition-ui',
-            value === o.value ? 'bg-active text-fg shadow-card' : 'text-fg-2 hover:text-fg',
+            value === o.value ? 'bg-elevated text-fg shadow-lift' : 'text-fg-2 hover:text-fg',
           )}
         >
           {o.label}
@@ -101,7 +101,7 @@ function Toggle({
       onClick={() => onChange(!checked)}
       className={cn(
         'relative h-5 w-9 rounded-full transition-ui',
-        checked ? 'bg-accent' : 'bg-hover',
+        checked ? 'bg-brand' : 'bg-elevated',
       )}
     >
       <span
@@ -115,7 +115,7 @@ function Toggle({
 }
 
 const selectClass =
-  'h-8 rounded-md border border-line-strong bg-surface px-2 text-[13px] text-fg outline-none focus:border-accent';
+  'h-8 rounded-md border border-line-strong bg-surface px-2 text-[13px] text-fg outline-none focus:border-focus/80 focus:shadow-[0_0_0_3px_var(--focus-soft)]';
 
 const SHORTCUTS: Array<{ keys: string; action: string; note?: string }> = [
   { keys: `${MOD_LABEL}+L`, action: 'Focus address bar' },
@@ -212,7 +212,7 @@ export function SettingsView() {
               step={4}
               value={settings.sidebarWidth}
               onChange={(e) => settings.setSidebarWidth(Number(e.target.value))}
-              className="w-48 accent-[var(--accent)]"
+              className="w-48 accent-[var(--brand)]"
             />
           </Row>
           <Row label="Show sidebar" hint={`${MOD_LABEL}+B toggles it from anywhere.`}>
@@ -225,7 +225,7 @@ export function SettingsView() {
         </Section>
 
         <Section title="Spaces & startup">
-          <Row label="Default space" hint="Used when Vela starts on the default space.">
+          <Row label="Default space" hint="Used when Port starts on the default space.">
             <select
               aria-label="Default space"
               className={selectClass}

@@ -16,7 +16,7 @@ export function AppShell() {
   const collapsed = useSettings((s) => s.sidebarCollapsed);
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-canvas text-fg">
+    <div className="flex h-full w-full overflow-hidden bg-chrome text-fg">
       <Sidebar />
       <div className={cn('flex min-w-0 flex-1 flex-col pb-2 pr-2', collapsed ? 'pl-2' : 'pl-0.5')}>
         <TopBar />

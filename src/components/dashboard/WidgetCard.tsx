@@ -136,6 +136,8 @@ export function WidgetCard({ dashboard, widget }: { dashboard: Dashboard; widget
       <Card
         title={widget.title}
         icon={meta.icon}
+        tone={meta.tone}
+        variant={meta.variant}
         className="h-full"
         actions={
           <div className="flex items-center">

@@ -24,7 +24,7 @@ export function ToastHost() {
       key={toast.id}
       role="status"
       aria-live="polite"
-      className="fixed bottom-5 left-1/2 z-[110] flex max-w-[min(480px,90vw)] -translate-x-1/2 animate-pop items-center gap-2 rounded-lg bg-raised py-2 pl-3 pr-2 text-[13px] text-fg shadow-pop"
+      className="fixed bottom-5 left-1/2 z-[110] flex max-w-[min(480px,90vw)] -translate-x-1/2 animate-pop items-center gap-2 rounded-xl bg-elevated py-2 pl-3 pr-2 text-[13px] text-fg shadow-pop"
     >
       <Icon
         size={15}
@@ -32,7 +32,7 @@ export function ToastHost() {
           'shrink-0',
           toast.tone === 'success' && 'text-success',
           toast.tone === 'error' && 'text-danger',
-          toast.tone === 'info' && 'text-accent',
+          toast.tone === 'info' && 'text-info',
         )}
       />
       <span className="truncate">{toast.message}</span>
@@ -44,7 +44,7 @@ export function ToastHost() {
             dismiss();
             run?.();
           }}
-          className="ml-1 shrink-0 rounded-md px-2 py-0.5 font-medium text-accent transition-ui hover:bg-hover"
+          className="ml-1 shrink-0 rounded-md px-2 py-0.5 font-medium text-brand transition-ui hover:bg-hover"
         >
           {toast.action.label}
         </button>

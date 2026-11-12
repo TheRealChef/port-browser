@@ -38,8 +38,8 @@ export function FolderTree({ spaceId, currentId }: FolderTreeProps) {
         onClick={() => showBookmarks(null, spaceId)}
         className={cn(
           'flex h-8 items-center gap-2 rounded-md px-2 text-left text-[13px] transition-ui',
-          currentId === null ? 'bg-active text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
-          rootOver && 'bg-[var(--accent-soft)] ring-1 ring-[var(--accent-ring)]',
+          currentId === null ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+          rootOver && 'bg-drop-soft ring-1 ring-[var(--focus-ring)]',
         )}
       >
         <Library size={15} className="shrink-0 text-accent" />
@@ -130,17 +130,17 @@ function TreeRow({ folder, ...props }: LevelProps & { folder: BookmarkFolder }) 
         style={{ paddingLeft: 4 + depth * 14 }}
         className={cn(
           'group/row relative flex h-8 cursor-default select-none items-center gap-1.5 rounded-md pr-2 text-[13px] outline-none transition-ui',
-          'focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)]',
-          active ? 'bg-active text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+          'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+          active ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
           drag.isDragging && 'opacity-40',
-          zone === 'into' && 'bg-[var(--accent-soft)] ring-1 ring-[var(--accent-ring)]',
+          zone === 'into' && 'bg-drop-soft ring-1 ring-[var(--focus-ring)]',
         )}
       >
         {zone && zone !== 'into' && (
           <span
             aria-hidden
             className={cn(
-              'pointer-events-none absolute right-1 h-0.5 rounded-full bg-accent',
+              'pointer-events-none absolute right-1 h-0.5 rounded-full bg-drop',
               zone === 'before' ? '-top-px' : '-bottom-px',
             )}
             style={{ left: 8 + depth * 14 }}

@@ -67,7 +67,7 @@ function FramePreview({ tab, local, forced }: { tab: Tab; local: boolean; forced
       <div className="relative flex h-8 shrink-0 items-center gap-2 border-b border-line bg-raised/60 px-3 text-[12px] text-fg-3">
         {state === 'loading' && (
           <div className="absolute inset-x-0 top-0 h-[2px] overflow-hidden">
-            <div className="h-full w-2/5 animate-progress bg-accent" />
+            <div className="h-full w-2/5 animate-progress bg-info" />
           </div>
         )}
         {state === 'slow' ? (
@@ -127,7 +127,7 @@ function EmbedFallback({ tab, reason }: { tab: Tab; reason: string }) {
         <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-line bg-raised/70 p-3 text-left text-[12.5px] leading-relaxed text-fg-2">
           <ShieldAlert size={16} className="mt-0.5 shrink-0 text-warning" />
           <span>
-            {reason} Vela’s development build runs inside your browser and cannot override that, so
+            {reason} Port’s development build runs inside your browser and cannot override that, so
             this page opens in a regular browser tab instead.
           </span>
         </div>

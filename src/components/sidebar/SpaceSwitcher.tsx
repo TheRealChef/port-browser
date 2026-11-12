@@ -43,14 +43,15 @@ function SpaceButton({ space, index, active }: { space: Space; index: number; ac
         onContextMenu={(e) => showContextMenu(e, buildSpaceMenu(space.id))}
         className={cn(
           'relative flex h-8 min-w-8 flex-1 items-center justify-center rounded-lg transition-ui',
-          active ? 'bg-active' : 'text-fg-3 hover:bg-hover hover:text-fg-2',
-          isDropTarget && 'ring-2 ring-[var(--accent-ring)]',
+          active ? 'shadow-lift' : 'text-fg-3 hover:bg-hover hover:text-fg-2',
+          isDropTarget && 'ring-2 ring-[var(--focus-ring)]',
           isDragging && 'opacity-40',
         )}
         style={{
           transform: CSS.Translate.toString(transform),
           transition,
           color: active || isDropTarget ? color : undefined,
+          background: active ? `color-mix(in oklab, ${color} 17%, var(--surface))` : undefined,
         }}
       >
         <EntityIcon name={space.icon} size={16} strokeWidth={2} />
@@ -73,7 +74,7 @@ export function SpaceSwitcher() {
   return (
     <nav
       aria-label="Spaces"
-      className="flex items-center gap-1 rounded-xl border border-line bg-surface/50 p-1"
+      className="flex items-center gap-1 rounded-xl border border-line bg-canvas/55 p-1"
     >
       <SortableContext
         items={list.map((sp) => `space:${sp.id}`)}

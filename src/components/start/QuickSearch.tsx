@@ -62,7 +62,7 @@ export function QuickSearch({ spaceId, autoFocus }: { spaceId: ID; autoFocus?: b
 
   return (
     <div className="relative">
-      <div className="flex h-11 items-center gap-2.5 rounded-xl border border-line-strong bg-raised px-3.5 shadow-card transition-ui focus-within:border-accent/60 focus-within:shadow-[0_0_0_3px_var(--accent-soft)]">
+      <div className="flex h-11 items-center gap-2.5 rounded-xl border border-line-strong bg-surface px-3.5 shadow-card transition-ui focus-within:border-focus/80 focus-within:shadow-[0_0_0_3px_var(--focus-soft)]">
         <Search size={16} className="shrink-0 text-fg-3" />
         <input
           autoFocus={autoFocus}

@@ -32,14 +32,14 @@ import {
 import type { AccentColor } from '../../types/models';
 
 export const ACCENTS: Record<AccentColor, { label: string; value: string }> = {
-  violet: { label: 'Violet', value: '#a78bfa' },
-  blue: { label: 'Blue', value: '#7aa2f7' },
-  teal: { label: 'Teal', value: '#4fd1c5' },
-  green: { label: 'Green', value: '#5bc69d' },
-  amber: { label: 'Amber', value: '#e6ae68' },
-  orange: { label: 'Orange', value: '#f0956a' },
-  rose: { label: 'Rose', value: '#f08ba0' },
-  slate: { label: 'Slate', value: '#a3a9bd' },
+  violet: { label: 'Mauve', value: 'var(--tone-violet)' },
+  blue: { label: 'Steel blue', value: 'var(--tone-blue)' },
+  teal: { label: 'Teal', value: 'var(--tone-teal)' },
+  green: { label: 'Sage', value: 'var(--tone-green)' },
+  amber: { label: 'Amber', value: 'var(--tone-amber)' },
+  orange: { label: 'Clay', value: 'var(--tone-orange)' },
+  rose: { label: 'Rose', value: 'var(--tone-rose)' },
+  slate: { label: 'Stone', value: 'var(--tone-slate)' },
 };
 
 export const ICONS: Record<string, LucideIcon> = {

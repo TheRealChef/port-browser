@@ -85,7 +85,7 @@ export function BookmarkTile({ bookmark, size, layout, path, sortable }: Bookmar
       }}
       className={cn(
         'group/tile relative cursor-default select-none outline-none transition-ui',
-        'focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)]',
+        'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
         isDragging && 'z-10 opacity-40',
         layout === 'list'
           ? 'flex h-10 items-center gap-3 rounded-lg px-3 hover:bg-hover'

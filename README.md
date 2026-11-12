@@ -1,4 +1,4 @@
-# Vela
+# Port
 
 A workspace-oriented browser interface built around **Spaces → Groups → Tabs and Dashboards**.
 
@@ -57,13 +57,34 @@ On a focused sidebar tab: `Enter` opens it, `F2` renames it, `Delete` closes it,
 
 Chrome and Edge reserve `Ctrl+T`, `Ctrl+W` and `Ctrl+N`, so a web page never receives them. Use the `Alt` variants in the dev build. Shortcuts also don't fire while focus is inside an embedded page's iframe. Single-key shortcuts never fire while you are typing in a text field.
 
+## Design system: Mineral Slate
+
+Every color comes from `src/styles/index.css`, which has two layers:
+
+1. **Palette** (`--port-*`): neutral slate surfaces (canvas `#111619`, sidebar `#1A2226`, surface `#242D32`, elevated `#303A40`, border `#465057`), ivory/stone text, and the mineral accents sage, clay, steel blue, amber, mauve, teal and rose.
+2. **Semantic roles**, exposed to Tailwind as colors (`bg-brand`, `text-focus`, `bg-selected`, `bg-drop-soft`, `text-hint`, …). Components only use roles, so a light theme only needs to redefine these two layers.
+
+| Role           | Color                                    | Used for                                                                          |
+| -------------- | ---------------------------------------- | --------------------------------------------------------------------------------- |
+| Brand          | Sage                                     | Primary buttons, toggles, the Port mark                                           |
+| Space accent   | per space (Work = sage, Personal = clay) | Selected rows, active tab bar, space icons, hero ridge                            |
+| Focus / drop   | Steel blue                               | Focus rings, address and search fields, keyboard selection, drag-and-drop targets |
+| Hint / warning | Amber                                    | Tips, quick actions, bookmarked star                                              |
+| Category       | Mauve                                    | Bookmark folders (collections), bookmarks widget                                  |
+| Development    | Teal                                     | Technical status (native host indicator)                                          |
+| Danger         | Rose                                     | Errors and destructive actions                                                    |
+
+The chrome (sidebar and toolbar) is slate and the content sits in a charcoal "well" where cards rest as surfaces. `Card` has five variants (`neutral`, `elevated`, `accent`, `interactive`, `status`) plus a `tone`; dashboard widgets each get a tone from `widgetMeta.ts`. `MineralBackdrop` draws the layered ridge artwork used on the start page and dashboard headers. Radii are 6px for small controls, 8px for inputs and rows, 12px for cards and 16px for dialogs, menus use 12px. Motion is 140ms by default and is disabled by the reduced-motion setting or the OS preference.
+
+The accent keys stored in your data (`violet`, `blue`, …) are unchanged and map to Mauve, Steel blue, Teal, Sage, Amber, Clay, Rose and Stone. Workspace schema v3 moves the seeded Work and Personal spaces to sage and clay if they still had their old default colors. Storage keys and the export format keep the `vela` identifier so existing data and exports still load.
+
 ## Known limitations of the web build
 
-These are limits of running inside a normal browser tab. Vela states them in the UI rather than hiding them.
+These are limits of running inside a normal browser tab. Port states them in the UI rather than hiding them.
 
-- **Embedding.** Pages are shown in a sandboxed `<iframe>` only as a preview. Many sites send `X-Frame-Options` or CSP `frame-ancestors` headers that forbid this. For well-known sites that do (`src/host/embedPolicy.ts`), Vela skips the attempt and shows a fallback with **Open in browser**. Other sites are attempted with a visible note that they may refuse. An iframe `load` event does not prove the page rendered, so Vela never reports a page as "supported" because of it. Vela does not use a proxy or scraping to get around these restrictions.
-- **History.** Cross-origin iframe history can't be observed. Back and forward follow Vela's own per-tab history of the addresses you navigated to. Clicks inside an embedded page are not tracked.
-- **Background tabs.** Only the visible tab is mounted. Inactive tabs and spaces keep their state (URL, title, history, position), but their pages are not kept running. Vela does not fake background playback.
+- **Embedding.** Pages are shown in a sandboxed `<iframe>` only as a preview. Many sites send `X-Frame-Options` or CSP `frame-ancestors` headers that forbid this. For well-known sites that do (`src/host/embedPolicy.ts`), Port skips the attempt and shows a fallback with **Open in browser**. Other sites are attempted with a visible note that they may refuse. An iframe `load` event does not prove the page rendered, so Port never reports a page as "supported" because of it. Port does not use a proxy or scraping to get around these restrictions.
+- **History.** Cross-origin iframe history can't be observed. Back and forward follow Port's own per-tab history of the addresses you navigated to. Clicks inside an embedded page are not tracked.
+- **Background tabs.** Only the visible tab is mounted. Inactive tabs and spaces keep their state (URL, title, history, position), but their pages are not kept running. Port does not fake background playback.
 - **Titles and favicons.** Cross-origin page titles can't be read. Titles come from the hostname, or from your rename. Favicons are loaded from `<origin>/favicon.ico`, with a letter tile as fallback. Local URLs are not probed.
 
 ## Architecture
@@ -119,7 +140,7 @@ interface BrowserHost {
 1. Wrap this UI in a native shell (for example WinUI 3 or WPF with WebView2) that loads the built `dist/` as the chrome UI.
 2. Have the shell own one WebView2 controller per tab, positioned over the content area's bounds. The bounds are reported from the UI over `window.chrome.webview.postMessage`.
 3. Implement `NativeBrowserHost` by forwarding `navigate`, `reload`, `goBack`, `goForward` and `disposeTab` as bridge messages. Return `{ mode: 'native' }` from `getEmbedSupport`, so `TabView` renders a placeholder slot instead of an iframe.
-4. Feed engine events (`NavigationCompleted`, `DocumentTitleChanged`, `FaviconChanged`, history changes) back into `workspaceStore` (`recordNavigation`, title and favicon updates). This replaces Vela-managed history with `engineHistory: true`.
+4. Feed engine events (`NavigationCompleted`, `DocumentTitleChanged`, `FaviconChanged`, history changes) back into `workspaceStore` (`recordNavigation`, title and favicon updates). This replaces Port-managed history with `engineHistory: true`.
 5. Keep WebView2 instances alive for inactive tabs and spaces (`persistentBackgroundTabs: true`), optionally with one WebView2 profile per space for cookie isolation.
 6. Choose the host in `src/host/createHost.ts` by detecting the bridge.
 

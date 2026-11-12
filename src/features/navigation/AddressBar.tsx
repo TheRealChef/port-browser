@@ -30,6 +30,7 @@ export function AddressBar() {
   const setSuggestionsOpen = useUI((s) => s.setSuggestionsOpen);
   const engine = useSettings((s) => s.searchEngine);
   const input = useRef<HTMLInputElement>(null);
+  const keepSelectionOnMouseUp = useRef(false);
   const [draft, setDraft] = useState<string | null>(null);
   const [highlight, setHighlight] = useState(0);
 
@@ -91,10 +92,10 @@ export function AddressBar() {
     <div className="relative flex min-w-0 flex-1">
       <div
         className={cn(
-          'group flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-lg border bg-surface pl-2.5 pr-1 transition-ui',
+          'group flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-lg border pl-2.5 pr-1 transition-ui',
           draft !== null
-            ? 'border-accent/60 bg-raised shadow-[0_0_0_3px_var(--accent-soft)]'
-            : 'border-line hover:border-line-strong',
+            ? 'border-focus/80 bg-surface shadow-[0_0_0_3px_var(--focus-soft)]'
+            : 'border-transparent bg-canvas/70 hover:border-line hover:bg-canvas',
         )}
       >
         <LeadIcon size={14} className="shrink-0 text-fg-3" strokeWidth={2} />
@@ -110,9 +111,18 @@ export function AddressBar() {
           placeholder={`Search or enter address  ·  ${MOD_LABEL}+L`}
           className="h-full min-w-0 flex-1 bg-transparent text-[13px] text-fg outline-none placeholder:text-fg-3"
           value={draft ?? url}
+          onMouseDown={(e) => {
+            // A click that focuses the field should keep the select-all from onFocus.
+            keepSelectionOnMouseUp.current = document.activeElement !== e.currentTarget;
+          }}
+          onMouseUp={(e) => {
+            if (keepSelectionOnMouseUp.current) e.preventDefault();
+            keepSelectionOnMouseUp.current = false;
+          }}
           onFocus={(e) => {
             setDraft(url);
-            requestAnimationFrame(() => e.target.select());
+            // Select synchronously: deferring it lets fast typing after Ctrl+L be overwritten.
+            e.target.select();
           }}
           onBlur={() => {
             setDraft(null);
@@ -149,7 +159,7 @@ export function AddressBar() {
               size="sm"
               icon={Star}
               label={bookmark ? 'Remove bookmark' : 'Bookmark this page'}
-              className={bookmark ? 'text-accent [&_svg]:fill-current' : undefined}
+              className={bookmark ? 'text-hint [&_svg]:fill-current' : undefined}
               onClick={() => {
                 if (bookmark) {
                   removeBookmarkWithUndo(bookmark.id);
@@ -180,7 +190,7 @@ export function AddressBar() {
         <ul
           id="address-suggestions"
           role="listbox"
-          className="absolute inset-x-0 top-[calc(100%+4px)] z-[80] animate-pop rounded-lg bg-raised p-1 shadow-pop"
+          className="absolute inset-x-0 top-[calc(100%+4px)] z-[80] animate-pop rounded-xl bg-elevated p-1 shadow-pop"
           onMouseDown={(e) => e.preventDefault()}
         >
           {suggestions.map((s, i) => (
@@ -220,16 +230,16 @@ export function AddressBar() {
 function SuggestionIcon({ suggestion }: { suggestion: Suggestion }) {
   switch (suggestion.kind) {
     case 'go':
-      return <ArrowRight size={15} className="shrink-0 text-accent" />;
+      return <ArrowRight size={15} className="shrink-0 text-focus" />;
     case 'search':
-      return <Search size={15} className="shrink-0 text-accent" />;
+      return <Search size={15} className="shrink-0 text-focus" />;
     case 'tab':
       return (
         <span className="relative shrink-0">
           <Favicon url={suggestion.url} />
           <AppWindow
             size={9}
-            className="absolute -bottom-1 -right-1 rounded-sm bg-raised text-fg-2"
+            className="absolute -bottom-1 -right-1 rounded-sm bg-elevated text-fg-2"
           />
         </span>
       );

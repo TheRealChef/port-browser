@@ -51,7 +51,7 @@ export function Dialog({ title, onClose, children, footer, width = 'sm' }: Dialo
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[95] flex animate-fade items-start justify-center bg-black/50 px-4 pt-[14vh] backdrop-blur-[2px]"
+      className="fixed inset-0 z-[95] flex animate-fade items-start justify-center bg-[rgb(6_10_12/0.55)] px-4 pt-[14vh]"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -63,14 +63,14 @@ export function Dialog({ title, onClose, children, footer, width = 'sm' }: Dialo
         aria-label={title}
         onKeyDown={onKeyDown}
         className={cn(
-          'w-full animate-pop rounded-xl border border-line-strong bg-raised shadow-pop',
+          'w-full animate-pop rounded-2xl bg-elevated shadow-pop',
           width === 'sm' && 'max-w-[400px]',
           width === 'md' && 'max-w-[520px]',
           width === 'lg' && 'max-w-[680px]',
         )}
       >
-        <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
-          <h2 className="text-[14px] font-semibold text-fg">{title}</h2>
+        <div className="flex items-center justify-between px-5 pb-1 pt-4">
+          <h2 className="text-[15px] font-semibold tracking-tight text-fg">{title}</h2>
           <button
             type="button"
             aria-label="Close"
@@ -80,9 +80,11 @@ export function Dialog({ title, onClose, children, footer, width = 'sm' }: Dialo
             <X size={14} />
           </button>
         </div>
-        <div className="px-4 pb-4 pt-2">{children}</div>
+        <div className="px-5 pb-5 pt-2">{children}</div>
         {footer && (
-          <div className="flex justify-end gap-2 border-t border-line px-4 py-3">{footer}</div>
+          <div className="flex justify-end gap-2 rounded-b-2xl border-t border-line bg-surface/60 px-5 py-3">
+            {footer}
+          </div>
         )}
       </div>
     </div>,

@@ -124,6 +124,16 @@ describe('bookmark folders', () => {
 });
 
 describe('persistence of folders', () => {
+  it('moves seeded spaces to their Mineral Slate colors only when unchanged', () => {
+    const data = createDefaultWorkspace();
+    const [work, personal] = sortedSpaces(data.spaces);
+    work!.accent = 'violet'; // old default
+    personal!.accent = 'rose'; // user's own choice
+    const migrated = migrateWorkspace(JSON.parse(JSON.stringify(data)), 2) as typeof data;
+    expect(migrated.spaces[work!.id]?.accent).toBe('green');
+    expect(migrated.spaces[personal!.id]?.accent).toBe('rose');
+  });
+
   it('migrates v1 data by adding an empty folder table', () => {
     const v1 = { ...createDefaultWorkspace(), bookmarkFolders: undefined };
     const migrated = migrateWorkspace(v1, 1) as Record<string, unknown>;

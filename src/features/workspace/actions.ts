@@ -20,7 +20,7 @@ export async function createSpaceFlow(): Promise<void> {
     initial: {
       name: '',
       icon: 'star',
-      accent: ACCENT_COLORS[(count + 2) % ACCENT_COLORS.length] ?? 'violet',
+      accent: ACCENT_COLORS[(count + 7) % ACCENT_COLORS.length] ?? 'blue',
     },
   });
   if (!result) return;

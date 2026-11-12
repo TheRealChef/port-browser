@@ -39,9 +39,9 @@ export function BookmarkList({ spaceId }: { spaceId: ID }) {
 
   const rowClass = (active: boolean) =>
     cn(
-      'flex h-row w-full items-center gap-2 rounded-md px-2 text-left text-[13px] outline-none transition-ui',
-      'focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)]',
-      active ? 'bg-active text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+      'flex h-row w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] outline-none transition-ui',
+      'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+      active ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
     );
 
   return (

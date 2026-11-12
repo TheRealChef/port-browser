@@ -6,6 +6,7 @@ import {
   FolderPlus,
   LayoutDashboard,
   Layers,
+  Lightbulb,
   Plus,
   Star,
   Zap,
@@ -34,6 +35,7 @@ import { MOD_LABEL, relativeTime } from '../../utils/misc';
 import { Card, EmptyHint } from '../common/Card';
 import { Favicon } from '../common/Favicon';
 import { Kbd } from '../common/Kbd';
+import { MineralBackdrop } from '../common/MineralBackdrop';
 import { LinkRow } from '../common/LinkRow';
 import { showContextMenu } from '../common/menu';
 import { QuickSearch } from './QuickSearch';
@@ -79,21 +81,23 @@ export function StartPage() {
   ];
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="mx-auto flex max-w-[1080px] flex-col gap-6 px-8 pb-12 pt-12">
+    <div className="relative h-full overflow-y-auto">
+      <MineralBackdrop className="h-[300px]" />
+      <div className="relative mx-auto flex max-w-[1080px] flex-col gap-6 px-8 pb-12 pt-14">
         <header className="flex items-center gap-4">
           <span
-            className="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-line"
+            className="flex size-12 shrink-0 items-center justify-center rounded-2xl border shadow-card"
             style={{
               color: accent,
-              background: `color-mix(in oklab, ${accent} 14%, var(--surface-raised))`,
+              borderColor: `color-mix(in oklab, ${accent} 32%, var(--border))`,
+              background: `color-mix(in oklab, ${accent} 15%, var(--surface))`,
             }}
           >
             <EntityIcon name={space.icon} size={22} strokeWidth={1.9} />
           </span>
           <div className="min-w-0">
-            <h1 className="truncate text-[22px] font-semibold tracking-tight">{space.name}</h1>
-            <p className="text-[12.5px] text-fg-3">
+            <h1 className="truncate text-[26px] font-semibold tracking-[-0.02em]">{space.name}</h1>
+            <p className="tabular text-[12.5px] text-fg-2">
               {new Date().toLocaleDateString(undefined, {
                 weekday: 'long',
                 month: 'long',
@@ -106,10 +110,17 @@ export function StartPage() {
         </header>
 
         <QuickSearch spaceId={spaceId} autoFocus={!isBlankTab} />
+        <p className="-mt-3 flex items-center gap-1.5 px-1 text-[12px] text-fg-3">
+          <Lightbulb size={13} className="text-hint" strokeWidth={2} />
+          Press <Kbd>{MOD_LABEL}+K</Kbd> to jump to any tab, group, folder or bookmark across
+          spaces.
+        </p>
 
         <Card
           title="Pinned sites"
           icon={Star}
+          tone={accent}
+          variant="accent"
           actions={
             <div className="flex items-center">
               <button
@@ -180,7 +191,7 @@ export function StartPage() {
         </Card>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Card title="Recent tabs" icon={Clock}>
+          <Card title="Recent tabs" icon={Clock} tone="var(--info)">
             {recent.length === 0 ? (
               <EmptyHint>Tabs you open in this space will show up here.</EmptyHint>
             ) : (
@@ -200,6 +211,7 @@ export function StartPage() {
           <Card
             title="Groups"
             icon={Layers}
+            tone="var(--category)"
             actions={
               <button
                 type="button"
@@ -254,7 +266,7 @@ export function StartPage() {
           </Card>
         </div>
 
-        <Card title="Quick actions" icon={Zap}>
+        <Card title="Quick actions" icon={Zap} tone="var(--hint)" variant="accent">
           <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-5">
             {quickActions.map(({ label, icon: Icon, hint, run }) => (
               <button
@@ -263,7 +275,7 @@ export function StartPage() {
                 onClick={run}
                 className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] text-fg-2 transition-ui hover:bg-hover hover:text-fg"
               >
-                <Icon size={15} className="shrink-0 text-accent" strokeWidth={2} />
+                <Icon size={15} className="shrink-0 text-hint" strokeWidth={2} />
                 <span className="flex-1 truncate">{label}</span>
                 {hint && <Kbd>{hint}</Kbd>}
               </button>

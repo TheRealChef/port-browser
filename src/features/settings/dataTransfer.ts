@@ -13,7 +13,7 @@ export function exportConfiguration(): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `vela-config-${new Date().toISOString().slice(0, 10)}.json`;
+  link.download = `port-config-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   toast('Configuration exported', 'success');
@@ -23,7 +23,7 @@ const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
 export async function importConfiguration(file: File): Promise<void> {
   if (file.size > MAX_IMPORT_BYTES) {
-    toast('That file is too large to be a Vela configuration.', 'error');
+    toast('That file is too large to be a Port configuration.', 'error');
     return;
   }
   const result = parseImport(await file.text());
@@ -55,7 +55,7 @@ export async function importConfiguration(file: File): Promise<void> {
 
 export async function resetApplicationData(): Promise<void> {
   const { ok } = await askConfirm({
-    title: 'Reset all Vela data?',
+    title: 'Reset all Port data?',
     message:
       'All spaces, groups, tabs, dashboards, bookmarks and settings will be replaced by the defaults. Consider exporting first. This cannot be undone.',
     confirmLabel: 'Reset everything',
@@ -65,5 +65,5 @@ export async function resetApplicationData(): Promise<void> {
   useWorkspace.getState().reset();
   useSettings.getState().reset();
   useUI.getState().setSettingsOpen(false);
-  toast('Vela was reset to defaults');
+  toast('Port was reset to defaults');
 }

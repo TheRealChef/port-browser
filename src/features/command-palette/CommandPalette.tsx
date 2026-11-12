@@ -327,7 +327,7 @@ function Palette() {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="flex max-h-[min(560px,72vh)] w-full max-w-[600px] animate-pop flex-col overflow-hidden rounded-xl border border-line-strong bg-raised shadow-pop"
+        className="flex max-h-[min(560px,72vh)] w-full max-w-[600px] animate-pop flex-col overflow-hidden rounded-2xl bg-elevated shadow-pop"
       >
         <div className="flex h-12 shrink-0 items-center gap-2.5 border-b border-line px-4">
           <Search size={16} className="text-fg-3" />

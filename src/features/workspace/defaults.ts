@@ -39,7 +39,7 @@ const SEED: SeedSpace[] = [
   {
     name: 'Work',
     icon: 'briefcase',
-    accent: 'violet',
+    accent: 'green',
     groups: [
       {
         name: 'Documentation',
@@ -123,7 +123,7 @@ const SEED: SeedSpace[] = [
   {
     name: 'Personal',
     icon: 'home',
-    accent: 'teal',
+    accent: 'orange',
     groups: [
       {
         name: 'Entertainment',

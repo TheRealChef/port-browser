@@ -123,7 +123,7 @@ export async function createFolderFlow(parentId: ID | null, spaceId?: ID): Promi
   const result = await askEntity({
     title: parentId ? `New folder in “${folderLabel(parentId)}”` : 'New folder',
     submitLabel: 'Create folder',
-    initial: { name: '', icon: 'folder', accent: 'slate' },
+    initial: { name: '', icon: 'folder', accent: 'violet' },
   });
   if (!result) return null;
   return ws().createFolder({ ...result, parentId, spaceId });
