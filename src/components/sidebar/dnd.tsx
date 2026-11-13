@@ -213,7 +213,7 @@ function DragPreview({ data }: { data: DragData | null }) {
   if (tab) {
     return (
       <div className="flex h-row w-[220px] items-center gap-2 rounded-lg bg-elevated px-2 text-[13px] shadow-pop">
-        <Favicon url={tab.url} />
+        <Favicon url={tab.url} icon={tab.favicon} />
         <span className="truncate">{tabDisplayTitle(tab)}</span>
       </div>
     );

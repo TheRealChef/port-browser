@@ -24,15 +24,19 @@ function letterColor(seed: string): string {
 
 export function Favicon({
   url,
+  icon,
   size = 16,
   className,
 }: {
   url: string;
+  /** Icon URL reported by the browser engine, preferred over guessing. */
+  icon?: string | null;
   size?: number;
   className?: string;
 }) {
   // Local dev servers are often not running; don't probe them for icons.
-  const src = url && !isLocalUrl(url) ? faviconCandidate(url) : null;
+  const guess = url && !isLocalUrl(url) ? faviconCandidate(url) : null;
+  const src = icon && url && !failed.has(icon) ? icon : guess;
   const [errorSrc, setErrorSrc] = useState<string | null>(null);
   const box = { width: size, height: size };
 

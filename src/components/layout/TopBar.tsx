@@ -8,7 +8,7 @@ import {
   Search,
   Settings,
 } from 'lucide-react';
-import { useNavigation } from '../../app/providers/hostContext';
+import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
 import { AddressBar } from '../../features/navigation/AddressBar';
 import { activeTab } from '../../features/workspace/selectors';
 import { useSettings } from '../../stores/settingsStore';
@@ -26,8 +26,14 @@ export function TopBar() {
   const setSettingsOpen = useUI((s) => s.setSettingsOpen);
   const setPaletteOpen = useUI((s) => s.setPaletteOpen);
 
-  const canGoBack = Boolean(tab && tab.historyIndex > 0);
-  const canGoForward = Boolean(tab && tab.historyIndex < tab.history.length - 1);
+  const host = useBrowserHost();
+  const engine = useUI((s) => (tab ? s.engineTabs[tab.id] : undefined));
+  const canGoBack = host.capabilities.engineHistory
+    ? Boolean(engine?.canGoBack)
+    : Boolean(tab && tab.historyIndex > 0);
+  const canGoForward = host.capabilities.engineHistory
+    ? Boolean(engine?.canGoForward)
+    : Boolean(tab && tab.historyIndex < tab.history.length - 1);
 
   return (
     <header className="flex h-11 shrink-0 items-center gap-1 px-1.5">

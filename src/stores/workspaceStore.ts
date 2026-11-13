@@ -47,7 +47,17 @@ export interface EntityAppearance {
   accent: AccentColor;
 }
 
+function originOf(url: string): string {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return '';
+  }
+}
+
 export interface CreateTabInput {
+  /** Use this id instead of generating one (a native host names popup tabs itself). */
+  id?: ID;
   url?: string;
   title?: string;
   spaceId?: ID;
@@ -89,6 +99,14 @@ interface WorkspaceActions {
   recordNavigation: (tabId: ID, url: string, title?: string) => void;
   /** Moves through the tab's history; returns the new URL, or null if not possible. */
   stepHistory: (tabId: ID, delta: -1 | 1) => string | null;
+  /**
+   * Mirrors a navigation the browser engine already made (native host).
+   * Steps the history when the URL matches a neighbouring entry, replaces
+   * the current entry when `replace` is set (redirects), and pushes otherwise.
+   */
+  syncNavigation: (tabId: ID, url: string, options?: { replace?: boolean }) => void;
+  /** Engine-reported page metadata (native host). */
+  setTabMeta: (tabId: ID, meta: { title?: string; favicon?: string | null }) => void;
 
   createGroup: (input: EntityAppearance & { spaceId?: ID }) => ID;
   updateGroup: (groupId: ID, patch: Partial<EntityAppearance>) => void;
@@ -333,13 +351,14 @@ export const useWorkspace = create<WorkspaceState>()(
           if (groupId && state.groups[groupId]?.spaceId !== spaceId) groupId = null;
 
           const url = input.url ?? '';
-          const tab = makeTab({
+          const base = makeTab({
             spaceId,
             groupId,
             pinned,
             url,
             title: input.title ?? (url ? titleFromUrl(url) : 'New Tab'),
           });
+          const tab = input.id && !state.tabs[input.id] ? { ...base, id: input.id } : base;
           const siblings = containerTabs(state.tabs, spaceId, pinned, groupId);
           const afterIndex = after ? siblings.findIndex((t) => t.id === after.id) : -1;
           siblings.splice(afterIndex >= 0 ? afterIndex + 1 : siblings.length, 0, tab);
@@ -481,6 +500,55 @@ export const useWorkspace = create<WorkspaceState>()(
           }));
           return url;
         },
+
+        syncNavigation: (tabId, url, options = {}) =>
+          set((s) => {
+            const tab = s.tabs[tabId];
+            if (!tab || tab.url === url) return s;
+            let history = tab.history;
+            let historyIndex = tab.historyIndex;
+            if (options.replace && historyIndex >= 0) {
+              history = [...history];
+              history[historyIndex] = url;
+            } else if (history[historyIndex - 1] === url) {
+              historyIndex -= 1;
+            } else if (history[historyIndex + 1] === url) {
+              historyIndex += 1;
+            } else {
+              history = [...history.slice(0, historyIndex + 1), url].slice(-HISTORY_LIMIT);
+              historyIndex = history.length - 1;
+            }
+            const sameOrigin = tab.url !== '' && originOf(tab.url) === originOf(url);
+            return {
+              tabs: {
+                ...s.tabs,
+                [tabId]: {
+                  ...tab,
+                  url,
+                  // Keep the old title until the engine reports the new one.
+                  title: tab.title && tab.url ? tab.title : titleFromUrl(url),
+                  favicon: sameOrigin ? tab.favicon : null,
+                  history,
+                  historyIndex,
+                },
+              },
+            };
+          }),
+
+        setTabMeta: (tabId, meta) =>
+          set((s) => {
+            const tab = s.tabs[tabId];
+            if (!tab) return s;
+            const title = meta.title?.trim() ? meta.title.trim().slice(0, 300) : tab.title;
+            const favicon =
+              meta.favicon === undefined
+                ? tab.favicon
+                : meta.favicon && /^https?:/i.test(meta.favicon)
+                  ? meta.favicon.slice(0, 2048)
+                  : null;
+            if (title === tab.title && favicon === tab.favicon) return s;
+            return { tabs: { ...s.tabs, [tabId]: { ...tab, title, favicon } } };
+          }),
 
         createGroup: ({ spaceId, name, icon, accent }) => {
           const id = createId();

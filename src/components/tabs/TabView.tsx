@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Copy, ExternalLink, Info, ShieldAlert, TriangleAlert } from 'lucide-react';
 import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
 import { useUI } from '../../stores/uiStore';
@@ -9,6 +9,7 @@ import { displayUrl } from '../../utils/url';
 import { Button } from '../common/Button';
 import { Favicon } from '../common/Favicon';
 import { StartPage } from '../start/StartPage';
+import { NativeBrowserHost } from '../../host/NativeBrowserHost';
 
 const SLOW_LOAD_MS = 12000;
 
@@ -27,15 +28,82 @@ function PageView({ tab }: { tab: Tab }) {
   if (support.mode === 'blocked' && !override) {
     return <EmbedFallback tab={tab} reason={support.reason} />;
   }
-  if (support.mode === 'native') {
-    return (
-      <div className="flex h-full items-center justify-center text-fg-3">
-        The native browser view renders here.
-      </div>
-    );
+  if (support.mode === 'native' && host instanceof NativeBrowserHost) {
+    return <NativeSlot host={host} tab={tab} />;
   }
   return (
     <FramePreview tab={tab} local={support.mode === 'iframe' && support.local} forced={override} />
+  );
+}
+
+/**
+ * Placeholder the desktop shell lays the tab's real WebView2 view over. It
+ * reports its bounds, and while any UI overlay is open (the shell's views
+ * always draw above the UI) it asks for a still snapshot instead.
+ */
+function NativeSlot({ host, tab }: { host: NativeBrowserHost; tab: Tab }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const covered = useUI((s) =>
+    Boolean(s.paletteOpen || s.contextMenu || s.dialog || s.suggestionsOpen || s.toast),
+  );
+  const snapshot = useUI((s) => s.engineTabs[tab.id]?.snapshot ?? null);
+  const loading = useUI((s) => s.engineTabs[tab.id]?.loading ?? false);
+  const dismissToast = useUI((s) => s.dismissToast);
+  const tabId = tab.id;
+  // Only needed when the view is created; later URL changes come from the engine.
+  const initialUrl = useRef(tab.url);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let frame = 0;
+    const send = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const r = el.getBoundingClientRect();
+        host.showView({
+          tabId,
+          url: initialUrl.current,
+          bounds: { x: r.left, y: r.top, width: r.width, height: r.height },
+          covered,
+        });
+      });
+    };
+    send();
+    const observer = new ResizeObserver(send);
+    observer.observe(el);
+    window.addEventListener('resize', send);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener('resize', send);
+    };
+  }, [host, tabId, covered]);
+
+  // Hide the view when the slot goes away (start page, dashboards, settings).
+  useEffect(() => () => host.showView({ tabId: null }), [host, tabId]);
+
+  useEffect(() => {
+    if (!covered && snapshot) useUI.getState().setEngineTab(tabId, { snapshot: null });
+  }, [covered, snapshot, tabId]);
+
+  return (
+    <div ref={ref} className="relative h-full overflow-hidden bg-canvas">
+      {covered && snapshot && (
+        <img
+          src={snapshot}
+          alt=""
+          draggable={false}
+          className="absolute inset-0 size-full object-fill"
+          onPointerDown={() => dismissToast()}
+        />
+      )}
+      {!snapshot && loading && (
+        <div className="absolute inset-x-0 top-0 h-[2px] overflow-hidden">
+          <div className="h-full w-2/5 animate-progress bg-info" />
+        </div>
+      )}
+    </div>
   );
 }
 

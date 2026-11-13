@@ -2,7 +2,10 @@
 
 A workspace-oriented browser interface built around **Spaces → Groups → Tabs and Dashboards**.
 
-This is milestone 0.1: a local web application that runs inside an existing browser. It is structured so a native shell (WebView2) can later host it and supply real browser views.
+Port runs two ways:
+
+- **Desktop app (Windows).** A small .NET/WPF shell hosts the UI and gives every tab a real WebView2 (Chromium/Edge engine) view. Every site works, sign-ins persist, and background tabs keep running.
+- **Web build.** The same UI in a normal browser tab for development, where pages are iframe previews (see the limitations below).
 
 ## Getting started
 
@@ -23,6 +26,27 @@ npm run dev        # http://localhost:5173 (bound to localhost only)
 | `npm run format`    | Prettier                                |
 
 If port 5173 is taken, Vite picks the next free port and prints it.
+
+## Desktop app
+
+Requires the .NET 10 SDK and the WebView2 runtime (built into Windows 11).
+
+| Script                | Purpose                                                                                                              |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `npm run app:install` | Build everything and install to `%LOCALAPPDATA%/Programs/Port` with Start menu and desktop shortcuts. Rerun to update. |
+| `npm run app:build`   | Build a portable copy to `release/Port/` (run `Port.exe`).                                                           |
+| `npm run app:dev`     | Run the shell against the Vite dev server (`npm run dev` must be running) for hot reload.                            |
+
+Data lives in `%LOCALAPPDATA%/Port` (workspace, cookies and site data in the `Profile` folder, window position in `window.json`). Reinstalling does not touch it. The desktop app has its own storage, so to bring over a workspace from the web build use **Settings → Export** there and **Import** in the app.
+
+How it works (`native/Port.Desktop`):
+
+- The UI is served from the bundled `dist/` at `https://port.example/` (a WebView2 virtual host; nothing is fetched from the network) and talks to the shell only through `chrome.webview.postMessage`. Messages are typed in `src/host/bridge.ts`, and the UI side is `src/host/NativeBrowserHost.ts`.
+- Each tab gets a WebView2 view laid over the content area the UI reports. Views are created when a tab is first shown and kept alive until the tab closes. Removing tabs any other way (deleting a space or group) also releases their views.
+- Native views always draw above the UI, so while a menu, dialog, the palette, address suggestions or a toast is open, the page is swapped for a still snapshot.
+- Titles, favicons, URL changes, loading state and back/forward come from the engine. `target=_blank` links and popups open as tabs that keep `window.opener` (OAuth popups work). Page fullscreen fills the window.
+- Port's shortcuts (`Ctrl+T/W/L/K`, `Ctrl+Shift+T`, `Ctrl+1…9`, `Ctrl+,`) still work while a page has focus. Everything else (`Ctrl+F`, `Ctrl+R`, `F12` DevTools, `Alt+←/→`) goes to the page.
+- Pages have no access to the bridge. Only the UI origin's messages are accepted, the UI view can't navigate away from its origin, and `openExternal` only opens http(s) URLs.
 
 ## Features
 
@@ -80,7 +104,7 @@ The accent keys stored in your data (`violet`, `blue`, …) are unchanged and ma
 
 ## Known limitations of the web build
 
-These are limits of running inside a normal browser tab. Port states them in the UI rather than hiding them.
+These apply to the web build only, not the desktop app. They are limits of running inside a normal browser tab. Port states them in the UI rather than hiding them.
 
 - **Embedding.** Pages are shown in a sandboxed `<iframe>` only as a preview. Many sites send `X-Frame-Options` or CSP `frame-ancestors` headers that forbid this. For well-known sites that do (`src/host/embedPolicy.ts`), Port skips the attempt and shows a fallback with **Open in browser**. Other sites are attempted with a visible note that they may refuse. An iframe `load` event does not prove the page rendered, so Port never reports a page as "supported" because of it. Port does not use a proxy or scraping to get around these restrictions.
 - **History.** Cross-origin iframe history can't be observed. Back and forward follow Port's own per-tab history of the addresses you navigated to. Clicks inside an embedded page are not tracked.
@@ -117,7 +141,7 @@ src/
 - **View routing.** `components/layout/viewRegistry.tsx` maps view kinds (`start`, `tab`, `dashboard`, `settings`) to renderers. To add a view, add a kind to `ContentView` and a renderer.
 - **Dashboards.** Widgets are a discriminated union with a `layout` object. v0.1 uses only `colSpan`; the optional `x/y/w/h` fields are reserved for drag-resize layouts. New widget kinds (for example an embedded web panel) slot into the same union.
 
-## Migrating to a native browser host
+## Native browser host
 
 All page rendering and navigation goes through `BrowserHost` (`src/host/types.ts`):
 

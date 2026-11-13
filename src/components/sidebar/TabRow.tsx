@@ -90,7 +90,7 @@ export function TabRow({
       )}
     >
       {active && <span className="absolute inset-y-1.5 left-0 w-[2px] rounded-full bg-accent" />}
-      <Favicon url={tab.url} />
+      <Favicon url={tab.url} icon={tab.favicon} />
       {renaming ? (
         <RenameInput tab={tab} onDone={() => setRenamingTab(null)} />
       ) : (
@@ -186,7 +186,7 @@ export function PinnedTile({ tab, active }: { tab: Tab; active: boolean }) {
           isDragging && 'opacity-40',
         )}
       >
-        <Favicon url={tab.url} size={18} />
+        <Favicon url={tab.url} icon={tab.favicon} size={18} />
       </div>
     </Tooltip>
   );

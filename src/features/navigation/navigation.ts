@@ -40,7 +40,10 @@ export function createNavigation(host: BrowserHost): Navigation {
         host
           .navigate(current.id, result.url)
           .then(() => {
-            if (result.kind === 'search') ws().recordNavigation(current.id, result.url, title);
+            // A native engine reports the real page title itself.
+            if (result.kind === 'search' && !host.capabilities.engineHistory) {
+              ws().recordNavigation(current.id, result.url, title);
+            }
           })
           .catch(report);
       } else {

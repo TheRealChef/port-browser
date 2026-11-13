@@ -84,6 +84,8 @@ export interface EngineTabState {
   canGoBack: boolean;
   canGoForward: boolean;
   loading: boolean;
+  /** Still image of the page shown while UI overlays cover the live view. */
+  snapshot?: string | null;
 }
 
 const CLOSED_TAB_LIMIT = 25;

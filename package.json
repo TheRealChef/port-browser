@@ -10,7 +10,10 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "app:dev": "dotnet run --project native/Port.Desktop -- --dev",
+    "app:build": "npm run build && dotnet publish native/Port.Desktop -c Release -o release/Port --nologo",
+    "app:install": "powershell -NoProfile -ExecutionPolicy Bypass -File native/install.ps1"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

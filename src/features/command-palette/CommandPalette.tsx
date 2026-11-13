@@ -176,7 +176,7 @@ function useItems(query: string): PaletteItem[] {
           title: tabDisplayTitle(tab),
           subtitle: `${spaceName(tab.spaceId)} · ${displayUrl(tab.url)}`,
           keywords: tab.url,
-          icon: <Favicon url={tab.url} />,
+          icon: <Favicon url={tab.url} icon={tab.favicon} />,
           run: () => {
             leaveSettings();
             ws.selectTab(tab.id);
