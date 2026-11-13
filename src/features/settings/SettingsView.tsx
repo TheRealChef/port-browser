@@ -10,7 +10,12 @@ import { Button } from '../../components/common/Button';
 import { IconButton } from '../../components/common/IconButton';
 import { Kbd } from '../../components/common/Kbd';
 import { AccentPicker } from '../../components/common/Pickers';
-import { SIDEBAR_MAX, SIDEBAR_MIN } from '../../stores/persistence';
+import {
+  SIDEBAR_MAX,
+  SIDEBAR_MIN,
+  SUSPEND_OPTIONS,
+  UNLOAD_OPTIONS,
+} from '../../stores/persistence';
 import { useSettings } from '../../stores/settingsStore';
 import { useWorkspace } from '../../stores/workspaceStore';
 import { SEARCH_ENGINES } from '../../types/models';
@@ -352,6 +357,47 @@ export function SettingsView() {
             </Button>
           </div>
         </Section>
+
+        {host instanceof NativeBrowserHost && (
+          <Section
+            title="Sleeping tabs"
+            description="Tabs you aren't looking at use less memory right away, go to sleep after a while (they keep their place and wake instantly) and are unloaded later (they reload when you open them; sign-ins stay). Tabs playing audio are left alone and pinned tabs are never unloaded."
+          >
+            <Row label="Put inactive tabs to sleep">
+              <Toggle
+                label="Put inactive tabs to sleep"
+                checked={settings.tabSleep}
+                onChange={(tabSleep) => settings.update({ tabSleep })}
+              />
+            </Row>
+            {settings.tabSleep && (
+              <>
+                <Row label="Sleep after" hint="Stops the page running; it wakes instantly.">
+                  <Segmented
+                    label="Sleep after"
+                    value={String(settings.tabSuspendMinutes)}
+                    options={SUSPEND_OPTIONS.map((m) => ({ value: String(m), label: `${m} min` }))}
+                    onChange={(v) => settings.update({ tabSuspendMinutes: Number(v) })}
+                  />
+                </Row>
+                <Row
+                  label="Unload after"
+                  hint="Frees all its memory; the page reloads when opened."
+                >
+                  <Segmented
+                    label="Unload after"
+                    value={String(settings.tabUnloadMinutes)}
+                    options={UNLOAD_OPTIONS.map((m) => ({
+                      value: String(m),
+                      label: m === 0 ? 'Never' : m >= 60 ? `${m / 60} h` : `${m} min`,
+                    }))}
+                    onChange={(v) => settings.update({ tabUnloadMinutes: Number(v) })}
+                  />
+                </Row>
+              </>
+            )}
+          </Section>
+        )}
 
         {host instanceof NativeBrowserHost && (
           <Section

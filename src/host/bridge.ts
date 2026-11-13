@@ -24,6 +24,8 @@ export interface DownloadItem {
   missing: boolean;
 }
 
+export type SleepState = 'awake' | 'suspended' | 'discarded';
+
 export type DownloadAction = 'pause' | 'resume' | 'cancel' | 'open' | 'showInFolder' | 'remove';
 
 /** Messages the UI sends to the native shell. */
@@ -56,6 +58,14 @@ export type UIToHostMessage =
   | { type: 'download'; id: string; action: DownloadAction }
   | { type: 'clearDownloads' }
   | { type: 'openDownloadsFolder' }
+  /** Tab sleeping settings; `keepLoaded` tabs (pinned) are never unloaded. */
+  | {
+      type: 'sleepPolicy';
+      enabled: boolean;
+      suspendMinutes: number;
+      discardMinutes: number;
+      keepLoaded: ID[];
+    }
   /** Signs out of every site in a space by clearing its profile's browsing data. */
   | { type: 'clearSpaceData'; spaceId: ID };
 
@@ -71,6 +81,8 @@ export type HostToUIMessage =
   /** A page called `window.close()`. */
   | { type: 'closeTab'; tabId: ID }
   | { type: 'snapshot'; tabId: ID; dataUrl: string | null }
+  /** A tab was suspended, unloaded (its view released) or woke up again. */
+  | { type: 'sleep'; tabId: ID; state: SleepState }
   /** The tab's live view is visible and painted again; any snapshot can go. */
   | { type: 'viewShown'; tabId: ID }
   | { type: 'downloads'; items: DownloadItem[]; started?: boolean }
@@ -115,6 +127,7 @@ const MESSAGE_TYPES = new Set([
   'closeTab',
   'snapshot',
   'viewShown',
+  'sleep',
   'downloads',
   'spaceDataCleared',
   'key',

@@ -158,4 +158,10 @@ export interface Settings {
   bookmarkShowNested: boolean;
   /** Keep a browsing history (stored only on this device). */
   recordHistory: boolean;
+  /** Desktop app: put tabs you are not looking at to sleep. */
+  tabSleep: boolean;
+  /** Minutes hidden before a tab is suspended (keeps its page, stops running). */
+  tabSuspendMinutes: number;
+  /** Minutes hidden before a tab is unloaded (reloads when shown); 0 = never. */
+  tabUnloadMinutes: number;
 }

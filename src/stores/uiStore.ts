@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { create } from 'zustand';
 import type { AccentColor, ID, Tab } from '../types/models';
-import type { DownloadItem } from '../host/bridge';
+import type { DownloadItem, SleepState } from '../host/bridge';
 
 /** Transient UI state. Nothing here is persisted. */
 
@@ -85,6 +85,8 @@ export interface EngineTabState {
   canGoBack: boolean;
   canGoForward: boolean;
   loading: boolean;
+  /** Desktop app: whether the tab is asleep (suspended or unloaded). */
+  sleep?: SleepState;
   /** Still image of the page shown while UI overlays cover the live view. */
   snapshot?: string | null;
 }

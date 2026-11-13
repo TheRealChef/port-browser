@@ -26,6 +26,7 @@ function deps(overrides: Partial<NativeHostDeps> = {}): NativeHostDeps {
     setTabMeta: vi.fn(),
     setEngineTab: vi.fn(),
     setSnapshot: vi.fn(),
+    setSleep: vi.fn(),
     openPopupTab: vi.fn(() => true),
     closeTab: vi.fn(),
     replayKey: vi.fn(),
@@ -116,6 +117,47 @@ describe('NativeBrowserHost', () => {
     new NativeBrowserHost(bridge, d);
     (d as unknown as { _move: (id: string, s: string) => void })._move('a', 's2');
     expect(sent).toContainEqual({ type: 'dispose', tabId: 'a' });
+  });
+
+  it('forgets unloaded views so showing the tab loads it again', () => {
+    const { bridge, sent, emit } = fakeBridge();
+    const d = deps();
+    const host = new NativeBrowserHost(bridge, d);
+    host.showView({ tabId: 'a', url: 'https://a.test/' });
+    host.showView({ tabId: 'a', url: 'https://a.test/' });
+    emit({ type: 'sleep', tabId: 'a', state: 'discarded' });
+    expect(d.setSleep).toHaveBeenCalledWith('a', 'discarded');
+    host.showView({ tabId: 'a', url: 'https://a.test/' });
+    // After unloading, the next show must be treated as a fresh view again (redirects replace).
+    emit({
+      type: 'navigated',
+      tabId: 'a',
+      url: 'https://www.a.test/',
+      canGoBack: false,
+      canGoForward: false,
+    });
+    expect(d.syncNavigation).toHaveBeenLastCalledWith('a', 'https://www.a.test/', {
+      replace: true,
+    });
+    expect(sent.filter((m) => (m as { type: string }).type === 'view')).toHaveLength(3);
+  });
+
+  it('sends the sleep policy', () => {
+    const { bridge, sent } = fakeBridge();
+    const host = new NativeBrowserHost(bridge, deps());
+    host.setSleepPolicy({
+      enabled: true,
+      suspendMinutes: 5,
+      discardMinutes: 30,
+      keepLoaded: ['a'],
+    });
+    expect(sent.at(-1)).toEqual({
+      type: 'sleepPolicy',
+      enabled: true,
+      suspendMinutes: 5,
+      discardMinutes: 30,
+      keepLoaded: ['a'],
+    });
   });
 
   it('opens popups as tabs and releases them if that fails', () => {

@@ -32,6 +32,7 @@ public sealed class MainWindow : Window
     private CoreWebView2Environment? environment;
     private readonly ProfileStore profiles;
     private readonly DownloadManager downloads;
+    private readonly TabSleeper sleeper;
     /// <summary>Completed when the UI reports it has painted a page snapshot.</summary>
     private TaskCompletionSource? snapshotShown;
 
@@ -47,6 +48,11 @@ public sealed class MainWindow : Window
         Directory.CreateDirectory(options.DataFolder);
         profiles = new ProfileStore(options.DataFolder);
         downloads = new DownloadManager(options.DataFolder, Post);
+        sleeper = new TabSleeper(
+            () => pages.Values,
+            page => page.TabId == activeTabId || page == fullscreenPage,
+            DisposePage,
+            (tabId, state) => Post(new { type = "sleep", tabId, state }));
         Title = "Port";
         Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x22, 0x26));
         MinWidth = 640;
@@ -185,6 +191,9 @@ public sealed class MainWindow : Window
                     _ = ShowViewAsync(tabId, Str(msg, "url"), ReadBounds(msg),
                         msg.TryGetProperty("covered", out var c) && c.ValueKind == JsonValueKind.True,
                         Str(msg, "spaceId"));
+                    break;
+                case "sleepPolicy":
+                    sleeper.SetPolicy(msg);
                     break;
                 case "snapshotShown":
                     snapshotShown?.TrySetResult();
@@ -334,6 +343,9 @@ public sealed class MainWindow : Window
                 page.View.Visibility = visibility;
                 if (isActive) ReportShownAfterPaint(page);
             }
+            // The shown tab counts as shown even while a snapshot covers it.
+            var shown = page.TabId == activeTabId || page == fullscreenPage;
+            if (shown == page.HiddenSince.HasValue) sleeper.VisibilityChanged(page, shown);
             // Both views are child windows; Windows keeps whichever was raised last on top,
             // and the UI view can end up above the page. Keep the page in front explicitly.
             if (isActive) NativeMethods.BringToTop(page.View.Handle);

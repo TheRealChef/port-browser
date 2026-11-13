@@ -47,6 +47,8 @@ export function TabRow({
   const { nav, select, onContextMenu, onAuxClick } = useTabHandlers(tab);
   const renaming = useUI((s) => s.renamingTabId === tab.id);
   const setRenamingTab = useUI((s) => s.setRenamingTab);
+  const sleep = useUI((s) => s.engineTabs[tab.id]?.sleep);
+  const asleep = !active && (sleep === 'suspended' || sleep === 'discarded');
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `tab:${tab.id}`,
     data: { type: 'tab', tabId: tab.id, container },
@@ -90,11 +92,29 @@ export function TabRow({
       )}
     >
       {active && <span className="absolute inset-y-1.5 left-0 w-[2px] rounded-full bg-accent" />}
-      <Favicon url={tab.url} icon={tab.favicon} />
+      <Favicon
+        url={tab.url}
+        icon={tab.favicon}
+        className={cn(
+          asleep &&
+            'opacity-45 grayscale transition-ui group-hover/tab:opacity-100 group-hover/tab:grayscale-0',
+        )}
+      />
       {renaming ? (
         <RenameInput tab={tab} onDone={() => setRenamingTab(null)} />
       ) : (
-        <span className="min-w-0 flex-1 truncate">{title}</span>
+        <span
+          className={cn('min-w-0 flex-1 truncate', asleep && !active && 'text-fg-3')}
+          title={
+            sleep === 'discarded'
+              ? 'Unloaded to save memory. Opens again when you select it.'
+              : sleep === 'suspended'
+                ? 'Sleeping to save memory. Wakes instantly when you select it.'
+                : undefined
+          }
+        >
+          {title}
+        </span>
       )}
       {!renaming && (
         <button

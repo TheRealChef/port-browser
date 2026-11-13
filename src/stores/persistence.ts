@@ -426,6 +426,14 @@ function parseView(
   return { kind: 'start' };
 }
 
+/** Choices offered in Settings; anything else falls back to the default. */
+export const SUSPEND_OPTIONS = [1, 5, 15, 30] as const;
+export const UNLOAD_OPTIONS = [15, 30, 60, 240, 0] as const;
+
+function oneOfNumbers(value: unknown, options: readonly number[], fallback: number): number {
+  return typeof value === 'number' && options.includes(value) ? value : fallback;
+}
+
 export const DEFAULT_SETTINGS: Settings = {
   sidebarWidth: SIDEBAR_DEFAULT,
   sidebarCollapsed: false,
@@ -440,6 +448,9 @@ export const DEFAULT_SETTINGS: Settings = {
   bookmarkTileSize: 'md',
   bookmarkShowNested: false,
   recordHistory: true,
+  tabSleep: true,
+  tabSuspendMinutes: 5,
+  tabUnloadMinutes: 30,
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
@@ -471,6 +482,9 @@ export function sanitizeSettings(raw: unknown): Settings {
     ),
     bookmarkShowNested: asBoolean(raw.bookmarkShowNested, d.bookmarkShowNested),
     recordHistory: asBoolean(raw.recordHistory, d.recordHistory),
+    tabSleep: asBoolean(raw.tabSleep, d.tabSleep),
+    tabSuspendMinutes: oneOfNumbers(raw.tabSuspendMinutes, SUSPEND_OPTIONS, d.tabSuspendMinutes),
+    tabUnloadMinutes: oneOfNumbers(raw.tabUnloadMinutes, UNLOAD_OPTIONS, d.tabUnloadMinutes),
   };
 }
 

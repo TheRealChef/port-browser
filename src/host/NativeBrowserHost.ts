@@ -4,6 +4,7 @@ import type {
   DownloadAction,
   DownloadItem,
   HostBridge,
+  SleepState,
   HostToUIMessage,
   UIToHostMessage,
   ViewBounds,
@@ -20,6 +21,7 @@ export interface NativeHostDeps {
     patch: { canGoBack?: boolean; canGoForward?: boolean; loading?: boolean },
   ) => void;
   setSnapshot: (tabId: ID, dataUrl: string | null) => void;
+  setSleep: (tabId: ID, state: SleepState) => void;
   /** Creates a tab for a window a page opened. Returns false if it could not. */
   openPopupTab: (tabId: ID, url: string, openerTabId: ID, background: boolean) => boolean;
   closeTab: (tabId: ID) => void;
@@ -131,6 +133,15 @@ export class NativeBrowserHost implements BrowserHost {
     this.post({ type: 'dispose', tabId });
   }
 
+  setSleepPolicy(policy: {
+    enabled: boolean;
+    suspendMinutes: number;
+    discardMinutes: number;
+    keepLoaded: ID[];
+  }): void {
+    this.post({ type: 'sleepPolicy', ...policy });
+  }
+
   snapshotShown(tabId: ID): void {
     this.post({ type: 'snapshotShown', tabId });
   }
@@ -199,6 +210,19 @@ export class NativeBrowserHost implements BrowserHost {
         break;
       case 'snapshot':
         deps.setSnapshot(message.tabId, message.dataUrl);
+        break;
+      case 'sleep':
+        if (message.state === 'discarded') {
+          // The shell released the view; showing the tab again recreates it from its URL.
+          this.created.delete(message.tabId);
+          this.pending.delete(message.tabId);
+          deps.setEngineTab(message.tabId, {
+            loading: false,
+            canGoBack: false,
+            canGoForward: false,
+          });
+        }
+        deps.setSleep(message.tabId, message.state);
         break;
       case 'viewShown':
         deps.setSnapshot(message.tabId, null);

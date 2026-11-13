@@ -1,3 +1,4 @@
+import { useSettings } from '../stores/settingsStore';
 import { useUI } from '../stores/uiStore';
 import { useWorkspace } from '../stores/workspaceStore';
 import { getHostBridge } from './bridge';
@@ -14,13 +15,16 @@ export function createBrowserHost(): BrowserHost {
   const bridge = getHostBridge();
   if (bridge) {
     const ws = () => useWorkspace.getState();
-    return new NativeBrowserHost(bridge, {
+    const host = new NativeBrowserHost(bridge, {
       syncNavigation: (tabId, url, options) => ws().syncNavigation(tabId, url, options),
       setTabMeta: (tabId, meta) => ws().setTabMeta(tabId, meta),
       setEngineTab: (tabId, patch) => {
         if (ws().tabs[tabId]) useUI.getState().setEngineTab(tabId, patch);
       },
       setSnapshot: (tabId, dataUrl) => useUI.getState().setEngineTab(tabId, { snapshot: dataUrl }),
+      setSleep: (tabId, sleep) => {
+        if (ws().tabs[tabId]) useUI.getState().setEngineTab(tabId, { sleep });
+      },
       openPopupTab: (tabId, url, openerTabId, background) => {
         const opener = ws().tabs[openerTabId];
         if (!opener) return false;
@@ -68,6 +72,8 @@ export function createBrowserHost(): BrowserHost {
           if (state.tabs !== previous.tabs) listener();
         }),
     });
+    syncSleepPolicy(host);
+    return host;
   }
 
   return new WebBrowserHost({
@@ -78,5 +84,32 @@ export function createBrowserHost(): BrowserHost {
     openWindow: (url) => {
       window.open(url, '_blank', 'noopener,noreferrer');
     },
+  });
+}
+
+/** Sends the tab sleeping settings and the pinned tabs (never unloaded) whenever they change. */
+function syncSleepPolicy(host: NativeBrowserHost): void {
+  let last = '';
+  const send = () => {
+    const s = useSettings.getState();
+    const keepLoaded = Object.values(useWorkspace.getState().tabs)
+      .filter((t) => t.pinned)
+      .map((t) => t.id)
+      .sort();
+    const policy = {
+      enabled: s.tabSleep,
+      suspendMinutes: s.tabSuspendMinutes,
+      discardMinutes: s.tabUnloadMinutes,
+      keepLoaded,
+    };
+    const key = JSON.stringify(policy);
+    if (key === last) return;
+    last = key;
+    host.setSleepPolicy(policy);
+  };
+  send();
+  useSettings.subscribe(send);
+  useWorkspace.subscribe((state, previous) => {
+    if (state.tabs !== previous.tabs) send();
   });
 }

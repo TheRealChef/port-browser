@@ -31,4 +31,8 @@ internal sealed class PageView
 
     /// <summary>Whether the view is currently swapped for a snapshot under UI overlays.</summary>
     public bool Covered { get; set; }
+
+    /// <summary>When the tab stopped being the shown tab; null while it is shown.</summary>
+    public DateTime? HiddenSince { get; set; }
+    public SleepState Sleep { get; set; } = SleepState.Awake;
 }
