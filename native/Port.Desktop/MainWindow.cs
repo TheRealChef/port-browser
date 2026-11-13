@@ -30,6 +30,10 @@ public sealed class MainWindow : Window
     private readonly Canvas pageLayer = new();
     private readonly Dictionary<string, PageView> pages = new();
     private CoreWebView2Environment? environment;
+    private readonly ProfileStore profiles;
+    private readonly DownloadManager downloads;
+    /// <summary>Completed when the UI reports it has painted a page snapshot.</summary>
+    private TaskCompletionSource? snapshotShown;
 
     private string? activeTabId;
     private Rect activeBounds = Rect.Empty;
@@ -40,6 +44,9 @@ public sealed class MainWindow : Window
     public MainWindow(ShellOptions options)
     {
         this.options = options;
+        Directory.CreateDirectory(options.DataFolder);
+        profiles = new ProfileStore(options.DataFolder);
+        downloads = new DownloadManager(options.DataFolder, Post);
         Title = "Port";
         Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x22, 0x26));
         MinWidth = 640;
@@ -172,13 +179,30 @@ public sealed class MainWindow : Window
             switch (type)
             {
                 case "ready":
+                    downloads.SendAll();
                     break;
                 case "view":
                     _ = ShowViewAsync(tabId, Str(msg, "url"), ReadBounds(msg),
-                        msg.TryGetProperty("covered", out var c) && c.ValueKind == JsonValueKind.True);
+                        msg.TryGetProperty("covered", out var c) && c.ValueKind == JsonValueKind.True,
+                        Str(msg, "spaceId"));
+                    break;
+                case "snapshotShown":
+                    snapshotShown?.TrySetResult();
                     break;
                 case "navigate" when tabId is not null:
-                    _ = NavigateAsync(tabId, Str(msg, "url"));
+                    _ = NavigateAsync(tabId, Str(msg, "url"), Str(msg, "spaceId"));
+                    break;
+                case "download":
+                    downloads.Act(Str(msg, "id"), Str(msg, "action"));
+                    break;
+                case "clearDownloads":
+                    downloads.ClearFinished();
+                    break;
+                case "openDownloadsFolder":
+                    DownloadManager.OpenFolder();
+                    break;
+                case "clearSpaceData" when Str(msg, "spaceId") is { } clearSpace:
+                    _ = ClearSpaceDataAsync(clearSpace);
                     break;
                 case "reload" when tabId is not null:
                     WithPage(tabId, core => core.Reload());
@@ -220,7 +244,7 @@ public sealed class MainWindow : Window
 
     // ------------------------------------------------------------ pages
 
-    private async Task ShowViewAsync(string? tabId, string? url, Rect? bounds, bool isCovered)
+    private async Task ShowViewAsync(string? tabId, string? url, Rect? bounds, bool isCovered, string? spaceId)
     {
         activeTabId = tabId;
         if (bounds is { } rect) activeBounds = rect;
@@ -234,7 +258,7 @@ public sealed class MainWindow : Window
 
         if (!pages.TryGetValue(tabId, out var page))
         {
-            page = CreatePage(tabId);
+            page = CreatePage(tabId, profiles.ForSpace(spaceId));
             LayoutPages();
             await page.Ready;
             if (page.Disposed) return;
@@ -252,7 +276,14 @@ public sealed class MainWindow : Window
             // Pages always draw above the UI, so show a still image while overlays are open.
             string? snapshot = null;
             if (page.View.Visibility == Visibility.Visible) snapshot = await CaptureAsync(page);
-            if (activeTabId == tabId) Post(new { type = "snapshot", tabId, dataUrl = snapshot });
+            if (activeTabId == tabId)
+            {
+                // Hide the live view only once the UI shows the still image, so nothing flashes.
+                var shown = new TaskCompletionSource();
+                snapshotShown = snapshot is null ? null : shown;
+                Post(new { type = "snapshot", tabId, dataUrl = snapshot });
+                if (snapshot is not null) await Task.WhenAny(shown.Task, Task.Delay(400));
+            }
             page.Covered = covered && activeTabId == tabId;
         }
         else if (!covered)
@@ -313,9 +344,9 @@ public sealed class MainWindow : Window
         return new Rect(css.X * zoom, css.Y * zoom, css.Width * zoom, css.Height * zoom);
     }
 
-    private PageView CreatePage(string tabId)
+    private PageView CreatePage(string tabId, string profile)
     {
-        var page = new PageView(tabId);
+        var page = new PageView(tabId, profile);
         pages[tabId] = page;
         pageLayer.Children.Add(page.View);
         page.Ready = InitializePageAsync(page);
@@ -324,10 +355,18 @@ public sealed class MainWindow : Window
 
     private async Task InitializePageAsync(PageView page)
     {
-        await page.View.EnsureCoreWebView2Async(environment);
+        CoreWebView2ControllerOptions? controllerOptions = null;
+        if (page.Profile != ProfileStore.DefaultProfile)
+        {
+            controllerOptions = environment!.CreateCoreWebView2ControllerOptions();
+            controllerOptions.ProfileName = page.Profile;
+            controllerOptions.IsInPrivateModeEnabled = false; // Persistent: sign-ins survive restarts.
+        }
+        await page.View.EnsureCoreWebView2Async(environment, controllerOptions);
         if (page.Disposed) return;
         var core = page.Core!;
         var tabId = page.TabId;
+        downloads.Attach(core);
 
         var settings = core.Settings;
         settings.IsWebMessageEnabled = false;
@@ -339,7 +378,16 @@ public sealed class MainWindow : Window
         core.NavigationCompleted += (_, _) =>
         {
             Post(new { type = "loading", tabId, loading = false });
-            PostHistory(page);
+            // Report where the page really is: a navigation that turned into a download
+            // (or failed) never changes the source, so the UI's optimistic URL is corrected.
+            Post(new
+            {
+                type = "navigated",
+                tabId,
+                url = core.Source,
+                canGoBack = core.CanGoBack,
+                canGoForward = core.CanGoForward,
+            });
         };
         core.SourceChanged += (_, _) => Post(new
         {
@@ -389,7 +437,7 @@ public sealed class MainWindow : Window
         try
         {
             var tabId = Guid.NewGuid().ToString("N")[..12];
-            var page = CreatePage(tabId);
+            var page = CreatePage(tabId, opener.Profile); // A popup must share its opener's profile.
             await page.Ready;
             e.NewWindow = page.Core;
             e.Handled = true;
@@ -401,12 +449,12 @@ public sealed class MainWindow : Window
         }
     }
 
-    private async Task NavigateAsync(string tabId, string? url)
+    private async Task NavigateAsync(string tabId, string? url, string? spaceId)
     {
         if (SafeHttpUrl(url) is not { } target) return;
         if (!pages.TryGetValue(tabId, out var page))
         {
-            page = CreatePage(tabId);
+            page = CreatePage(tabId, profiles.ForSpace(spaceId));
             LayoutPages();
         }
         await page.Ready;
@@ -427,6 +475,64 @@ public sealed class MainWindow : Window
         if (fullscreenPage == page) SetFullscreen(page, false);
         pageLayer.Children.Remove(page.View);
         page.View.Dispose();
+    }
+
+    /// <summary>Signs a space out of every site by clearing its profile's browsing data.</summary>
+    private async Task ClearSpaceDataAsync(string spaceId)
+    {
+        var profileName = profiles.Existing(spaceId);
+        if (profileName is null)
+        {
+            Post(new { type = "spaceDataCleared", spaceId, ok = true }); // Never browsed: nothing stored.
+            return;
+        }
+
+        PageView? temp = null;
+        try
+        {
+            var host = pages.Values.FirstOrDefault(p => p.Profile == profileName && p.Core is not null && !p.Disposed);
+            if (host is null)
+            {
+                temp = CreatePage("clear-" + Guid.NewGuid().ToString("N")[..8], profileName);
+                pages.Remove(temp.TabId);
+                await temp.Ready;
+                host = temp;
+            }
+            var profile = host.Core!.Profile;
+            if (profileName == ProfileStore.DefaultProfile)
+            {
+                // The default profile also holds Port's own saved workspace (local storage
+                // of the UI origin), so everything except local storage is cleared there.
+                await profile.ClearBrowsingDataAsync(
+                    CoreWebView2BrowsingDataKinds.Cookies | CoreWebView2BrowsingDataKinds.DiskCache
+                    | CoreWebView2BrowsingDataKinds.IndexedDb | CoreWebView2BrowsingDataKinds.WebSql
+                    | CoreWebView2BrowsingDataKinds.FileSystems | CoreWebView2BrowsingDataKinds.CacheStorage
+                    | CoreWebView2BrowsingDataKinds.ServiceWorkers | CoreWebView2BrowsingDataKinds.GeneralAutofill
+                    | CoreWebView2BrowsingDataKinds.PasswordAutosave);
+            }
+            else
+            {
+                await profile.ClearBrowsingDataAsync();
+            }
+            foreach (var page in pages.Values.Where(p => p.Profile == profileName && p.Core is not null))
+            {
+                page.Core!.Reload();
+            }
+            Post(new { type = "spaceDataCleared", spaceId, ok = true });
+        }
+        catch
+        {
+            Post(new { type = "spaceDataCleared", spaceId, ok = false });
+        }
+        finally
+        {
+            if (temp is not null)
+            {
+                temp.Disposed = true;
+                pageLayer.Children.Remove(temp.View);
+                temp.View.Dispose();
+            }
+        }
     }
 
     // ------------------------------------------------------- fullscreen
@@ -493,7 +599,7 @@ public sealed class MainWindow : Window
         var lower = name.ToLowerInvariant();
         var digit = code!.StartsWith("Digit");
         var forward =
-            (ctrl && !alt && !shift && (lower is "t" or "w" or "l" or "k" || name == "," || digit))
+            (ctrl && !alt && !shift && (lower is "t" or "w" or "l" or "k" or "h" or "j" || name == "," || digit))
             || (ctrl && !alt && shift && lower == "t")
             || (alt && !ctrl && !shift && (lower is "t" or "w" || digit));
         if (!forward) return;

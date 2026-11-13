@@ -7,7 +7,13 @@ export type Suggestion =
   | { kind: 'go'; id: string; title: string; url: string }
   | { kind: 'search'; id: string; title: string; url: string }
   | { kind: 'tab'; id: string; title: string; url: string; tabId: ID; spaceName: string }
-  | { kind: 'bookmark'; id: string; title: string; url: string };
+  | { kind: 'bookmark'; id: string; title: string; url: string }
+  | { kind: 'history'; id: string; title: string; url: string };
+
+/** How many recent history entries are searched (newest first). */
+const HISTORY_SCAN = 2000;
+/** History counts a bit less than open tabs and bookmarks for the same match. */
+const HISTORY_WEIGHT = 0.9;
 
 const MAX_MATCHES = 6;
 const OTHER_SPACE_PENALTY = 0.85;
@@ -21,6 +27,7 @@ export function buildSuggestions(
   state: WorkspaceData,
   engine: SearchEngine,
   excludeTabId: ID | null,
+  history: ReadonlyArray<{ url: string; title: string; visitedAt: number }> = [],
 ): Suggestion[] {
   const q = query.trim();
   const target = normalizeInput(q, engine);
@@ -71,11 +78,38 @@ export function buildSuggestions(
     });
   }
 
+  // Several visits of one page count once, with a small boost for recency and repeats.
+  const visits = new Map<string, { url: string; title: string; count: number; last: number }>();
+  for (const entry of history.slice(0, HISTORY_SCAN)) {
+    const key = urlKey(entry.url);
+    const seenVisit = visits.get(key);
+    if (seenVisit) seenVisit.count += 1;
+    else visits.set(key, { url: entry.url, title: entry.title, count: 1, last: entry.visitedAt });
+  }
+  const now = Date.now();
+  for (const [key, v] of visits) {
+    let value = score(v.title || displayUrl(v.url), v.url);
+    if (value <= 10) continue;
+    const recent = now - v.last < 7 * 24 * 60 * 60 * 1000 ? 1.05 : 1;
+    value *= HISTORY_WEIGHT * recent * Math.min(1.15, 1 + v.count * 0.02);
+    ranked.push({
+      score: value,
+      s: { kind: 'history', id: `history:${key}`, title: v.title || displayUrl(v.url), url: v.url },
+    });
+  }
+
   const matches: Suggestion[] = [];
   for (const { s } of ranked.sort((a, b) => b.score - a.score)) {
     // An open tab and a bookmark for the same page collapse into the tab.
     const key = s.kind === 'tab' ? `tab:${urlKey(s.url)}` : urlKey(s.url);
-    if (seen.has(key) || (s.kind === 'bookmark' && seen.has(`tab:${urlKey(s.url)}`))) continue;
+    const page = urlKey(s.url);
+    if (
+      seen.has(key) ||
+      (s.kind !== 'tab' && seen.has(`tab:${page}`)) ||
+      (s.kind === 'history' && seen.has(page))
+    ) {
+      continue;
+    }
     seen.add(key);
     matches.push(s);
     if (matches.length >= MAX_MATCHES) break;

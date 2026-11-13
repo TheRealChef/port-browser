@@ -4,7 +4,7 @@ import { createFolderFlow } from '../../features/bookmarks/bookmarkActions';
 import { buildFolderMenu } from '../../features/bookmarks/bookmarkMenu';
 import { ACCENTS } from '../../features/workspace/appearance';
 import { activeView, folderPath, foldersIn } from '../../features/workspace/selectors';
-import { useUI } from '../../stores/uiStore';
+import { selectPanelOpen, useUI } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';
 import type { ID } from '../../types/models';
 import { cn } from '../../utils/misc';
@@ -21,7 +21,7 @@ export function BookmarkList({ spaceId }: { spaceId: ID }) {
   const bookmarks = useWorkspace((s) => s.bookmarks);
   const showBookmarks = useWorkspace((s) => s.showBookmarks);
   const view = useWorkspace(activeView);
-  const settingsOpen = useUI((s) => s.settingsOpen);
+  const settingsOpen = useUI(selectPanelOpen);
   const setSettingsOpen = useUI((s) => s.setSettingsOpen);
 
   const topLevel = useMemo(() => foldersIn(folders, spaceId, null), [folders, spaceId]);

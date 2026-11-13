@@ -5,7 +5,7 @@ import { LayoutDashboard, Plus } from 'lucide-react';
 import { createDashboardFlow } from '../../features/workspace/actions';
 import { buildDashboardMenu } from '../../features/workspace/menus';
 import { activeView, dashboardsOfSpace } from '../../features/workspace/selectors';
-import { useUI } from '../../stores/uiStore';
+import { selectPanelOpen, useUI } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';
 import type { Dashboard, ID } from '../../types/models';
 import { cn } from '../../utils/misc';
@@ -16,7 +16,7 @@ import { SectionHeader } from './SidebarTree';
 export function DashboardList({ spaceId }: { spaceId: ID }) {
   const dashboards = useWorkspace((s) => s.dashboards);
   const view = useWorkspace(activeView);
-  const settingsOpen = useUI((s) => s.settingsOpen);
+  const settingsOpen = useUI(selectPanelOpen);
   const list = useMemo(() => dashboardsOfSpace(dashboards, spaceId), [dashboards, spaceId]);
 
   return (

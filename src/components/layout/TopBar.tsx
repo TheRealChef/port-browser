@@ -7,7 +7,9 @@ import {
   RotateCw,
   Search,
   Settings,
+  Download,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
 import { AddressBar } from '../../features/navigation/AddressBar';
 import { activeTab } from '../../features/workspace/selectors';
@@ -16,6 +18,8 @@ import { useUI } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';
 import { MOD_LABEL } from '../../utils/misc';
 import { IconButton } from '../common/IconButton';
+import { DownloadsPanel } from '../../features/downloads/DownloadsPanel';
+import { downloadProgress } from '../../features/downloads/format';
 
 export function TopBar() {
   const nav = useNavigation();
@@ -36,7 +40,7 @@ export function TopBar() {
     : Boolean(tab && tab.historyIndex < tab.history.length - 1);
 
   return (
-    <header className="flex h-11 shrink-0 items-center gap-1 px-1.5">
+    <header className="flex h-11 shrink-0 select-none items-center gap-1 px-1.5">
       <IconButton
         icon={collapsed ? PanelLeftOpen : PanelLeftClose}
         label={collapsed ? 'Show sidebar' : 'Hide sidebar'}
@@ -75,6 +79,7 @@ export function TopBar() {
         shortcut={`${MOD_LABEL}+T`}
         onClick={() => nav.newTab()}
       />
+      {host.kind === 'native' && <DownloadsButton />}
       <IconButton
         icon={Search}
         label="Command palette"
@@ -89,5 +94,54 @@ export function TopBar() {
         onClick={() => setSettingsOpen(!settingsOpen)}
       />
     </header>
+  );
+}
+
+/** Toolbar button with a progress ring while downloads run; opens the downloads panel. */
+function DownloadsButton() {
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
+  const open = useUI((s) => s.downloadsOpen);
+  const setOpen = useUI((s) => s.setDownloadsOpen);
+  const downloads = useUI((s) => s.downloads);
+  const active = downloads.filter((d) => d.state === 'inProgress');
+  const known = active.map(downloadProgress).filter((p): p is number => p !== null);
+  const progress = known.length ? known.reduce((a, b) => a + b, 0) / known.length : null;
+  const r = 13;
+  const circumference = 2 * Math.PI * r;
+
+  return (
+    <span className="relative inline-flex">
+      <IconButton
+        ref={setAnchor}
+        icon={Download}
+        label={active.length ? `Downloads (${active.length} in progress)` : 'Downloads'}
+        shortcut={`${MOD_LABEL}+J`}
+        active={open}
+        className={active.length ? 'text-info' : undefined}
+        onClick={() => setOpen(!open)}
+      />
+      {active.length > 0 && (
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -rotate-90"
+          viewBox="0 0 32 32"
+        >
+          <circle cx="16" cy="16" r={r} fill="none" stroke="var(--border)" strokeWidth="2" />
+          <circle
+            cx="16"
+            cy="16"
+            r={r}
+            fill="none"
+            stroke="var(--info)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference * (1 - (progress ?? 0.25))}
+            className={progress === null ? 'origin-center animate-spin' : undefined}
+          />
+        </svg>
+      )}
+      <DownloadsPanel anchor={anchor} />
+    </span>
   );
 }

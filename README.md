@@ -31,21 +31,24 @@ If port 5173 is taken, Vite picks the next free port and prints it.
 
 Requires the .NET 10 SDK and the WebView2 runtime (built into Windows 11).
 
-| Script                | Purpose                                                                                                              |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Script                | Purpose                                                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `npm run app:install` | Build everything and install to `%LOCALAPPDATA%/Programs/Port` with Start menu and desktop shortcuts. Rerun to update. |
-| `npm run app:build`   | Build a portable copy to `release/Port/` (run `Port.exe`).                                                           |
-| `npm run app:dev`     | Run the shell against the Vite dev server (`npm run dev` must be running) for hot reload.                            |
+| `npm run app:build`   | Build a portable copy to `release/Port/` (run `Port.exe`).                                                             |
+| `npm run app:dev`     | Run the shell against the Vite dev server (`npm run dev` must be running) for hot reload.                              |
 
-Data lives in `%LOCALAPPDATA%/Port` (workspace, cookies and site data in the `Profile` folder, window position in `window.json`). Reinstalling does not touch it. The desktop app has its own storage, so to bring over a workspace from the web build use **Settings → Export** there and **Import** in the app.
+Data lives in `%LOCALAPPDATA%/Port`: the workspace and each space's cookies and site data in `Profile`, which space uses which browser profile in `profiles.json`, the download list in `downloads.json`, and the window position in `window.json`. Reinstalling does not touch it. The desktop app has its own storage, so to bring over a workspace from the web build use **Settings → Export** there and **Import** in the app.
 
 How it works (`native/Port.Desktop`):
 
 - The UI is served from the bundled `dist/` at `https://port.example/` (a WebView2 virtual host; nothing is fetched from the network) and talks to the shell only through `chrome.webview.postMessage`. Messages are typed in `src/host/bridge.ts`, and the UI side is `src/host/NativeBrowserHost.ts`.
 - Each tab gets a WebView2 view laid over the content area the UI reports. Views are created when a tab is first shown and kept alive until the tab closes. Removing tabs any other way (deleting a space or group) also releases their views.
-- Native views always draw above the UI, so while a menu, dialog, the palette, address suggestions or a toast is open, the page is swapped for a still snapshot.
+- **Sign-ins per space.** Each space browses in its own persistent WebView2 profile (cookies, storage, cache), so you can be signed in to different accounts in Work and Personal, and sign-ins survive restarts. Popups share their opener's profile; a tab moved to another space reloads in that space's profile. **Settings → Sign-ins** signs a space out of every site. Pages opened before per-space profiles existed used the default profile; the first space that opens a page afterwards keeps those sign-ins. That default profile also holds Port's own saved workspace, so signing that space out clears everything except site local storage.
+- **Downloads** go to your Downloads folder and appear in Port's panel (toolbar button or `Ctrl+J`) with progress, pause, resume, cancel, open and show in folder, instead of WebView2's own flyout. The list is kept across restarts.
+- **History.** Every address a tab settles on for a moment is recorded locally (`src/stores/historyStore.ts`, `vela:history`): visited pages with title, space and time, without sign-in codes or tokens from addresses. Open it from the sidebar, the palette or `Ctrl+H` to search it, filter by space, and delete single visits, a whole site or a time range. History also feeds address-bar suggestions, and **Settings → History** turns recording off. It works in the web build too.
+- Native views always draw above the UI, so while a menu, dialog, the palette, address suggestions, the downloads panel, a toast or a tooltip that reaches into the page is open, the page is swapped for a still snapshot. The live view is hidden only after the UI has painted the snapshot, so nothing flashes.
 - Titles, favicons, URL changes, loading state and back/forward come from the engine. `target=_blank` links and popups open as tabs that keep `window.opener` (OAuth popups work). Page fullscreen fills the window.
-- Port's shortcuts (`Ctrl+T/W/L/K`, `Ctrl+Shift+T`, `Ctrl+1…9`, `Ctrl+,`) still work while a page has focus. Everything else (`Ctrl+F`, `Ctrl+R`, `F12` DevTools, `Alt+←/→`) goes to the page.
+- Port's shortcuts (`Ctrl+T/W/L/K/H/J`, `Ctrl+Shift+T`, `Ctrl+1…9`, `Ctrl+,`) still work while a page has focus. Everything else (`Ctrl+F`, `Ctrl+R`, `F12` DevTools, `Alt+←/→`) goes to the page.
 - Pages have no access to the bridge. Only the UI origin's messages are accepted, the UI view can't navigate away from its origin, and `openExternal` only opens http(s) URLs.
 
 ## Features

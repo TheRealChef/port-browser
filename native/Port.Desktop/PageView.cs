@@ -8,9 +8,10 @@ namespace Port.Desktop;
 /// <summary>One tab's real browser view. Created hidden; the window positions it.</summary>
 internal sealed class PageView
 {
-    public PageView(string tabId)
+    public PageView(string tabId, string profile)
     {
         TabId = tabId;
+        Profile = profile;
         View = new WebView2
         {
             Visibility = Visibility.Hidden,
@@ -21,6 +22,8 @@ internal sealed class PageView
     }
 
     public string TabId { get; }
+    /// <summary>WebView2 profile (one per space); empty for the default profile.</summary>
+    public string Profile { get; }
     public WebView2 View { get; }
     public CoreWebView2? Core => View.CoreWebView2;
     public Task Ready { get; set; } = Task.CompletedTask;

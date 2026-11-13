@@ -36,7 +36,9 @@ export function useGlobalShortcuts(): void {
       if (event.key === 'Escape') {
         if (ui.contextMenu) ui.closeContextMenu();
         else if (ui.paletteOpen) ui.setPaletteOpen(false);
-        else if (ui.settingsOpen && !ui.dialog && !typing) ui.setSettingsOpen(false);
+        else if (ui.downloadsOpen) ui.setDownloadsOpen(false);
+        else if ((ui.settingsOpen || ui.historyOpen) && !ui.dialog && !typing)
+          ui.setSettingsOpen(false);
         return;
       }
       if (overlayOpen) return;
@@ -68,6 +70,8 @@ export function useGlobalShortcuts(): void {
       if (modOnly && key === 'b') return run(() => useSettings.getState().toggleSidebar());
       if (modOnly && key === 'r') return run(() => nav.reload());
       if (modOnly && key === ',') return run(() => ui.setSettingsOpen(!ui.settingsOpen));
+      if (modOnly && key === 'h') return run(() => ui.setHistoryOpen(!ui.historyOpen));
+      if (modOnly && key === 'j') return run(() => ui.setDownloadsOpen(!ui.downloadsOpen));
 
       if ((modOnly || altOnly) && /^[1-9]$/.test(event.key)) {
         const space = sortedSpaces(useWorkspace.getState().spaces)[Number(event.key) - 1];

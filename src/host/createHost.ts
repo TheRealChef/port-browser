@@ -42,7 +42,27 @@ export function createBrowserHost(): BrowserHost {
           new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true }),
         );
       },
-      tabIds: () => new Set(Object.keys(ws().tabs)),
+      tabSpaces: () => new Map(Object.values(ws().tabs).map((t) => [t.id, t.spaceId])),
+      setDownloads: (items, started) => {
+        const ui = useUI.getState();
+        ui.setDownloads(items);
+        const latest = items[0];
+        if (started && latest && !ui.downloadsOpen) {
+          ui.showToast(`Downloading ${latest.fileName}`, 'info', {
+            label: 'Show',
+            run: () => useUI.getState().setDownloadsOpen(true),
+          });
+        }
+      },
+      spaceDataCleared: (spaceId, ok) => {
+        const name = ws().spaces[spaceId]?.name ?? 'this space';
+        useUI
+          .getState()
+          .showToast(
+            ok ? `Signed out of all sites in ${name}` : 'Could not clear site data',
+            ok ? 'success' : 'error',
+          );
+      },
       subscribeToTabs: (listener) =>
         useWorkspace.subscribe((state, previous) => {
           if (state.tabs !== previous.tabs) listener();

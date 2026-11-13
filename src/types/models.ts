@@ -156,4 +156,6 @@ export interface Settings {
   bookmarkTileSize: 'sm' | 'md' | 'lg';
   /** Show subfolder contents as sections instead of folder cards only. */
   bookmarkShowNested: boolean;
+  /** Keep a browsing history (stored only on this device). */
+  recordHistory: boolean;
 }

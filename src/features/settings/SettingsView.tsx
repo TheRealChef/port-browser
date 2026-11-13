@@ -1,3 +1,7 @@
+import { NativeBrowserHost } from '../../host/NativeBrowserHost';
+import { askConfirm } from '../../components/common/dialogs';
+import { useUI } from '../../stores/uiStore';
+import { History } from 'lucide-react';
 import { useMemo, useRef, type ReactNode } from 'react';
 import { EntityIcon } from '../../components/common/EntityIcon';
 import { Download, Pencil, RotateCcw, Trash2, Upload } from 'lucide-react';
@@ -137,9 +141,11 @@ const SHORTCUTS: Array<{ keys: string; action: string; note?: string }> = [
   { keys: `${MOD_LABEL}+1…9  ·  Alt+1…9`, action: 'Switch space (Work, Personal, …)' },
   { keys: `${MOD_LABEL}+B`, action: 'Toggle sidebar' },
   { keys: `${MOD_LABEL}+K`, action: 'Command palette' },
-  { keys: `${MOD_LABEL}+R`, action: 'Reload tab preview' },
+  { keys: `${MOD_LABEL}+R`, action: 'Reload tab' },
   { keys: 'Alt+← / Alt+→', action: 'Back / forward' },
   { keys: `${MOD_LABEL}+,`, action: 'Settings' },
+  { keys: `${MOD_LABEL}+H`, action: 'History' },
+  { keys: `${MOD_LABEL}+J`, action: 'Downloads', note: 'Desktop app' },
   { keys: 'Esc', action: 'Close menu, dialog or palette' },
   { keys: 'F2 · Delete · Space', action: 'On a focused tab: rename · close · pick up to reorder' },
 ];
@@ -305,7 +311,11 @@ export function SettingsView() {
 
         <Section
           title="Keyboard shortcuts"
-          description="Shortcuts don't fire while focus is inside an embedded page."
+          description={
+            host.kind === 'web'
+              ? "Shortcuts don't fire while focus is inside an embedded page."
+              : 'These work even while a page has focus.'
+          }
         >
           <div className="overflow-hidden rounded-lg border border-line">
             {SHORTCUTS.map((s) => (
@@ -315,13 +325,71 @@ export function SettingsView() {
               >
                 <span className="flex-1">
                   {s.action}
-                  {s.note && <span className="ml-2 text-[12px] text-fg-3">{s.note}</span>}
+                  {s.note && (host.kind === 'web' || !s.note.includes('reserve')) && (
+                    <span className="ml-2 text-[12px] text-fg-3">{s.note}</span>
+                  )}
                 </span>
                 <Kbd>{s.keys}</Kbd>
               </div>
             ))}
           </div>
         </Section>
+
+        <Section
+          title="History"
+          description="Visited pages are kept only on this device, without sign-in codes or tokens from addresses."
+        >
+          <Row label="Save browsing history" hint="Turning this off keeps existing history.">
+            <Toggle
+              label="Save browsing history"
+              checked={settings.recordHistory}
+              onChange={(recordHistory) => settings.update({ recordHistory })}
+            />
+          </Row>
+          <div className="flex flex-wrap gap-2">
+            <Button icon={History} onClick={() => useUI.getState().setHistoryOpen(true)}>
+              Open history
+            </Button>
+          </div>
+        </Section>
+
+        {host instanceof NativeBrowserHost && (
+          <Section
+            title="Sign-ins"
+            description="Each space browses with its own cookies and site data, so you can be signed in to different accounts per space. Sign-ins are kept when Port restarts."
+          >
+            <div className="overflow-hidden rounded-lg border border-line">
+              {spaceList.map((space) => (
+                <div
+                  key={space.id}
+                  className="flex items-center gap-3 px-3 py-2 text-[13px] [&+&]:border-t [&+&]:border-line"
+                >
+                  <span
+                    className="size-2 rounded-full"
+                    style={{ background: ACCENTS[space.accent].value }}
+                  />
+                  <span className="flex-1">{space.name}</span>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      void askConfirm({
+                        title: `Sign out of all sites in ${space.name}?`,
+                        message:
+                          'Deletes cookies, site storage and cache for this space. Open pages reload signed out. Bookmarks, tabs and history stay.',
+                        confirmLabel: 'Sign out',
+                        danger: true,
+                      }).then(({ ok }) => {
+                        if (ok) host.clearSpaceData(space.id);
+                      })
+                    }
+                  >
+                    Sign out of all sites
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
 
         <Section
           title="Data management"
@@ -358,13 +426,20 @@ export function SettingsView() {
               {host.kind}
             </span>
           </Row>
-          <p className="text-[12.5px] leading-relaxed text-fg-3">
-            This development build runs inside your existing browser. Pages are shown as sandboxed
-            previews only when the site allows embedding; many sites refuse, and those open in a
-            regular browser tab instead. Tabs in inactive spaces keep their place and history, but
-            their pages are not kept running in the background. A native host (WebView2) will lift
-            these limits.
-          </p>
+          {host.kind === 'native' ? (
+            <p className="text-[12.5px] leading-relaxed text-fg-3">
+              Pages run in Microsoft Edge WebView2. Every tab is a real browser view that keeps
+              running in the background, and each space has its own profile.
+            </p>
+          ) : (
+            <p className="text-[12.5px] leading-relaxed text-fg-3">
+              This development build runs inside your existing browser. Pages are shown as sandboxed
+              previews only when the site allows embedding; many sites refuse, and those open in a
+              regular browser tab instead. Tabs in inactive spaces keep their place and history, but
+              their pages are not kept running in the background. A native host (WebView2) will lift
+              these limits.
+            </p>
+          )}
         </Section>
       </div>
     </div>

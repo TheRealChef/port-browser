@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { create } from 'zustand';
 import type { AccentColor, ID, Tab } from '../types/models';
+import type { DownloadItem } from '../host/bridge';
 
 /** Transient UI state. Nothing here is persisted. */
 
@@ -92,6 +93,13 @@ const CLOSED_TAB_LIMIT = 25;
 
 interface UIState {
   settingsOpen: boolean;
+  /** History page in the content area (like settings, not part of the saved workspace). */
+  historyOpen: boolean;
+  downloadsOpen: boolean;
+  /** Downloads reported by the desktop shell, newest first. */
+  downloads: DownloadItem[];
+  /** A tooltip currently overlaps a native page view. */
+  tooltipOverPage: boolean;
   paletteOpen: boolean;
   contextMenu: ContextMenuState | null;
   dialog: DialogRequest | null;
@@ -108,7 +116,12 @@ interface UIState {
   closedTabs: Tab[];
   engineTabs: Record<ID, EngineTabState>;
 
+  /** Opening settings closes history; closing it leaves both panels (back to content). */
   setSettingsOpen: (open: boolean) => void;
+  setHistoryOpen: (open: boolean) => void;
+  setDownloadsOpen: (open: boolean) => void;
+  setDownloads: (downloads: DownloadItem[]) => void;
+  setTooltipOverPage: (over: boolean) => void;
   setPaletteOpen: (open: boolean) => void;
   openContextMenu: (menu: ContextMenuState) => void;
   closeContextMenu: () => void;
@@ -129,6 +142,10 @@ let toastSeq = 0;
 
 export const useUI = create<UIState>()((set, get) => ({
   settingsOpen: false,
+  historyOpen: false,
+  downloadsOpen: false,
+  downloads: [],
+  tooltipOverPage: false,
   paletteOpen: false,
   contextMenu: null,
   dialog: null,
@@ -141,7 +158,13 @@ export const useUI = create<UIState>()((set, get) => ({
   closedTabs: [],
   engineTabs: {},
 
-  setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
+  setSettingsOpen: (settingsOpen) => set({ settingsOpen, historyOpen: false }),
+  setHistoryOpen: (historyOpen) => set({ historyOpen, settingsOpen: false }),
+  setDownloadsOpen: (downloadsOpen) => set({ downloadsOpen }),
+  setDownloads: (downloads) => set({ downloads }),
+  setTooltipOverPage: (tooltipOverPage) => {
+    if (get().tooltipOverPage !== tooltipOverPage) set({ tooltipOverPage });
+  },
   setPaletteOpen: (paletteOpen) => set({ paletteOpen, contextMenu: null }),
   openContextMenu: (contextMenu) => set({ contextMenu }),
   closeContextMenu: () => set({ contextMenu: null }),
@@ -180,3 +203,21 @@ export const useUI = create<UIState>()((set, get) => ({
       return { engineTabs: { ...s.engineTabs, [tabId]: { ...current, ...patch } } };
     }),
 }));
+
+/** UI that draws over the content area, where native page views would hide it. */
+export function selectContentCovered(s: UIState): boolean {
+  return Boolean(
+    s.paletteOpen ||
+    s.contextMenu ||
+    s.dialog ||
+    s.suggestionsOpen ||
+    s.toast ||
+    s.downloadsOpen ||
+    s.tooltipOverPage,
+  );
+}
+
+/** Settings or history is showing instead of the space's own view. */
+export function selectPanelOpen(s: UIState): boolean {
+  return s.settingsOpen || s.historyOpen;
+}

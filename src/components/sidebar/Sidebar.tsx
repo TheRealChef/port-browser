@@ -1,3 +1,4 @@
+import { History } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { EntityIcon } from '../common/EntityIcon';
 import { Compass, MoreHorizontal, Plus, Search, Settings } from 'lucide-react';
@@ -7,7 +8,7 @@ import { buildSpaceMenu } from '../../features/workspace/menus';
 import { activeView } from '../../features/workspace/selectors';
 import { SIDEBAR_DEFAULT, SIDEBAR_MAX, SIDEBAR_MIN } from '../../stores/persistence';
 import { useSettings } from '../../stores/settingsStore';
-import { useUI } from '../../stores/uiStore';
+import { selectPanelOpen, useUI } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';
 import { cn, MOD_LABEL } from '../../utils/misc';
 import { clamp } from '../../utils/validate';
@@ -77,17 +78,20 @@ export function Sidebar() {
   const view = useWorkspace(activeView);
   const showStart = useWorkspace((s) => s.showStart);
   const settingsOpen = useUI((s) => s.settingsOpen);
+  const panelOpen = useUI(selectPanelOpen);
+  const historyOpen = useUI((s) => s.historyOpen);
+  const setHistoryOpen = useUI((s) => s.setHistoryOpen);
   const setSettingsOpen = useUI((s) => s.setSettingsOpen);
   const setPaletteOpen = useUI((s) => s.setPaletteOpen);
 
   if (collapsed || !space) return null;
   const width = liveWidth ?? storedWidth;
-  const startActive = !settingsOpen && view.kind === 'start';
+  const startActive = !panelOpen && view.kind === 'start';
 
   return (
     <aside
       aria-label="Sidebar"
-      className="relative flex h-full shrink-0 flex-col bg-sidebar"
+      className="relative flex h-full shrink-0 select-none flex-col bg-sidebar"
       style={{ width }}
     >
       <SidebarDnd spaceId={space.id}>
@@ -158,6 +162,23 @@ export function Sidebar() {
               className={startActive ? 'text-accent' : 'text-fg-3'}
             />
             Start page
+          </button>
+          <button
+            type="button"
+            aria-current={historyOpen ? 'page' : undefined}
+            onClick={() => setHistoryOpen(!historyOpen)}
+            className={cn(
+              'flex h-row items-center gap-2 rounded-lg px-2 text-[13px] transition-ui',
+              historyOpen ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+            )}
+          >
+            <History
+              size={15}
+              strokeWidth={1.9}
+              className={historyOpen ? 'text-accent' : 'text-fg-3'}
+            />
+            <span className="flex-1 text-left">History</span>
+            <Kbd>{MOD_LABEL}+H</Kbd>
           </button>
         </div>
 

@@ -17,7 +17,10 @@ function fakeBridge() {
 
 function deps(overrides: Partial<NativeHostDeps> = {}): NativeHostDeps {
   let tabListener: () => void = () => {};
-  const ids = new Set(['a', 'b']);
+  const ids = new Map([
+    ['a', 's1'],
+    ['b', 's1'],
+  ]);
   return {
     syncNavigation: vi.fn(),
     setTabMeta: vi.fn(),
@@ -26,14 +29,19 @@ function deps(overrides: Partial<NativeHostDeps> = {}): NativeHostDeps {
     openPopupTab: vi.fn(() => true),
     closeTab: vi.fn(),
     replayKey: vi.fn(),
-    tabIds: () => new Set(ids),
+    tabSpaces: () => new Map(ids),
+    setDownloads: vi.fn(),
+    spaceDataCleared: vi.fn(),
     subscribeToTabs: (l) => {
       tabListener = l;
       return () => {};
     },
     ...overrides,
     // test hooks
-    ...({ _remove: (id: string) => (ids.delete(id), tabListener()) } as object),
+    ...({
+      _remove: (id: string) => (ids.delete(id), tabListener()),
+      _move: (id: string, space: string) => (ids.set(id, space), tabListener()),
+    } as object),
   } as NativeHostDeps;
 }
 
@@ -55,11 +63,17 @@ describe('NativeBrowserHost', () => {
   });
 
   it('replaces the requested URL with the engine’s (redirects) instead of adding history', async () => {
-    const { bridge, emit } = fakeBridge();
+    const { bridge, emit, sent } = fakeBridge();
     const d = deps();
     const host = new NativeBrowserHost(bridge, d);
     await host.navigate('a', 'http://example.com');
     expect(d.syncNavigation).toHaveBeenLastCalledWith('a', 'http://example.com/');
+    expect(sent.at(-1)).toEqual({
+      type: 'navigate',
+      tabId: 'a',
+      url: 'http://example.com/',
+      spaceId: 's1',
+    });
     emit({
       type: 'navigated',
       tabId: 'a',
@@ -94,6 +108,14 @@ describe('NativeBrowserHost', () => {
     new NativeBrowserHost(bridge, d);
     (d as unknown as { _remove: (id: string) => void })._remove('b');
     expect(sent).toContainEqual({ type: 'dispose', tabId: 'b' });
+  });
+
+  it('recreates the view of a tab moved to another space', () => {
+    const { bridge, sent } = fakeBridge();
+    const d = deps();
+    new NativeBrowserHost(bridge, d);
+    (d as unknown as { _move: (id: string, s: string) => void })._move('a', 's2');
+    expect(sent).toContainEqual({ type: 'dispose', tabId: 'a' });
   });
 
   it('opens popups as tabs and releases them if that fails', () => {

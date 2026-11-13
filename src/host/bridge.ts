@@ -8,6 +8,24 @@ export interface ViewBounds {
   height: number;
 }
 
+export interface DownloadItem {
+  id: string;
+  url: string;
+  fileName: string;
+  /** Bytes; null when the server did not say. */
+  totalBytes: number | null;
+  receivedBytes: number;
+  state: 'inProgress' | 'paused' | 'interrupted' | 'completed';
+  /** Engine reason when interrupted, e.g. NetworkFailed. */
+  reason: string | null;
+  canResume: boolean;
+  startedAt: number;
+  /** File no longer at its saved path (moved or deleted). */
+  missing: boolean;
+}
+
+export type DownloadAction = 'pause' | 'resume' | 'cancel' | 'open' | 'showInFolder' | 'remove';
+
 /** Messages the UI sends to the native shell. */
 export type UIToHostMessage =
   | { type: 'ready' }
@@ -24,13 +42,22 @@ export type UIToHostMessage =
       url?: string;
       bounds?: ViewBounds;
       covered?: boolean;
+      /** Each space browses in its own profile (cookies, sign-ins, storage). */
+      spaceId?: ID;
     }
-  | { type: 'navigate'; tabId: ID; url: string }
+  /** The UI has painted the snapshot; the shell can hide the live view without a flash. */
+  | { type: 'snapshotShown'; tabId: ID }
+  | { type: 'navigate'; tabId: ID; url: string; spaceId?: ID }
   | { type: 'reload'; tabId: ID }
   | { type: 'back'; tabId: ID }
   | { type: 'forward'; tabId: ID }
   | { type: 'dispose'; tabId: ID }
-  | { type: 'openExternal'; url: string };
+  | { type: 'openExternal'; url: string }
+  | { type: 'download'; id: string; action: DownloadAction }
+  | { type: 'clearDownloads' }
+  | { type: 'openDownloadsFolder' }
+  /** Signs out of every site in a space by clearing its profile's browsing data. */
+  | { type: 'clearSpaceData'; spaceId: ID };
 
 /** Messages the native shell sends to the UI. */
 export type HostToUIMessage =
@@ -44,6 +71,8 @@ export type HostToUIMessage =
   /** A page called `window.close()`. */
   | { type: 'closeTab'; tabId: ID }
   | { type: 'snapshot'; tabId: ID; dataUrl: string | null }
+  | { type: 'downloads'; items: DownloadItem[]; started?: boolean }
+  | { type: 'spaceDataCleared'; spaceId: ID; ok: boolean }
   /** A browser shortcut pressed while a page had focus, forwarded to the UI. */
   | {
       type: 'key';
@@ -83,6 +112,8 @@ const MESSAGE_TYPES = new Set([
   'newTab',
   'closeTab',
   'snapshot',
+  'downloads',
+  'spaceDataCleared',
   'key',
 ]);
 

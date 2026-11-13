@@ -15,6 +15,7 @@ import { IconButton } from '../../components/common/IconButton';
 import { useSettings } from '../../stores/settingsStore';
 import { useUI } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';
+import { useHistory } from '../../stores/historyStore';
 import { activeTab, bookmarksOfSpace } from '../workspace/selectors';
 import { editBookmarkFlow, removeBookmarkWithUndo } from '../bookmarks/bookmarkActions';
 import { cn, MOD_LABEL } from '../../utils/misc';
@@ -39,7 +40,13 @@ export function AddressBar() {
 
   const suggestions = useMemo<Suggestion[]>(() => {
     if (!editing || draft === null) return [];
-    return buildSuggestions(draft, useWorkspace.getState(), engine, tab?.id ?? null);
+    return buildSuggestions(
+      draft,
+      useWorkspace.getState(),
+      engine,
+      tab?.id ?? null,
+      useHistory.getState().entries,
+    );
   }, [editing, draft, engine, tab?.id]);
   const open = suggestions.length > 0;
   const active = Math.min(highlight, Math.max(suggestions.length - 1, 0));
@@ -209,7 +216,7 @@ export function AddressBar() {
               <SuggestionIcon suggestion={s} />
               <span className="min-w-0 flex-1 truncate">
                 <span className="text-fg">{s.title}</span>
-                {(s.kind === 'tab' || s.kind === 'bookmark') && (
+                {(s.kind === 'tab' || s.kind === 'bookmark' || s.kind === 'history') && (
                   <span className="ml-2 text-[12px] text-fg-3">{displayUrl(s.url)}</span>
                 )}
               </span>
@@ -218,6 +225,7 @@ export function AddressBar() {
                 {s.kind === 'search' && 'Search'}
                 {s.kind === 'tab' && `Switch to tab · ${s.spaceName}`}
                 {s.kind === 'bookmark' && 'Bookmark'}
+                {s.kind === 'history' && 'History'}
               </span>
             </li>
           ))}
@@ -244,6 +252,7 @@ function SuggestionIcon({ suggestion }: { suggestion: Suggestion }) {
         </span>
       );
     case 'bookmark':
+    case 'history':
       return <Favicon url={suggestion.url} />;
   }
 }

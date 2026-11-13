@@ -439,6 +439,7 @@ export const DEFAULT_SETTINGS: Settings = {
   bookmarkLayout: 'grid',
   bookmarkTileSize: 'md',
   bookmarkShowNested: false,
+  recordHistory: true,
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
@@ -469,6 +470,7 @@ export function sanitizeSettings(raw: unknown): Settings {
       d.bookmarkTileSize,
     ),
     bookmarkShowNested: asBoolean(raw.bookmarkShowNested, d.bookmarkShowNested),
+    recordHistory: asBoolean(raw.recordHistory, d.recordHistory),
   };
 }
 

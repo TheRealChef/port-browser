@@ -1,6 +1,13 @@
 import type { ID } from '../types/models';
 import { toSafeHttpUrl } from '../utils/url';
-import type { HostBridge, HostToUIMessage, UIToHostMessage, ViewBounds } from './bridge';
+import type {
+  DownloadAction,
+  DownloadItem,
+  HostBridge,
+  HostToUIMessage,
+  UIToHostMessage,
+  ViewBounds,
+} from './bridge';
 import { isHostMessage } from './bridge';
 import type { BrowserHost, EmbedSupport } from './types';
 
@@ -18,8 +25,10 @@ export interface NativeHostDeps {
   closeTab: (tabId: ID) => void;
   /** Replays a shortcut pressed inside a page as if it was pressed in the UI. */
   replayKey: (init: KeyboardEventInit) => void;
-  /** Ids of all tabs that currently exist, to release views of removed tabs. */
-  tabIds: () => Set<ID>;
+  /** Every existing tab and its space, to release views of removed or moved tabs. */
+  tabSpaces: () => Map<ID, ID>;
+  setDownloads: (items: DownloadItem[], started: boolean) => void;
+  spaceDataCleared: (spaceId: ID, ok: boolean) => void;
   subscribeToTabs: (listener: () => void) => () => void;
 }
 
@@ -42,23 +51,24 @@ export class NativeBrowserHost implements BrowserHost {
   private readonly deps: NativeHostDeps;
   /** Tabs with a navigation we started that the engine has not reported yet. */
   private readonly pending = new Set<ID>();
-  private known = new Set<ID>();
+  private known = new Map<ID, ID>();
   /** Tabs the shell has a view for (as far as the UI knows). */
   private readonly created = new Set<ID>();
 
   constructor(bridge: HostBridge, deps: NativeHostDeps) {
     this.bridge = bridge;
     this.deps = deps;
-    this.known = deps.tabIds();
+    this.known = deps.tabSpaces();
     bridge.addEventListener('message', (event) => {
       if (isHostMessage(event.data)) this.receive(event.data);
     });
     // Tabs can disappear without closeTab (space or group deletion, imports):
-    // release their views so hidden pages stop running.
+    // release their views so hidden pages stop running. A tab moved to another
+    // space is released too and recreated in that space's profile when shown.
     deps.subscribeToTabs(() => {
-      const current = deps.tabIds();
-      for (const id of this.known) {
-        if (!current.has(id)) void this.disposeTab(id);
+      const current = deps.tabSpaces();
+      for (const [id, spaceId] of this.known) {
+        if (current.get(id) !== spaceId) void this.disposeTab(id);
       }
       this.known = current;
     });
@@ -69,7 +79,13 @@ export class NativeBrowserHost implements BrowserHost {
    * Shows a tab's view over `bounds` (or hides all views with `tabId: null`).
    * The first time a tab is shown the shell creates its view and loads `url`.
    */
-  showView(view: { tabId: ID | null; url?: string; bounds?: ViewBounds; covered?: boolean }): void {
+  showView(view: {
+    tabId: ID | null;
+    url?: string;
+    bounds?: ViewBounds;
+    covered?: boolean;
+    spaceId?: ID;
+  }): void {
     if (view.tabId && !this.created.has(view.tabId)) {
       this.created.add(view.tabId);
       // The engine may land on a redirected URL; replace instead of adding history.
@@ -89,7 +105,7 @@ export class NativeBrowserHost implements BrowserHost {
     this.deps.syncNavigation(tabId, safe);
     this.pending.add(tabId);
     this.created.add(tabId);
-    this.post({ type: 'navigate', tabId, url: safe });
+    this.post({ type: 'navigate', tabId, url: safe, spaceId: this.deps.tabSpaces().get(tabId) });
   }
 
   async reload(tabId: ID): Promise<void> {
@@ -113,6 +129,27 @@ export class NativeBrowserHost implements BrowserHost {
     this.pending.delete(tabId);
     this.created.delete(tabId);
     this.post({ type: 'dispose', tabId });
+  }
+
+  snapshotShown(tabId: ID): void {
+    this.post({ type: 'snapshotShown', tabId });
+  }
+
+  downloadAction(id: string, action: DownloadAction): void {
+    this.post({ type: 'download', id, action });
+  }
+
+  clearDownloads(): void {
+    this.post({ type: 'clearDownloads' });
+  }
+
+  openDownloadsFolder(): void {
+    this.post({ type: 'openDownloadsFolder' });
+  }
+
+  /** Signs out of all sites in a space (clears its cookies and site data). */
+  clearSpaceData(spaceId: ID): void {
+    this.post({ type: 'clearSpaceData', spaceId });
   }
 
   getEmbedSupport(): EmbedSupport {
@@ -162,6 +199,15 @@ export class NativeBrowserHost implements BrowserHost {
         break;
       case 'snapshot':
         deps.setSnapshot(message.tabId, message.dataUrl);
+        break;
+      case 'downloads':
+        deps.setDownloads(
+          Array.isArray(message.items) ? message.items : [],
+          Boolean(message.started),
+        );
+        break;
+      case 'spaceDataCleared':
+        deps.spaceDataCleared(message.spaceId, message.ok);
         break;
       case 'key':
         deps.replayKey({

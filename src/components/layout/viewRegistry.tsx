@@ -4,6 +4,7 @@ import { useWorkspace } from '../../stores/workspaceStore';
 import type { SpaceView } from '../../types/models';
 import { activeView } from '../../features/workspace/selectors';
 import { SettingsView } from '../../features/settings/SettingsView';
+import { HistoryView } from '../../features/history/HistoryView';
 import { BookmarksView } from '../bookmarks/BookmarksView';
 import { DashboardView } from '../dashboard/DashboardView';
 import { StartPage } from '../start/StartPage';
@@ -13,7 +14,7 @@ import { TabView } from '../tabs/TabView';
  * Everything the content area can show. Add a kind to this union and a
  * renderer to the registry to introduce a new view without touching the shell.
  */
-export type ContentView = SpaceView | { kind: 'settings' };
+export type ContentView = SpaceView | { kind: 'settings' } | { kind: 'history' };
 
 type Renderers = {
   [K in ContentView['kind']]: (view: Extract<ContentView, { kind: K }>) => ReactNode;
@@ -25,12 +26,16 @@ const registry: Renderers = {
   dashboard: (view) => <DashboardView dashboardId={view.dashboardId} />,
   bookmarks: (view) => <BookmarksView folderId={view.folderId} />,
   settings: () => <SettingsView />,
+  history: () => <HistoryView />,
 };
 
 export function useContentView(): ContentView {
   const settingsOpen = useUI((s) => s.settingsOpen);
+  const historyOpen = useUI((s) => s.historyOpen);
   const view = useWorkspace(activeView);
-  return settingsOpen ? { kind: 'settings' } : view;
+  if (settingsOpen) return { kind: 'settings' };
+  if (historyOpen) return { kind: 'history' };
+  return view;
 }
 
 export function viewKey(view: ContentView): string {

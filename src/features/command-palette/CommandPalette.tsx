@@ -1,3 +1,4 @@
+import { History } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { EntityIcon } from '../../components/common/EntityIcon';
 import { createPortal } from 'react-dom';
@@ -96,6 +97,14 @@ function useItems(query: string): PaletteItem[] {
           leaveSettings();
           ws.showStart();
         },
+      },
+      {
+        id: 'a:history',
+        title: 'Show history',
+        icon: <History size={15} />,
+        keywords: 'visited recent pages browsing',
+        hint: `${MOD_LABEL}+H`,
+        run: () => useUI.getState().setHistoryOpen(true),
       },
       {
         id: 'a:library',

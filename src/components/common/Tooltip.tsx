@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useUI } from '../../stores/uiStore';
 import { createPortal } from 'react-dom';
 import { Kbd } from './Kbd';
 
@@ -41,6 +42,21 @@ export function Tooltip({ label, shortcut, side = 'bottom', children }: TooltipP
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
+  // In the desktop app pages draw above the UI; a tooltip reaching into the
+  // page area asks for the page snapshot so it stays visible.
+  const tip = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const slot = document.querySelector('[data-native-slot]');
+    const el = tip.current;
+    if (!pos || !slot || !el) return;
+    const a = el.getBoundingClientRect();
+    const b = slot.getBoundingClientRect();
+    const overlaps = a.right > b.left && a.left < b.right && a.bottom > b.top && a.top < b.bottom;
+    if (!overlaps) return;
+    useUI.getState().setTooltipOverPage(true);
+    return () => useUI.getState().setTooltipOverPage(false);
+  }, [pos]);
+
   const transform =
     side === 'right'
       ? 'translate(0, -50%)'
@@ -64,6 +80,7 @@ export function Tooltip({ label, shortcut, side = 'bottom', children }: TooltipP
       {pos &&
         createPortal(
           <div
+            ref={tip}
             role="tooltip"
             className="pointer-events-none fixed z-[100] flex animate-fade items-center gap-2 whitespace-nowrap rounded-md bg-elevated px-2 py-1 text-[11.5px] text-fg shadow-pop"
             style={{

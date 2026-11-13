@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Copy, ExternalLink, Info, ShieldAlert, TriangleAlert } from 'lucide-react';
 import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
-import { useUI } from '../../stores/uiStore';
+import { selectContentCovered, useUI } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';
 import { tabDisplayTitle } from '../../features/workspace/selectors';
 import type { Tab } from '../../types/models';
@@ -43,13 +43,12 @@ function PageView({ tab }: { tab: Tab }) {
  */
 function NativeSlot({ host, tab }: { host: NativeBrowserHost; tab: Tab }) {
   const ref = useRef<HTMLDivElement>(null);
-  const covered = useUI((s) =>
-    Boolean(s.paletteOpen || s.contextMenu || s.dialog || s.suggestionsOpen || s.toast),
-  );
+  const covered = useUI(selectContentCovered);
   const snapshot = useUI((s) => s.engineTabs[tab.id]?.snapshot ?? null);
   const loading = useUI((s) => s.engineTabs[tab.id]?.loading ?? false);
   const dismissToast = useUI((s) => s.dismissToast);
   const tabId = tab.id;
+  const spaceId = tab.spaceId;
   // Only needed when the view is created; later URL changes come from the engine.
   const initialUrl = useRef(tab.url);
 
@@ -66,6 +65,7 @@ function NativeSlot({ host, tab }: { host: NativeBrowserHost; tab: Tab }) {
           url: initialUrl.current,
           bounds: { x: r.left, y: r.top, width: r.width, height: r.height },
           covered,
+          spaceId,
         });
       });
     };
@@ -78,7 +78,7 @@ function NativeSlot({ host, tab }: { host: NativeBrowserHost; tab: Tab }) {
       observer.disconnect();
       window.removeEventListener('resize', send);
     };
-  }, [host, tabId, covered]);
+  }, [host, tabId, spaceId, covered]);
 
   // Hide the view when the slot goes away (start page, dashboards, settings).
   useEffect(() => () => host.showView({ tabId: null }), [host, tabId]);
@@ -88,13 +88,14 @@ function NativeSlot({ host, tab }: { host: NativeBrowserHost; tab: Tab }) {
   }, [covered, snapshot, tabId]);
 
   return (
-    <div ref={ref} className="relative h-full overflow-hidden bg-canvas">
+    <div ref={ref} data-native-slot className="relative h-full overflow-hidden bg-canvas">
       {covered && snapshot && (
         <img
           src={snapshot}
           alt=""
           draggable={false}
           className="absolute inset-0 size-full object-fill"
+          onLoad={() => host.snapshotShown(tabId)}
           onPointerDown={() => dismissToast()}
         />
       )}
