@@ -329,10 +329,27 @@ public sealed class MainWindow : Window
             }
 
             var visibility = isActive ? Visibility.Visible : Visibility.Hidden;
-            if (page.View.Visibility != visibility) page.View.Visibility = visibility;
+            if (page.View.Visibility != visibility)
+            {
+                page.View.Visibility = visibility;
+                if (isActive) ReportShownAfterPaint(page);
+            }
             // Both views are child windows; Windows keeps whichever was raised last on top,
             // and the UI view can end up above the page. Keep the page in front explicitly.
             if (isActive) NativeMethods.BringToTop(page.View.Handle);
+        }
+    }
+
+    /// <summary>
+    /// Tells the UI a page is visible again once it has had a couple of frames to
+    /// paint, so the UI can drop the snapshot underneath without a flash.
+    /// </summary>
+    private async void ReportShownAfterPaint(PageView page)
+    {
+        await Task.Delay(80);
+        if (!page.Disposed && page.View.Visibility == Visibility.Visible)
+        {
+            Post(new { type = "viewShown", tabId = page.TabId });
         }
     }
 

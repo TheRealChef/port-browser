@@ -83,13 +83,10 @@ function NativeSlot({ host, tab }: { host: NativeBrowserHost; tab: Tab }) {
   // Hide the view when the slot goes away (start page, dashboards, settings).
   useEffect(() => () => host.showView({ tabId: null }), [host, tabId]);
 
-  useEffect(() => {
-    if (!covered && snapshot) useUI.getState().setEngineTab(tabId, { snapshot: null });
-  }, [covered, snapshot, tabId]);
-
   return (
     <div ref={ref} data-native-slot className="relative h-full overflow-hidden bg-canvas">
-      {covered && snapshot && (
+      {/* Stays until the shell reports the live view is back, so uncovering never flashes. */}
+      {snapshot && (
         <img
           src={snapshot}
           alt=""

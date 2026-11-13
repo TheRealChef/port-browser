@@ -200,6 +200,9 @@ export class NativeBrowserHost implements BrowserHost {
       case 'snapshot':
         deps.setSnapshot(message.tabId, message.dataUrl);
         break;
+      case 'viewShown':
+        deps.setSnapshot(message.tabId, null);
+        break;
       case 'downloads':
         deps.setDownloads(
           Array.isArray(message.items) ? message.items : [],

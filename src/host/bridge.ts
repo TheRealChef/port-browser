@@ -71,6 +71,8 @@ export type HostToUIMessage =
   /** A page called `window.close()`. */
   | { type: 'closeTab'; tabId: ID }
   | { type: 'snapshot'; tabId: ID; dataUrl: string | null }
+  /** The tab's live view is visible and painted again; any snapshot can go. */
+  | { type: 'viewShown'; tabId: ID }
   | { type: 'downloads'; items: DownloadItem[]; started?: boolean }
   | { type: 'spaceDataCleared'; spaceId: ID; ok: boolean }
   /** A browser shortcut pressed while a page had focus, forwarded to the UI. */
@@ -112,6 +114,7 @@ const MESSAGE_TYPES = new Set([
   'newTab',
   'closeTab',
   'snapshot',
+  'viewShown',
   'downloads',
   'spaceDataCleared',
   'key',
