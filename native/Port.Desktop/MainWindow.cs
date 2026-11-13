@@ -33,6 +33,7 @@ public sealed class MainWindow : Window
     private readonly ProfileStore profiles;
     private readonly DownloadManager downloads;
     private readonly TabSleeper sleeper;
+    private readonly MediaWatcher media;
     /// <summary>Completed when the UI reports it has painted a page snapshot.</summary>
     private TaskCompletionSource? snapshotShown;
 
@@ -53,6 +54,7 @@ public sealed class MainWindow : Window
             page => page.TabId == activeTabId || page == fullscreenPage,
             DisposePage,
             (tabId, state) => Post(new { type = "sleep", tabId, state }));
+        media = new MediaWatcher(() => pages.Values, Post);
         Title = "Port";
         Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x22, 0x26));
         MinWidth = 640;
@@ -191,6 +193,10 @@ public sealed class MainWindow : Window
                     _ = ShowViewAsync(tabId, Str(msg, "url"), ReadBounds(msg),
                         msg.TryGetProperty("covered", out var c) && c.ValueKind == JsonValueKind.True,
                         Str(msg, "spaceId"));
+                    break;
+                case "mediaAction" when tabId is not null && pages.TryGetValue(tabId, out var mediaPage):
+                    _ = media.ActAsync(mediaPage, Str(msg, "action"),
+                        msg.TryGetProperty("time", out var tm) && tm.TryGetDouble(out var seconds) ? seconds : null);
                     break;
                 case "sleepPolicy":
                     sleeper.SetPolicy(msg);
@@ -396,6 +402,7 @@ public sealed class MainWindow : Window
         var core = page.Core!;
         var tabId = page.TabId;
         downloads.Attach(core);
+        await media.AttachAsync(page, core); // Before the first navigation, so every document gets the script.
 
         var settings = core.Settings;
         settings.IsWebMessageEnabled = false;

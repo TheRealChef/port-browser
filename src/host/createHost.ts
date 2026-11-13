@@ -22,6 +22,9 @@ export function createBrowserHost(): BrowserHost {
         if (ws().tabs[tabId]) useUI.getState().setEngineTab(tabId, patch);
       },
       setSnapshot: (tabId, dataUrl) => useUI.getState().setEngineTab(tabId, { snapshot: dataUrl }),
+      setMedia: (tabId, state) => {
+        if (!state || ws().tabs[tabId]) useUI.getState().setMedia(tabId, state);
+      },
       setSleep: (tabId, sleep) => {
         if (ws().tabs[tabId]) useUI.getState().setEngineTab(tabId, { sleep });
       },

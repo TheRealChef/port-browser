@@ -4,6 +4,8 @@ import type {
   DownloadAction,
   DownloadItem,
   HostBridge,
+  MediaAction,
+  MediaState,
   SleepState,
   HostToUIMessage,
   UIToHostMessage,
@@ -22,6 +24,7 @@ export interface NativeHostDeps {
   ) => void;
   setSnapshot: (tabId: ID, dataUrl: string | null) => void;
   setSleep: (tabId: ID, state: SleepState) => void;
+  setMedia: (tabId: ID, state: MediaState | null) => void;
   /** Creates a tab for a window a page opened. Returns false if it could not. */
   openPopupTab: (tabId: ID, url: string, openerTabId: ID, background: boolean) => boolean;
   closeTab: (tabId: ID) => void;
@@ -128,9 +131,18 @@ export class NativeBrowserHost implements BrowserHost {
   }
 
   async disposeTab(tabId: ID): Promise<void> {
+    this.deps.setMedia(tabId, null);
     this.pending.delete(tabId);
     this.created.delete(tabId);
     this.post({ type: 'dispose', tabId });
+  }
+
+  mediaAction(tabId: ID, action: MediaAction | 'mute' | 'unmute', time?: number): void {
+    this.post(
+      time === undefined
+        ? { type: 'mediaAction', tabId, action }
+        : { type: 'mediaAction', tabId, action, time },
+    );
   }
 
   setSleepPolicy(policy: {
@@ -216,6 +228,7 @@ export class NativeBrowserHost implements BrowserHost {
           // The shell released the view; showing the tab again recreates it from its URL.
           this.created.delete(message.tabId);
           this.pending.delete(message.tabId);
+          deps.setMedia(message.tabId, null);
           deps.setEngineTab(message.tabId, {
             loading: false,
             canGoBack: false,
@@ -223,6 +236,12 @@ export class NativeBrowserHost implements BrowserHost {
           });
         }
         deps.setSleep(message.tabId, message.state);
+        break;
+      case 'media':
+        deps.setMedia(
+          message.tabId,
+          message.state && typeof message.state === 'object' ? message.state : null,
+        );
         break;
       case 'viewShown':
         deps.setSnapshot(message.tabId, null);

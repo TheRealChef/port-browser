@@ -24,6 +24,29 @@ export interface DownloadItem {
   missing: boolean;
 }
 
+/** Site player controls Port can trigger (the Media Session API's action names). */
+export type MediaAction =
+  'play' | 'pause' | 'nexttrack' | 'previoustrack' | 'seekto' | 'seekbackward' | 'seekforward';
+
+/** What a tab is playing, as read from the page (untrusted display data). */
+export interface MediaState {
+  title: string;
+  artist: string;
+  album: string;
+  artwork: Array<{ src: string; sizes: string }>;
+  playing: boolean;
+  /** Seconds; null for live streams or unknown. */
+  position: number | null;
+  duration: number | null;
+  /** Controls the site registered. */
+  actions: MediaAction[];
+  /** A plain <video>/<audio> element is present (seeking works without a site handler). */
+  element: boolean;
+  /** The tab is making sound right now. */
+  audible: boolean;
+  muted: boolean;
+}
+
 export type SleepState = 'awake' | 'suspended' | 'discarded';
 
 export type DownloadAction = 'pause' | 'resume' | 'cancel' | 'open' | 'showInFolder' | 'remove';
@@ -58,6 +81,7 @@ export type UIToHostMessage =
   | { type: 'download'; id: string; action: DownloadAction }
   | { type: 'clearDownloads' }
   | { type: 'openDownloadsFolder' }
+  | { type: 'mediaAction'; tabId: ID; action: MediaAction | 'mute' | 'unmute'; time?: number }
   /** Tab sleeping settings; `keepLoaded` tabs (pinned) are never unloaded. */
   | {
       type: 'sleepPolicy';
@@ -81,6 +105,8 @@ export type HostToUIMessage =
   /** A page called `window.close()`. */
   | { type: 'closeTab'; tabId: ID }
   | { type: 'snapshot'; tabId: ID; dataUrl: string | null }
+  /** What a tab plays changed (null: nothing anymore). */
+  | { type: 'media'; tabId: ID; state: MediaState | null }
   /** A tab was suspended, unloaded (its view released) or woke up again. */
   | { type: 'sleep'; tabId: ID; state: SleepState }
   /** The tab's live view is visible and painted again; any snapshot can go. */
@@ -128,6 +154,7 @@ const MESSAGE_TYPES = new Set([
   'snapshot',
   'viewShown',
   'sleep',
+  'media',
   'downloads',
   'spaceDataCleared',
   'key',

@@ -161,6 +161,7 @@
   --animate-pop: pop var(--dur) var(--ease);
   --animate-fade: fade var(--dur) var(--ease);
   --animate-progress: progress 1.4s ease-in-out infinite;
+  --animate-eq: eq 0.9s ease-in-out infinite alternate;
 }
 
 @keyframes pop {
@@ -173,6 +174,15 @@
 @keyframes fade {
   from {
     opacity: 0;
+  }
+}
+
+@keyframes eq {
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(1);
   }
 }
 

@@ -27,6 +27,7 @@ function deps(overrides: Partial<NativeHostDeps> = {}): NativeHostDeps {
     setEngineTab: vi.fn(),
     setSnapshot: vi.fn(),
     setSleep: vi.fn(),
+    setMedia: vi.fn(),
     openPopupTab: vi.fn(() => true),
     closeTab: vi.fn(),
     replayKey: vi.fn(),
@@ -173,6 +174,39 @@ describe('NativeBrowserHost', () => {
     });
     expect(d.openPopupTab).toHaveBeenCalledWith('p', 'https://x.test/', 'a', false);
     expect(sent).toContainEqual({ type: 'dispose', tabId: 'p' });
+  });
+
+  it('passes media state to the player and sends its controls', () => {
+    const { bridge, sent, emit } = fakeBridge();
+    const d = deps();
+    const host = new NativeBrowserHost(bridge, d);
+    const state = {
+      title: 'Song',
+      artist: 'Band',
+      album: '',
+      artwork: [],
+      playing: true,
+      position: 3,
+      duration: 200,
+      actions: ['play', 'pause', 'nexttrack'] as const,
+      element: true,
+      audible: true,
+      muted: false,
+    };
+    emit({ type: 'media', tabId: 'a', state: { ...state, actions: [...state.actions] } });
+    expect(d.setMedia).toHaveBeenLastCalledWith('a', expect.objectContaining({ title: 'Song' }));
+    emit({ type: 'media', tabId: 'a', state: 'junk' } as unknown as HostToUIMessage);
+    expect(d.setMedia).toHaveBeenLastCalledWith('a', null);
+
+    host.mediaAction('a', 'nexttrack');
+    host.mediaAction('a', 'seekto', 42);
+    expect(sent.slice(-2)).toEqual([
+      { type: 'mediaAction', tabId: 'a', action: 'nexttrack' },
+      { type: 'mediaAction', tabId: 'a', action: 'seekto', time: 42 },
+    ]);
+
+    emit({ type: 'sleep', tabId: 'a', state: 'discarded' });
+    expect(d.setMedia).toHaveBeenLastCalledWith('a', null);
   });
 
   it('ignores messages it does not know', () => {

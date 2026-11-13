@@ -35,4 +35,9 @@ internal sealed class PageView
     /// <summary>When the tab stopped being the shown tab; null while it is shown.</summary>
     public DateTime? HiddenSince { get; set; }
     public SleepState Sleep { get; set; } = SleepState.Awake;
+
+    /// <summary>The page has played media; it keeps being watched for the player.</summary>
+    public bool HasMedia { get; set; }
+    /// <summary>Last media state sent to the UI (serialized), to skip unchanged updates.</summary>
+    public string? LastMedia { get; set; }
 }

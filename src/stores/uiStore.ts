@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { create } from 'zustand';
 import type { AccentColor, ID, Tab } from '../types/models';
-import type { DownloadItem, SleepState } from '../host/bridge';
+import type { DownloadItem, MediaState, SleepState } from '../host/bridge';
 
 /** Transient UI state. Nothing here is persisted. */
 
@@ -91,6 +91,13 @@ export interface EngineTabState {
   snapshot?: string | null;
 }
 
+export interface MediaEntry extends MediaState {
+  /** When this state arrived; positions advance from here while playing. */
+  receivedAt: number;
+  lastPlayedAt: number;
+  dismissed: boolean;
+}
+
 const CLOSED_TAB_LIMIT = 25;
 
 interface UIState {
@@ -100,6 +107,8 @@ interface UIState {
   downloadsOpen: boolean;
   /** Downloads reported by the desktop shell, newest first. */
   downloads: DownloadItem[];
+  /** What each tab plays (desktop app), for the built-in player. */
+  media: Record<ID, MediaEntry>;
   /** A tooltip currently overlaps a native page view. */
   tooltipOverPage: boolean;
   paletteOpen: boolean;
@@ -124,6 +133,9 @@ interface UIState {
   setDownloadsOpen: (open: boolean) => void;
   setDownloads: (downloads: DownloadItem[]) => void;
   setTooltipOverPage: (over: boolean) => void;
+  setMedia: (tabId: ID, state: MediaState | null) => void;
+  /** Hides a source from the player until it starts playing again. */
+  dismissMedia: (tabId: ID) => void;
   setPaletteOpen: (open: boolean) => void;
   openContextMenu: (menu: ContextMenuState) => void;
   closeContextMenu: () => void;
@@ -148,6 +160,7 @@ export const useUI = create<UIState>()((set, get) => ({
   downloadsOpen: false,
   downloads: [],
   tooltipOverPage: false,
+  media: {},
   paletteOpen: false,
   contextMenu: null,
   dialog: null,
@@ -164,6 +177,31 @@ export const useUI = create<UIState>()((set, get) => ({
   setHistoryOpen: (historyOpen) => set({ historyOpen, settingsOpen: false }),
   setDownloadsOpen: (downloadsOpen) => set({ downloadsOpen }),
   setDownloads: (downloads) => set({ downloads }),
+  setMedia: (tabId, state) =>
+    set((s) => {
+      const media = { ...s.media };
+      const previous = media[tabId];
+      if (!state) {
+        if (!previous) return s;
+        delete media[tabId];
+        return { media };
+      }
+      const now = Date.now();
+      media[tabId] = {
+        ...state,
+        receivedAt: now,
+        lastPlayedAt: state.playing ? now : (previous?.lastPlayedAt ?? 0),
+        // Starting to play again brings a dismissed source back.
+        dismissed: state.playing && !previous?.playing ? false : (previous?.dismissed ?? false),
+      };
+      return { media };
+    }),
+  dismissMedia: (tabId) =>
+    set((s) =>
+      s.media[tabId]
+        ? { media: { ...s.media, [tabId]: { ...s.media[tabId]!, dismissed: true } } }
+        : s,
+    ),
   setTooltipOverPage: (tooltipOverPage) => {
     if (get().tooltipOverPage !== tooltipOverPage) set({ tooltipOverPage });
   },

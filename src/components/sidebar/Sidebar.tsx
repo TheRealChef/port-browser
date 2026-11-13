@@ -18,6 +18,7 @@ import { PortLogo } from '../common/PortLogo';
 import { showContextMenu, showMenuAt } from '../common/menu';
 import { BookmarkList } from './BookmarkList';
 import { DashboardList } from './DashboardList';
+import { MiniPlayer } from '../../features/media/MiniPlayer';
 import { SidebarDnd } from './dnd';
 import { SidebarTree } from './SidebarTree';
 import { SpaceSwitcher } from './SpaceSwitcher';
@@ -194,6 +195,8 @@ export function Sidebar() {
           </div>
         </div>
       </SidebarDnd>
+
+      <MiniPlayer />
 
       <div className="flex items-center gap-1 border-t border-line px-2.5 py-2">
         <button

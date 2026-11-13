@@ -1,8 +1,9 @@
 import { useEffect, useRef, type MouseEvent } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { X } from 'lucide-react';
-import { useNavigation } from '../../app/providers/hostContext';
+import { Volume2, VolumeX, X } from 'lucide-react';
+import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
+import { NativeBrowserHost } from '../../host/NativeBrowserHost';
 import { buildTabMenu } from '../../features/workspace/menus';
 import { tabDisplayTitle } from '../../features/workspace/selectors';
 import { useUI } from '../../stores/uiStore';
@@ -116,6 +117,7 @@ export function TabRow({
           {title}
         </span>
       )}
+      {!renaming && <AudioButton tab={tab} />}
       {!renaming && (
         <button
           type="button"
@@ -135,6 +137,34 @@ export function TabRow({
         </button>
       )}
     </div>
+  );
+}
+
+/** Speaker on tabs making sound; click to mute or unmute just that tab. */
+function AudioButton({ tab }: { tab: Tab }) {
+  const host = useBrowserHost();
+  const audible = useUI((s) => s.media[tab.id]?.audible ?? false);
+  const muted = useUI((s) => s.media[tab.id]?.muted ?? false);
+  if (!(host instanceof NativeBrowserHost) || !(audible || muted)) return null;
+  const Icon = muted ? VolumeX : Volume2;
+  return (
+    <button
+      type="button"
+      aria-label={muted ? 'Unmute tab' : 'Mute tab'}
+      title={muted ? 'Unmute tab' : 'Mute tab'}
+      tabIndex={-1}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation();
+        host.mediaAction(tab.id, muted ? 'unmute' : 'mute');
+      }}
+      className={cn(
+        'flex size-5 shrink-0 items-center justify-center rounded transition-ui hover:bg-surface hover:text-fg',
+        muted ? 'text-danger' : 'text-fg-3',
+      )}
+    >
+      <Icon size={13} />
+    </button>
   );
 }
 
