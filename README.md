@@ -86,26 +86,17 @@ On a focused sidebar tab: `Enter` opens it, `F2` renames it, `Delete` closes it,
 
 Chrome and Edge reserve `Ctrl+T`, `Ctrl+W` and `Ctrl+N`, so a web page never receives them. Use the `Alt` variants in the dev build. Shortcuts also don't fire while focus is inside an embedded page's iframe. Single-key shortcuts never fire while you are typing in a text field.
 
-## Design system: Mineral Slate
+## Design system: Port UI
 
-Every color comes from `src/styles/index.css`, which has two layers:
+The interface uses **Port UI** (`@port/ui`), the shared design system for Port products. It is vendored in `vendor/port-ui` and installed as a local package. `src/styles/index.css` imports `@port/ui/port.css` into its own cascade layer (`theme, base, port, components, utilities`), so Port's component classes (`.btn`, `.menu`, `.dlg`, `.cmdk`, `.seg`, `.toggle`, `.ck`, `.slider`, `.setcard`, `.toast`, `.pill`, `.bar`, …) style the markup and Tailwind utilities can still adjust them. The same file maps Port tokens to the Tailwind colours the components use (`bg-chrome`, `bg-canvas`, `bg-surface`, `bg-sunk`, `bg-selected`, `text-fg-2`, `text-accent-ink`, `bg-success-soft`, …).
 
-1. **Palette** (`--port-*`): neutral slate surfaces (canvas `#111619`, sidebar `#1A2226`, surface `#242D32`, elevated `#303A40`, border `#465057`), ivory/stone text, and the mineral accents sage, clay, steel blue, amber, mauve, teal and rose.
-2. **Semantic roles**, exposed to Tailwind as colors (`bg-brand`, `text-focus`, `bg-selected`, `bg-drop-soft`, `text-hint`, …). Components only use roles, so a light theme only needs to redefine these two layers.
+- **Themes.** Light and dark are designed separately with equal priority. Settings → Appearance has a Mode (System, Light, Dark) and five presets: Stone & Slate (default), Dusk, Signal, Pigment and High contrast. These set `data-theme` and `data-palette` on the root `.port` element. The desktop shell gets the resolved colours through a `theme` message, so the Windows title bar, window background and each page's preferred colour scheme follow the theme. The choice is saved in `theme.json` to avoid a flash at startup.
+- **Hues have fixed meanings.** Cobalt is the browser's identity (primary buttons, information). Mineral means success only, amber is a warning, coral is an error, violet is reserved for AI, and `--focus` is used only for the keyboard focus ring. Spaces, groups and folders choose from Port, Cobalt, Teal, Lichen, Clay, Heather and Graphite. Each one sets its local hue with an `h-<hue>` class, and selected rows, washes and indicators use that hue.
+- **State grammar.** Active means a wash in the local hue plus 600 weight. Selected means a lifted tile. Focus is a 2px ring. A drop target is a dashed hue outline over the wash.
+- **Density and type.** Rows are compact (26px) by default, or cozy (32px). Text is IBM Plex Sans and IBM Plex Mono, self-hosted through Fontsource. Corners use `corner-shape: squircle` where the engine supports it.
+- **Icons.** `src/components/icons.tsx` serves Port's 16px icon set, plus extra glyphs drawn on the same grid, under the names the components already use.
 
-| Role           | Color                                    | Used for                                                                          |
-| -------------- | ---------------------------------------- | --------------------------------------------------------------------------------- |
-| Brand          | Sage                                     | Primary buttons, toggles, the Port mark                                           |
-| Space accent   | per space (Work = sage, Personal = clay) | Selected rows, active tab bar, space icons, hero ridge                            |
-| Focus / drop   | Steel blue                               | Focus rings, address and search fields, keyboard selection, drag-and-drop targets |
-| Hint / warning | Amber                                    | Tips, quick actions, bookmarked star                                              |
-| Category       | Mauve                                    | Bookmark folders (collections), bookmarks widget                                  |
-| Development    | Teal                                     | Technical status (native host indicator)                                          |
-| Danger         | Rose                                     | Errors and destructive actions                                                    |
-
-The chrome (sidebar and toolbar) is slate and the content sits in a charcoal "well" where cards rest as surfaces. `Card` has five variants (`neutral`, `elevated`, `accent`, `interactive`, `status`) plus a `tone`; dashboard widgets each get a tone from `widgetMeta.ts`. `MineralBackdrop` draws the layered ridge artwork used on the start page and dashboard headers. Radii are 6px for small controls, 8px for inputs and rows, 12px for cards and 16px for dialogs, menus use 12px. Motion is 140ms by default and is disabled by the reduced-motion setting or the OS preference.
-
-The accent keys stored in your data (`violet`, `blue`, …) are unchanged and map to Mauve, Steel blue, Teal, Sage, Amber, Clay, Rose and Stone. Workspace schema v3 moves the seeded Work and Personal spaces to sage and clay if they still had their old default colors. Storage keys and the export format keep the `vela` identifier so existing data and exports still load.
+Colour keys saved before Port UI are mapped when loaded: violet and rose become heather, blue becomes cobalt, green becomes Port, amber becomes lichen and slate becomes graphite. Storage keys and the export format keep the `vela` identifier, so existing data and exports still load.
 
 ## Known limitations of the web build
 

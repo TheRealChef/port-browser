@@ -171,6 +171,10 @@ export class NativeBrowserHost implements BrowserHost {
   }
 
   /** Signs out of all sites in a space (clears its cookies and site data). */
+  setTheme(theme: { dark: boolean; background: string; caption: string; text: string }): void {
+    this.post({ type: 'theme', ...theme });
+  }
+
   clearSpaceData(spaceId: ID): void {
     this.post({ type: 'clearSpaceData', spaceId });
   }

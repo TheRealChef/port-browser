@@ -1,25 +1,18 @@
 import { useState } from 'react';
-import { Globe, Plus } from 'lucide-react';
+import { Globe, Plus } from '../icons';
 import { faviconCandidate, hostnameOf, isLocalUrl } from '../../utils/url';
 import { cn } from '../../utils/misc';
 
 /** Origins whose /favicon.ico failed this session, so we don't retry and flicker. */
 const failed = new Set<string>();
 
-const PALETTE = [
-  'var(--port-mauve)',
-  'var(--port-steel)',
-  'var(--port-teal)',
-  'var(--port-sage)',
-  'var(--port-amber)',
-  'var(--port-clay)',
-  'var(--port-rose)',
-];
+/** Letter tiles use Port UI's `.fav`: a workspace-hue wash with its ink. */
+const HUES = ['h-cobalt', 'h-teal', 'h-lichen', 'h-clay', 'h-heather', 'h-brand', 'h-graphite'];
 
-function letterColor(seed: string): string {
+function letterHue(seed: string): string {
   let hash = 0;
   for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) | 0;
-  return PALETTE[Math.abs(hash) % PALETTE.length] as string;
+  return HUES[Math.abs(hash) % HUES.length] as string;
 }
 
 export function Favicon({
@@ -46,7 +39,7 @@ export function Favicon({
         className={cn('flex shrink-0 items-center justify-center text-fg-3', className)}
         style={box}
       >
-        <Plus size={size - 2} strokeWidth={2} />
+        <Plus size={size - 2} />
       </span>
     );
   }
@@ -63,11 +56,8 @@ export function Favicon({
     return (
       <span
         aria-hidden
-        className={cn(
-          'flex shrink-0 items-center justify-center rounded-[4px] font-semibold text-on-brand',
-          className,
-        )}
-        style={{ ...box, fontSize: size * 0.62, background: letterColor(host) }}
+        className={cn('fav', letterHue(host), className)}
+        style={{ ...box, fontSize: Math.round(size * 0.6), borderRadius: Math.max(4, size / 4) }}
       >
         {letter}
       </span>

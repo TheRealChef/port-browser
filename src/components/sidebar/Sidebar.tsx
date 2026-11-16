@@ -1,9 +1,9 @@
-import { History } from 'lucide-react';
+import { History } from '../icons';
 import { useRef, useState } from 'react';
 import { EntityIcon } from '../common/EntityIcon';
-import { Compass, MoreHorizontal, Plus, Search, Settings } from 'lucide-react';
+import { Compass, MoreHorizontal, Plus, Search, Settings } from '../icons';
 import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
-import { ACCENTS } from '../../features/workspace/appearance';
+import { hueClass } from '../../features/workspace/appearance';
 import { buildSpaceMenu } from '../../features/workspace/menus';
 import { activeView } from '../../features/workspace/selectors';
 import { SIDEBAR_DEFAULT, SIDEBAR_MAX, SIDEBAR_MIN } from '../../stores/persistence';
@@ -98,7 +98,7 @@ export function Sidebar() {
       <SidebarDnd spaceId={space.id}>
         <div className="flex h-12 items-center gap-2.5 pl-3.5 pr-1.5">
           <PortLogo size={24} />
-          <span className="flex-1 text-[15px] font-semibold tracking-[-0.01em] text-fg">Port</span>
+          <span className="flex-1 text-[14px] font-semibold tracking-[-0.01em] text-fg">Port</span>
           <IconButton
             icon={Search}
             label="Command palette"
@@ -112,17 +112,11 @@ export function Sidebar() {
         </div>
 
         <div className="flex items-center gap-2 px-3.5 pb-1 pt-1">
-          <span
-            className="flex size-5 items-center justify-center rounded-md"
-            style={{
-              color: ACCENTS[space.accent].value,
-              background: `color-mix(in oklab, ${ACCENTS[space.accent].value} 16%, transparent)`,
-            }}
-          >
-            <EntityIcon name={space.icon} size={12} strokeWidth={2.3} />
+          <span className={cn('icbox size-5 rounded-md', hueClass(space.accent))}>
+            <EntityIcon name={space.icon} size={12} />
           </span>
           <h2
-            className="min-w-0 flex-1 truncate text-[13.5px] font-semibold text-fg"
+            className="min-w-0 flex-1 truncate text-[13px] font-semibold text-fg"
             onContextMenu={(e) => showContextMenu(e, buildSpaceMenu(space.id))}
           >
             {space.name}
@@ -139,9 +133,9 @@ export function Sidebar() {
           <button
             type="button"
             onClick={() => nav.newTab()}
-            className="flex h-row items-center gap-2 rounded-lg px-2 text-[13px] text-fg-2 transition-ui hover:bg-hover hover:text-fg"
+            className="flex h-row items-center gap-2 rounded-[7px] px-2 text-[13px] text-fg-2 transition-ui hover:bg-hover hover:text-fg"
           >
-            <Plus size={15} strokeWidth={2} className="text-fg-3" />
+            <Plus size={15} className="text-fg-3" />
             <span className="flex-1 text-left">New tab</span>
             <Kbd>{MOD_LABEL}+T</Kbd>
           </button>
@@ -153,15 +147,13 @@ export function Sidebar() {
               showStart();
             }}
             className={cn(
-              'flex h-row items-center gap-2 rounded-lg px-2 text-[13px] transition-ui',
-              startActive ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+              'flex h-row items-center gap-2 rounded-[7px] px-2 text-[13px] transition-ui',
+              startActive
+                ? 'bg-selected font-semibold text-fg'
+                : 'text-fg-2 hover:bg-hover hover:text-fg',
             )}
           >
-            <Compass
-              size={15}
-              strokeWidth={1.9}
-              className={startActive ? 'text-accent' : 'text-fg-3'}
-            />
+            <Compass size={15} className={startActive ? 'text-accent' : 'text-fg-3'} />
             Start page
           </button>
           <button
@@ -169,15 +161,13 @@ export function Sidebar() {
             aria-current={historyOpen ? 'page' : undefined}
             onClick={() => setHistoryOpen(!historyOpen)}
             className={cn(
-              'flex h-row items-center gap-2 rounded-lg px-2 text-[13px] transition-ui',
-              historyOpen ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+              'flex h-row items-center gap-2 rounded-[7px] px-2 text-[13px] transition-ui',
+              historyOpen
+                ? 'bg-selected font-semibold text-fg'
+                : 'text-fg-2 hover:bg-hover hover:text-fg',
             )}
           >
-            <History
-              size={15}
-              strokeWidth={1.9}
-              className={historyOpen ? 'text-accent' : 'text-fg-3'}
-            />
+            <History size={15} className={historyOpen ? 'text-accent' : 'text-fg-3'} />
             <span className="flex-1 text-left">History</span>
             <Kbd>{MOD_LABEL}+H</Kbd>
           </button>
@@ -198,27 +188,26 @@ export function Sidebar() {
 
       <MiniPlayer />
 
-      <div className="flex items-center gap-1 border-t border-line px-2.5 py-2">
+      <div className="flex items-center gap-1.5 border-t border-line px-2.5 py-1.5">
         <button
           type="button"
           onClick={() => setSettingsOpen(!settingsOpen)}
           aria-pressed={settingsOpen}
           className={cn(
-            'flex h-8 flex-1 items-center gap-2 rounded-lg px-2 text-[13px] transition-ui',
-            settingsOpen ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+            'flex h-row flex-1 items-center gap-2 rounded-[7px] px-2 text-[13px] transition-ui',
+            settingsOpen
+              ? 'bg-selected font-semibold text-fg'
+              : 'text-fg-2 hover:bg-hover hover:text-fg',
           )}
         >
-          <Settings size={15} strokeWidth={1.9} />
+          <Settings size={15} />
           Settings
         </button>
         <span
           title={`Browser host: ${host.label}`}
-          className="flex items-center gap-1.5 rounded-md border border-line px-1.5 py-0.5 text-[10.5px] text-fg-3"
+          className={cn('pill', host.kind === 'web' ? 'h-amber' : 'h-mineral')}
         >
-          <span
-            aria-hidden
-            className={cn('size-1.5 rounded-full', host.kind === 'web' ? 'bg-hint' : 'bg-dev')}
-          />
+          <span aria-hidden className="dot size-1.5" />
           {host.kind === 'web' ? 'Web preview' : 'Native'}
         </span>
       </div>

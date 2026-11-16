@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
+import type { Icon as IconType } from '../components/icons';
 import { create } from 'zustand';
 import type { AccentColor, ID, Tab } from '../types/models';
 import type { DownloadItem, MediaState, SleepState } from '../host/bridge';
@@ -10,7 +10,7 @@ export type MenuEntry =
       type: 'item';
       id: string;
       label: string;
-      icon?: LucideIcon;
+      icon?: IconType;
       shortcut?: string;
       danger?: boolean;
       disabled?: boolean;
@@ -21,7 +21,7 @@ export type MenuEntry =
       type: 'submenu';
       id: string;
       label: string;
-      icon?: LucideIcon;
+      icon?: IconType;
       disabled?: boolean;
       items: MenuEntry[];
     }

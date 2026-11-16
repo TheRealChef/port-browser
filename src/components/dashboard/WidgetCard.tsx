@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Columns2, GripVertical, MoreHorizontal, Pencil, Square, Trash2 } from 'lucide-react';
+import { Columns2, GripVertical, MoreHorizontal, Pencil, Square, Trash2 } from '../icons';
 import { askText } from '../common/dialogs';
 import { menu, showMenuAt } from '../common/menu';
 import { groupsOfSpace } from '../../features/workspace/selectors';
@@ -136,7 +136,7 @@ export function WidgetCard({ dashboard, widget }: { dashboard: Dashboard; widget
       <Card
         title={widget.title}
         icon={meta.icon}
-        tone={meta.tone}
+        hue={meta.space ? 'space' : undefined}
         variant={meta.variant}
         className="h-full"
         actions={

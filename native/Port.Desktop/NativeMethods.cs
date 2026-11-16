@@ -12,13 +12,16 @@ internal static partial class NativeMethods
     [LibraryImport("dwmapi.dll")]
     private static partial int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int size);
 
-    /// <summary>Dark title bar tinted to the sidebar color (Windows 11; ignored elsewhere).</summary>
-    public static void StyleTitleBar(IntPtr hwnd)
+    /// <summary>Title bar in the Port UI window colour (Windows 11; ignored elsewhere).</summary>
+    public static void StyleTitleBar(IntPtr hwnd, ShellTheme theme)
     {
-        Set(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, 1);
-        Set(hwnd, DWMWA_CAPTION_COLOR, ColorRef(0x1a, 0x22, 0x26));
-        Set(hwnd, DWMWA_BORDER_COLOR, ColorRef(0x2a, 0x34, 0x39));
-        Set(hwnd, DWMWA_TEXT_COLOR, ColorRef(0xe9, 0xe7, 0xe0));
+        if (hwnd == IntPtr.Zero) return;
+        var bg = theme.Background;
+        var text = theme.Text;
+        Set(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, theme.Dark ? 1 : 0);
+        Set(hwnd, DWMWA_CAPTION_COLOR, ColorRef(bg.R, bg.G, bg.B));
+        Set(hwnd, DWMWA_BORDER_COLOR, ColorRef(bg.R, bg.G, bg.B));
+        Set(hwnd, DWMWA_TEXT_COLOR, ColorRef(text.R, text.G, text.B));
     }
 
     private static readonly IntPtr HWND_TOP = IntPtr.Zero;

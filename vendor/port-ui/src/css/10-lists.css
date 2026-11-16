@@ -1,0 +1,38 @@
+/* Port UI — Rows, state grammar, trees, groups */
+.port .row{display:flex;align-items:center;gap:8px;height:var(--row-h);padding:0 8px;border-radius:var(--r-row);position:relative;cursor:default;white-space:nowrap;color:var(--ink);
+  transition:background var(--d2) var(--e-out),box-shadow var(--d2) var(--e-out),color var(--d2)}
+.port .row > .lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.port .row:hover,.port .row.is-hover{background:color-mix(in oklab,var(--ink) 5.5%,transparent)}
+.port .row:focus{outline:none}
+.port .row:focus-visible,.port .row.is-focus{outline:2px solid var(--focus);outline-offset:-2px}
+.port .row.is-selected{background:var(--wash);color:var(--ink)}
+.port .row.is-selected::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--hue)}
+.port .row.is-active{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line-strong);font-weight:600}
+.port .row.is-active.is-selected{background:var(--wash);box-shadow:inset 0 0 0 1px var(--hue-line)}
+.port .row.is-running::after,.port .is-running > .conveyor{content:"";position:absolute;left:8px;right:8px;bottom:1px;height:2px;border-radius:1px;
+  background:repeating-linear-gradient(90deg,var(--hue) 0 8px,transparent 8px 14px);background-size:28px 2px;animation:port-conveyor .9s linear infinite}
+.port .row.is-disabled{color:var(--ink-3);cursor:not-allowed}
+.port .row.is-blocked{background:repeating-linear-gradient(-45deg,transparent 0 5px,color-mix(in oklab,var(--ink) 6%,transparent) 5px 7px)}
+.port .row.is-error{color:var(--coral-ink)}
+.port .row.is-drop{background:var(--wash);box-shadow:inset 0 0 0 1.5px var(--hue);outline:1.5px dashed var(--hue);outline-offset:2px}
+.port .row.is-dragging{background:var(--surface-2);box-shadow:var(--shadow-float);transform:rotate(-1.2deg) scale(1.02);z-index:5}
+.port .row.is-selected{background:var(--surface-2);box-shadow:var(--shadow-tile)}
+.port .row.is-selected::before{display:none}
+.port .row.is-active{background:var(--wash);box-shadow:none}
+.port .kids{position:relative;margin-left:16px}
+.port .kids::before{content:"";position:absolute;left:-7px;top:0;bottom:calc(var(--row-h) / 2);border-left:1px solid var(--conn)}
+.port .kids > .row > .elb,.port .kids > .node > .row > .elb{position:absolute;left:-7px;top:50%;width:9px;height:0;border-top:1px solid var(--conn)}
+.port .kids{margin-left:12px}
+.port .grp{position:relative;margin:2px 0 8px}
+.port .grp-h{display:flex;align-items:center;gap:8px;height:var(--row-h);padding:0 8px;cursor:pointer;user-select:none;border-radius:var(--r-row);font-size:12px;font-weight:600}
+.port .grp-h .chev{transition:transform var(--d3) var(--e-spring);color:var(--ink-3)}
+.port .grp.is-collapsed .grp-h .chev{transform:rotate(-90deg)}
+.port .grp-h:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.port .grp-b{display:grid;grid-template-rows:1fr;transition:grid-template-rows var(--d3) var(--e-out),opacity var(--d3) var(--e-out)}
+.port .grp-b > .grp-in{overflow:hidden;min-height:0}
+.port .grp.is-collapsed .grp-b{grid-template-rows:0fr;opacity:0}
+.port .grp-h{color:var(--ink-2);font-size:11.5px}
+.port .grp-h::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--hue);order:1}
+.port .grp-h .chev{order:0}
+.port .grp-h > *:not(.chev){order:2}
+.port .grp-in{background:var(--surface-sunk);border-radius:10px;padding:3px;box-shadow:var(--shadow-well)}

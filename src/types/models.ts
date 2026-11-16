@@ -1,16 +1,31 @@
 export type ID = string;
 
+/**
+ * Port UI workspace hues. Violet (AI only), amber (warning), coral (error) and
+ * mineral (success) are signals and never colour a space, group or folder.
+ */
 export const ACCENT_COLORS = [
-  'violet',
-  'blue',
+  'brand',
+  'cobalt',
   'teal',
-  'green',
-  'amber',
-  'orange',
-  'rose',
-  'slate',
+  'lichen',
+  'clay',
+  'heather',
+  'graphite',
 ] as const;
 export type AccentColor = (typeof ACCENT_COLORS)[number];
+
+/** Colours saved before Port UI, mapped to the nearest workspace hue. */
+export const LEGACY_ACCENTS: Record<string, AccentColor> = {
+  violet: 'heather',
+  blue: 'cobalt',
+  teal: 'teal',
+  green: 'brand',
+  amber: 'lichen',
+  orange: 'clay',
+  rose: 'heather',
+  slate: 'graphite',
+};
 
 export interface Space {
   id: ID;
@@ -142,7 +157,17 @@ export interface WorkspaceData {
 export const SEARCH_ENGINES = ['duckduckgo', 'google', 'bing'] as const;
 export type SearchEngine = (typeof SEARCH_ENGINES)[number];
 
+/** Port UI light/dark mode; `system` follows Windows. */
+export const THEME_MODES = ['system', 'light', 'dark'] as const;
+export type ThemeMode = (typeof THEME_MODES)[number];
+
+/** Port UI presets. `stone` is the default (Stone & Slate). */
+export const PALETTES = ['stone', 'dusk', 'signal', 'pigment', 'contrast'] as const;
+export type Palette = (typeof PALETTES)[number];
+
 export interface Settings {
+  theme: ThemeMode;
+  palette: Palette;
   sidebarWidth: number;
   sidebarCollapsed: boolean;
   accentMode: 'space' | 'fixed';

@@ -10,7 +10,7 @@ import {
   Plus,
   Search,
   X,
-} from 'lucide-react';
+} from '../icons';
 import { useWorkspace } from '../../stores/workspaceStore';
 import { useSettings } from '../../stores/settingsStore';
 import type { BookmarkFolder, ID } from '../../types/models';
@@ -66,7 +66,7 @@ function Crumb({
         current
           ? 'text-[18px] font-semibold tracking-tight text-fg'
           : 'text-[13px] text-fg-3 hover:bg-hover hover:text-fg',
-        isOver && 'bg-drop-soft text-fg ring-1 ring-[var(--focus-ring)]',
+        isOver && 'drop-target text-fg',
       )}
     >
       {label}
@@ -94,7 +94,7 @@ export const LibraryControls = forwardRef<HTMLInputElement, ControlsProps>(funct
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <label className="flex h-8 min-w-[220px] flex-1 items-center gap-2 rounded-lg border border-line bg-surface px-2.5 focus-within:border-focus/70 md:max-w-[380px]">
+      <label className="flex h-8 min-w-[220px] flex-1 items-center gap-2 field px-2.5 md:max-w-[380px]">
         <Search size={14} className="shrink-0 text-fg-3" />
         <input
           ref={searchRef}
@@ -130,6 +130,7 @@ export const LibraryControls = forwardRef<HTMLInputElement, ControlsProps>(funct
           icon={LayoutGrid}
           label="Tile grid"
           active={layout === 'grid'}
+          className="px-0"
           onClick={() => update({ bookmarkLayout: 'grid' })}
         />
         <IconButton
@@ -137,6 +138,7 @@ export const LibraryControls = forwardRef<HTMLInputElement, ControlsProps>(funct
           icon={List}
           label="Compact list"
           active={layout === 'list'}
+          className="px-0"
           onClick={() => update({ bookmarkLayout: 'list' })}
         />
       </Segmented>
@@ -151,8 +153,8 @@ export const LibraryControls = forwardRef<HTMLInputElement, ControlsProps>(funct
             title={{ sm: 'Small tiles', md: 'Medium tiles', lg: 'Large cards' }[value]}
             onClick={() => update({ bookmarkTileSize: value })}
             className={cn(
-              'h-6 rounded-md px-2 text-[11.5px] font-medium uppercase transition-ui disabled:opacity-35',
-              size === value ? 'bg-hover text-fg' : 'text-fg-3 hover:text-fg',
+              'px-2.5 disabled:opacity-35',
+              size === value && layout !== 'list' && 'bg-raised shadow-card',
             )}
           >
             {value === 'sm' ? 'S' : value === 'md' ? 'M' : 'L'}
@@ -182,9 +184,5 @@ export const LibraryControls = forwardRef<HTMLInputElement, ControlsProps>(funct
 });
 
 function Segmented({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex items-center gap-0.5 rounded-lg border border-line bg-surface p-0.5">
-      {children}
-    </div>
-  );
+  return <div className="seg">{children}</div>;
 }

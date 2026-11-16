@@ -8,8 +8,8 @@ import {
   Volume2,
   VolumeX,
   X,
-  type LucideIcon,
-} from 'lucide-react';
+  type Icon,
+} from '../../components/icons';
 import { useBrowserHost } from '../../app/providers/hostContext';
 import { Favicon } from '../../components/common/Favicon';
 import { NativeBrowserHost } from '../../host/NativeBrowserHost';
@@ -63,7 +63,7 @@ export function MiniPlayer() {
   return (
     <section
       aria-label="Now playing"
-      className="group/player relative mx-2.5 mb-2 overflow-hidden rounded-xl border border-line bg-surface shadow-card"
+      className="group/player relative mx-2.5 mb-2 overflow-hidden rounded-xl bg-surface shadow-card"
     >
       <Backdrop entry={m} />
       <div className="relative flex items-center gap-2.5 p-2 pb-1">
@@ -91,7 +91,7 @@ export function MiniPlayer() {
           aria-label="Hide player"
           title="Hide until it plays again"
           onClick={() => useUI.getState().dismissMedia(tabId)}
-          className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-md text-fg-3 opacity-0 transition-ui hover:bg-hover hover:text-fg group-hover/player:opacity-100"
+          className="btn icon quiet sm absolute right-1 top-1 size-5 text-fg-3 opacity-0 group-hover/player:opacity-100 focus-visible:opacity-100"
         >
           <X size={12} />
         </button>
@@ -138,7 +138,7 @@ export function MiniPlayer() {
             type="button"
             title="Switch between tabs playing media"
             onClick={() => setPicked(sources[(index + 1) % sources.length]![0])}
-            className="tabular flex h-7 min-w-7 items-center justify-center gap-1 rounded-md px-1 text-[11px] text-fg-3 transition-ui hover:bg-hover hover:text-fg"
+            className="tabular flex h-7 min-w-7 items-center justify-center gap-1 rounded-[7px] px-1 text-[11px] text-fg-3 transition-ui hover:bg-hover hover:text-fg"
           >
             <Repeat size={11} />
             {index + 1}/{sources.length}
@@ -227,7 +227,7 @@ function Progress({
   const position = mediaPosition(entry, now);
   const duration = entry.duration;
   if (position === null || !duration) {
-    return <div className="relative mx-2.5 my-1 h-[3px] rounded-full bg-line" />;
+    return <div className="relative mx-2.5 my-1 h-[3px] rounded-full bg-sunk shadow-sunk" />;
   }
   const canSeek = entry.actions.includes('seekto') || entry.element;
   const share = Math.min(1, position / duration);
@@ -256,7 +256,7 @@ function Progress({
           canSeek ? 'cursor-pointer' : 'cursor-default',
         )}
       >
-        <span className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-line" />
+        <span className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-sunk shadow-sunk" />
         <span
           className="absolute left-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-accent"
           style={{ width: `${share * 100}%` }}
@@ -280,7 +280,7 @@ function ControlButton({
   disabled,
   active,
 }: {
-  icon: LucideIcon;
+  icon: Icon;
   label: string;
   onClick: () => void;
   disabled?: boolean;

@@ -1,9 +1,9 @@
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { EntityIcon } from '../common/EntityIcon';
 import { CSS } from '@dnd-kit/utilities';
-import { ChevronRight, MoreHorizontal, Plus } from 'lucide-react';
+import { ChevronRight, MoreHorizontal, Plus } from '../icons';
 import { useNavigation } from '../../app/providers/hostContext';
-import { ACCENTS } from '../../features/workspace/appearance';
+import { ACCENTS, hueClass } from '../../features/workspace/appearance';
 import { buildGroupMenu } from '../../features/workspace/menus';
 import { useWorkspace } from '../../stores/workspaceStore';
 import type { Group, Tab } from '../../types/models';
@@ -47,7 +47,7 @@ export function GroupBlock({ group, tabs, activeTabId }: GroupBlockProps) {
       style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
         'rounded-lg transition-ui',
-        isDropTarget && 'bg-drop-soft ring-1 ring-[var(--focus-ring)]',
+        isDropTarget && 'drop-target',
         isDragging && 'opacity-40',
       )}
     >
@@ -66,7 +66,7 @@ export function GroupBlock({ group, tabs, activeTabId }: GroupBlockProps) {
           if (e.key === 'ArrowLeft' && !group.collapsed) toggle();
         }}
         onContextMenu={(e) => showContextMenu(e, buildGroupMenu(group.id, nav))}
-        className="group/header flex h-row items-center gap-1.5 rounded-lg pl-1 pr-1 text-[13px] text-fg-2 outline-none transition-ui hover:bg-hover hover:text-fg focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
+        className="group/header flex h-row items-center gap-1.5 rounded-[7px] pl-1 pr-1 text-[12.5px] text-fg-2 outline-none transition-ui hover:bg-hover hover:text-fg focus-inset"
       >
         <ChevronRight
           size={13}
@@ -75,17 +75,9 @@ export function GroupBlock({ group, tabs, activeTabId }: GroupBlockProps) {
             !group.collapsed && 'rotate-90',
           )}
         />
-        <EntityIcon
-          name={group.icon}
-          size={14}
-          style={{ color }}
-          strokeWidth={2.1}
-          className="shrink-0"
-        />
-        <span className="min-w-0 flex-1 truncate font-medium">{group.name}</span>
-        <span className="pr-1 text-[11px] tabular-nums text-fg-3 group-hover/header:hidden">
-          {tabs.length}
-        </span>
+        <EntityIcon name={group.icon} size={14} style={{ color }} className="shrink-0" />
+        <span className="min-w-0 flex-1 truncate font-semibold">{group.name}</span>
+        <span className="count pr-1 group-hover/header:hidden">{tabs.length}</span>
         <div
           className="hidden items-center group-focus-within/header:flex group-hover/header:flex"
           onClick={(e) => e.stopPropagation()}
@@ -115,8 +107,10 @@ export function GroupBlock({ group, tabs, activeTabId }: GroupBlockProps) {
       >
         {visibleTabs.length > 0 && (
           <div
-            className="relative ml-[13px] flex flex-col gap-px border-l pl-1.5"
-            style={{ borderColor: `color-mix(in oklab, ${color} 30%, transparent)` }}
+            className={cn(
+              'relative mb-1 flex flex-col gap-px rounded-[10px] bg-sunk p-[3px] shadow-sunk',
+              hueClass(group.accent),
+            )}
           >
             {visibleTabs.map((tab) => (
               <TabRow
@@ -129,7 +123,7 @@ export function GroupBlock({ group, tabs, activeTabId }: GroupBlockProps) {
           </div>
         )}
         {!group.collapsed && tabs.length === 0 && (
-          <p className="ml-[13px] border-l border-line py-1 pl-3 text-[12px] text-fg-3">
+          <p className="mb-1 rounded-[10px] bg-sunk px-3 py-1.5 text-[12px] text-fg-3 shadow-sunk">
             Drop tabs here
           </p>
         )}

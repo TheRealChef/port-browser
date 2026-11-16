@@ -12,7 +12,7 @@ import {
   Plus,
   Trash2,
   X,
-} from 'lucide-react';
+} from '../../components/icons';
 import { menu } from '../../components/common/menu';
 import type { Navigation } from '../navigation/navigation';
 import { useUI, type MenuEntry } from '../../stores/uiStore';

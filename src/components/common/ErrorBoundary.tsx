@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { TriangleAlert } from 'lucide-react';
+import { TriangleAlert } from '../icons';
 
 interface Props {
   children: ReactNode;
@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (!this.state.error) return this.props.children;
     return (
       <div className="flex h-full w-full items-center justify-center p-8">
-        <div className="max-w-sm rounded-xl border border-line bg-surface p-5 text-center">
+        <div className="max-w-sm rounded-xl bg-surface p-5 text-center shadow-card">
           <TriangleAlert className="mx-auto mb-3 text-warning" size={22} />
           <h2 className="mb-1 text-[14px] font-semibold">
             {this.props.label ?? 'This view'} hit a problem

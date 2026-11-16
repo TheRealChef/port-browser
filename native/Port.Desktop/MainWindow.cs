@@ -34,6 +34,7 @@ public sealed class MainWindow : Window
     private readonly DownloadManager downloads;
     private readonly TabSleeper sleeper;
     private readonly MediaWatcher media;
+    private ShellTheme theme;
     /// <summary>Completed when the UI reports it has painted a page snapshot.</summary>
     private TaskCompletionSource? snapshotShown;
 
@@ -56,7 +57,8 @@ public sealed class MainWindow : Window
             (tabId, state) => Post(new { type = "sleep", tabId, state }));
         media = new MediaWatcher(() => pages.Values, Post);
         Title = "Port";
-        Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x22, 0x26));
+        theme = ShellTheme.Load(options.DataFolder);
+        Background = new SolidColorBrush(theme.Background);
         MinWidth = 640;
         MinHeight = 420;
         Width = 1440;
@@ -85,14 +87,14 @@ public sealed class MainWindow : Window
             if (placement.Maximized) WindowState = WindowState.Maximized;
         }
 
-        ui.DefaultBackgroundColor = System.Drawing.Color.FromArgb(0x1a, 0x22, 0x26);
+        ui.DefaultBackgroundColor = System.Drawing.Color.FromArgb(theme.Background.R, theme.Background.G, theme.Background.B);
         var root = new Grid();
         root.Children.Add(ui);
         root.Children.Add(pageLayer);
         Content = root;
 
         pageLayer.SizeChanged += (_, _) => { if (fullscreenPage is not null) LayoutPages(); };
-        SourceInitialized += (_, _) => NativeMethods.StyleTitleBar(new WindowInteropHelper(this).Handle);
+        SourceInitialized += (_, _) => NativeMethods.StyleTitleBar(new WindowInteropHelper(this).Handle, theme);
         Loaded += async (_, _) => await InitializeAsync();
         Closing += (_, _) => SavePlacement();
     }
@@ -215,6 +217,9 @@ public sealed class MainWindow : Window
                     break;
                 case "openDownloadsFolder":
                     DownloadManager.OpenFolder();
+                    break;
+                case "theme" when ShellTheme.FromMessage(msg) is { } next:
+                    ApplyTheme(next);
                     break;
                 case "clearSpaceData" when Str(msg, "spaceId") is { } clearSpace:
                     _ = ClearSpaceDataAsync(clearSpace);
@@ -379,6 +384,24 @@ public sealed class MainWindow : Window
         return new Rect(css.X * zoom, css.Y * zoom, css.Width * zoom, css.Height * zoom);
     }
 
+    private CoreWebView2PreferredColorScheme PageColorScheme =>
+        theme.Dark ? CoreWebView2PreferredColorScheme.Dark : CoreWebView2PreferredColorScheme.Light;
+
+    /// <summary>Window frame, background and sites' light/dark preference follow Port's theme.</summary>
+    private void ApplyTheme(ShellTheme next)
+    {
+        if (next == theme) return;
+        theme = next;
+        Background = new SolidColorBrush(theme.Background);
+        ui.DefaultBackgroundColor = System.Drawing.Color.FromArgb(theme.Background.R, theme.Background.G, theme.Background.B);
+        NativeMethods.StyleTitleBar(new WindowInteropHelper(this).Handle, theme);
+        foreach (var page in pages.Values)
+        {
+            if (page.Core is { } core && !page.Disposed) core.Profile.PreferredColorScheme = PageColorScheme;
+        }
+        theme.Save(options.DataFolder);
+    }
+
     private PageView CreatePage(string tabId, string profile)
     {
         var page = new PageView(tabId, profile);
@@ -404,6 +427,7 @@ public sealed class MainWindow : Window
         downloads.Attach(core);
         await media.AttachAsync(page, core); // Before the first navigation, so every document gets the script.
 
+        core.Profile.PreferredColorScheme = PageColorScheme;
         var settings = core.Settings;
         settings.IsWebMessageEnabled = false;
         settings.AreHostObjectsAllowed = false;

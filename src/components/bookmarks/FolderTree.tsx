@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { ChevronRight, Library } from 'lucide-react';
+import { ChevronRight, Library } from '../icons';
 import { buildFolderMenu } from '../../features/bookmarks/bookmarkMenu';
 import { ACCENTS } from '../../features/workspace/appearance';
 import { foldersIn } from '../../features/workspace/selectors';
@@ -39,7 +39,7 @@ export function FolderTree({ spaceId, currentId }: FolderTreeProps) {
         className={cn(
           'flex h-8 items-center gap-2 rounded-md px-2 text-left text-[13px] transition-ui',
           currentId === null ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
-          rootOver && 'bg-drop-soft ring-1 ring-[var(--focus-ring)]',
+          rootOver && 'drop-target',
         )}
       >
         <Library size={15} className="shrink-0 text-accent" />
@@ -130,10 +130,10 @@ function TreeRow({ folder, ...props }: LevelProps & { folder: BookmarkFolder }) 
         style={{ paddingLeft: 4 + depth * 14 }}
         className={cn(
           'group/row relative flex h-8 cursor-default select-none items-center gap-1.5 rounded-md pr-2 text-[13px] outline-none transition-ui',
-          'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+          'focus-inset',
           active ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
           drag.isDragging && 'opacity-40',
-          zone === 'into' && 'bg-drop-soft ring-1 ring-[var(--focus-ring)]',
+          zone === 'into' && 'drop-target',
         )}
       >
         {zone && zone !== 'into' && (
@@ -163,7 +163,7 @@ function TreeRow({ folder, ...props }: LevelProps & { folder: BookmarkFolder }) 
           <ChevronRight size={12} className={cn('transition-transform', expanded && 'rotate-90')} />
         </button>
         <span className="shrink-0" style={{ color: accent }}>
-          <EntityIcon name={folder.icon} size={14} strokeWidth={2} />
+          <EntityIcon name={folder.icon} size={14} />
         </span>
         <span className="min-w-0 flex-1 truncate">{folder.name}</span>
         <span className="text-[11px] tabular-nums text-fg-3">{counts.get(folder.id) || ''}</span>

@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { ChevronRight, MoreHorizontal } from 'lucide-react';
+import { ChevronRight, MoreHorizontal } from '../icons';
 import { buildFolderMenu } from '../../features/bookmarks/bookmarkMenu';
 import { deleteFolderFlow, editFolderFlow } from '../../features/bookmarks/bookmarkActions';
 import { ACCENTS } from '../../features/workspace/appearance';
@@ -64,7 +64,7 @@ export function FolderCard({ folder, size, layout, path }: FolderCardProps) {
       className={cn('flex shrink-0 items-center justify-center rounded-lg', box)}
       style={{ color: accent, background: `color-mix(in oklab, ${accent} 16%, transparent)` }}
     >
-      <EntityIcon name={folder.icon} size={px} strokeWidth={2} />
+      <EntityIcon name={folder.icon} size={px} />
     </span>
   );
 
@@ -91,14 +91,14 @@ export function FolderCard({ folder, size, layout, path }: FolderCardProps) {
       }}
       className={cn(
         'group/tile relative cursor-default select-none outline-none transition-ui',
-        'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+        'focus-inset',
         drag.isDragging && 'opacity-40',
         layout === 'list'
           ? 'flex h-10 items-center gap-3 rounded-lg px-3 hover:bg-hover'
-          : 'rounded-xl border bg-raised/70 shadow-card hover:bg-hover',
+          : 'rounded-xl bg-surface shadow-card hover:bg-hover',
         layout === 'grid' &&
           (zone === 'into' ? 'border-drop' : 'border-line hover:border-line-strong'),
-        zone === 'into' && 'bg-drop-soft ring-2 ring-[var(--focus-ring)]',
+        zone === 'into' && 'drop-target',
         layout === 'grid' &&
           size === 'sm' &&
           'flex h-[84px] flex-col items-center justify-center gap-2 px-2',
@@ -160,7 +160,7 @@ export function FolderCard({ folder, size, layout, path }: FolderCardProps) {
               stats.preview.map((b) => (
                 <span
                   key={b.id}
-                  className="flex size-7 items-center justify-center rounded-lg bg-white/85 shadow-card"
+                  className="flex size-7 items-center justify-center rounded-lg bg-raised shadow-card ring-1 ring-line"
                 >
                   <Favicon url={b.url} size={15} />
                 </span>

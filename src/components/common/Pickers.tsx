@@ -1,6 +1,7 @@
 import { ACCENT_COLORS, type AccentColor } from '../../types/models';
 import { ACCENTS, ICONS, ICON_NAMES } from '../../features/workspace/appearance';
 import { cn } from '../../utils/misc';
+import { Check } from '../icons';
 
 export function AccentPicker({
   value,
@@ -10,7 +11,7 @@ export function AccentPicker({
   onChange: (accent: AccentColor) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label="Accent color" className="flex flex-wrap gap-2">
+    <div role="radiogroup" aria-label="Colour" className="swatches">
       {ACCENT_COLORS.map((accent) => (
         <button
           key={accent}
@@ -20,12 +21,10 @@ export function AccentPicker({
           aria-label={ACCENTS[accent].label}
           title={ACCENTS[accent].label}
           onClick={() => onChange(accent)}
-          className={cn(
-            'size-6 rounded-full transition-ui hover:scale-110',
-            value === accent && 'ring-2 ring-fg ring-offset-2 ring-offset-raised',
-          )}
-          style={{ background: ACCENTS[accent].value }}
-        />
+          className={cn('sw', `h-${accent}`)}
+        >
+          <Check size={12} strokeWidth={2.5} />
+        </button>
       ))}
     </div>
   );
@@ -56,12 +55,14 @@ export function IconPicker({
             title={name}
             onClick={() => onChange(name)}
             className={cn(
-              'flex size-8 items-center justify-center rounded-md transition-ui hover:bg-hover',
-              selected ? 'bg-active' : 'text-fg-2',
+              'flex size-8 items-center justify-center rounded-lg transition-ui hover:bg-hover',
+              `h-${accent}`,
+              selected
+                ? 'bg-accent-soft text-accent-ink shadow-[inset_0_0_0_1.5px_var(--hue)]'
+                : 'text-fg-2',
             )}
-            style={selected ? { color: ACCENTS[accent].value } : undefined}
           >
-            <Icon size={16} strokeWidth={1.9} />
+            <Icon size={16} />
           </button>
         );
       })}

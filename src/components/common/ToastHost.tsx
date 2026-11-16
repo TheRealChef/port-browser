@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { CircleAlert, CircleCheck, Info } from 'lucide-react';
+import { CircleAlert, CircleCheck, Info } from '../icons';
 import { useUI } from '../../stores/uiStore';
 import { cn } from '../../utils/misc';
 
 const ICONS = { info: Info, success: CircleCheck, error: CircleAlert };
+/** Signal hue per tone: mineral = success, coral = error, cobalt = information. */
+const HUES = { info: 'h-cobalt', success: 'h-mineral', error: 'h-coral' };
 
 export function ToastHost() {
   const toast = useUI((s) => s.toast);
@@ -24,18 +26,15 @@ export function ToastHost() {
       key={toast.id}
       role="status"
       aria-live="polite"
-      className="fixed bottom-5 left-1/2 z-[110] flex max-w-[min(480px,90vw)] -translate-x-1/2 animate-pop items-center gap-2 rounded-xl bg-elevated py-2 pl-3 pr-2 text-[13px] text-fg shadow-pop"
+      className={cn(
+        'toast fixed bottom-5 left-1/2 z-[110] max-w-[min(480px,90vw)] -translate-x-1/2 py-2 pl-2 pr-2 text-fg',
+        HUES[toast.tone],
+      )}
     >
-      <Icon
-        size={15}
-        className={cn(
-          'shrink-0',
-          toast.tone === 'success' && 'text-success',
-          toast.tone === 'error' && 'text-danger',
-          toast.tone === 'info' && 'text-info',
-        )}
-      />
-      <span className="truncate">{toast.message}</span>
+      <span className="icbox">
+        <Icon size={14} />
+      </span>
+      <span className="truncate pr-1">{toast.message}</span>
       {toast.action && (
         <button
           type="button"
@@ -44,7 +43,7 @@ export function ToastHost() {
             dismiss();
             run?.();
           }}
-          className="ml-1 shrink-0 rounded-md px-2 py-0.5 font-medium text-brand transition-ui hover:bg-hover"
+          className="btn sm tonal h-cobalt shrink-0"
         >
           {toast.action.label}
         </button>

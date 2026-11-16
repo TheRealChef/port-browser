@@ -8,7 +8,7 @@ import {
   Search,
   Settings,
   Download,
-} from 'lucide-react';
+} from '../icons';
 import { useState } from 'react';
 import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
 import { AddressBar } from '../../features/navigation/AddressBar';
@@ -126,13 +126,13 @@ function DownloadsButton() {
           className="pointer-events-none absolute inset-0 -rotate-90"
           viewBox="0 0 32 32"
         >
-          <circle cx="16" cy="16" r={r} fill="none" stroke="var(--border)" strokeWidth="2" />
+          <circle cx="16" cy="16" r={r} fill="none" stroke="var(--line)" strokeWidth="2" />
           <circle
             cx="16"
             cy="16"
             r={r}
             fill="none"
-            stroke="var(--info)"
+            stroke="var(--cobalt)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeDasharray={circumference}

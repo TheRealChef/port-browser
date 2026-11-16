@@ -1,7 +1,7 @@
 /**
- * The Port mark: an ivory geometric "P" on a mineral tile with a small sage
- * block, the "port" the P docks into. Kept as inline vector so it stays crisp
- * at any size and follows the theme tokens.
+ * The Port mark: a "P" on a tile in Port's brand colour, with a small block in
+ * Port Browser's identity hue (cobalt), the "port" the P docks into. Inline
+ * vector so it stays crisp and follows the theme and preset.
  */
 export function PortLogo({ size = 22, className }: { size?: number; className?: string }) {
   return (
@@ -13,21 +13,13 @@ export function PortLogo({ size = 22, className }: { size?: number; className?: 
       aria-hidden
       focusable="false"
     >
-      <rect
-        x="0.5"
-        y="0.5"
-        width="31"
-        height="31"
-        rx="8"
-        fill="var(--port-surface)"
-        stroke="var(--port-border)"
-      />
+      <rect width="32" height="32" rx="9" fill="var(--brand)" />
       <path
         fillRule="evenodd"
-        fill="var(--port-ivory)"
+        fill="var(--on-fill)"
         d="M9.5 7h8a6.5 6.5 0 0 1 0 13H14v5H9.5V7Zm4.5 4.25v4.5h3.25a2.25 2.25 0 0 0 0-4.5H14Z"
       />
-      <rect x="19.25" y="21.25" width="3.75" height="3.75" rx="1" fill="var(--port-sage)" />
+      <rect x="19.25" y="21.25" width="3.75" height="3.75" rx="1" fill="var(--cobalt)" />
     </svg>
   );
 }

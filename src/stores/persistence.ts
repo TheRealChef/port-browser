@@ -1,6 +1,10 @@
 import type { PersistStorage, StorageValue } from 'zustand/middleware';
 import {
   ACCENT_COLORS,
+  type AccentColor,
+  LEGACY_ACCENTS,
+  PALETTES,
+  THEME_MODES,
   SEARCH_ENGINES,
   WIDGET_KINDS,
   type Bookmark,
@@ -129,6 +133,12 @@ export function migrateWorkspace(persisted: unknown, fromVersion: number): unkno
 
 const ids = (value: unknown): value is ID => isNonEmptyString(value);
 
+/** A workspace hue, accepting colours saved before Port UI. */
+function asAccent(value: unknown, fallback: AccentColor): AccentColor {
+  const legacy = typeof value === 'string' ? LEGACY_ACCENTS[value] : undefined;
+  return asOneOf(legacy ?? value, ACCENT_COLORS, fallback);
+}
+
 const httpUrlOrNull = (value: unknown): string | null =>
   typeof value === 'string' ? toSafeHttpUrl(value) : null;
 
@@ -138,7 +148,7 @@ function parseSpace(raw: unknown, index: number): Space | null {
     id: raw.id,
     name: raw.name.slice(0, 80),
     icon: asString(raw.icon, 'folder'),
-    accent: asOneOf(raw.accent, ACCENT_COLORS, 'violet'),
+    accent: asAccent(raw.accent, 'heather'),
     order: asNumber(raw.order, index),
     createdAt: asNumber(raw.createdAt, Date.now()),
   };
@@ -153,7 +163,7 @@ function parseGroup(raw: unknown, index: number): Group | null {
     spaceId: raw.spaceId,
     name: raw.name.slice(0, 80),
     icon: asString(raw.icon, 'folder'),
-    accent: asOneOf(raw.accent, ACCENT_COLORS, 'violet'),
+    accent: asAccent(raw.accent, 'heather'),
     order: asNumber(raw.order, index),
     collapsed: asBoolean(raw.collapsed, false),
   };
@@ -218,7 +228,7 @@ function parseFolder(raw: unknown, index: number): BookmarkFolder | null {
     parentId: ids(raw.parentId) ? raw.parentId : null,
     name: raw.name.slice(0, 120),
     icon: asString(raw.icon, 'folder'),
-    accent: asOneOf(raw.accent, ACCENT_COLORS, 'slate'),
+    accent: asAccent(raw.accent, 'graphite'),
     order: asNumber(raw.order, index),
     collapsed: asBoolean(raw.collapsed, true),
     createdAt: asNumber(raw.createdAt, Date.now()),
@@ -435,11 +445,13 @@ function oneOfNumbers(value: unknown, options: readonly number[], fallback: numb
 }
 
 export const DEFAULT_SETTINGS: Settings = {
+  theme: 'system',
+  palette: 'stone',
   sidebarWidth: SIDEBAR_DEFAULT,
   sidebarCollapsed: false,
   accentMode: 'space',
-  fixedAccent: 'green',
-  density: 'comfortable',
+  fixedAccent: 'brand',
+  density: 'compact',
   reduceMotion: false,
   defaultSpaceId: null,
   restoreBehavior: 'restore',
@@ -457,6 +469,8 @@ export function sanitizeSettings(raw: unknown): Settings {
   if (!isRecord(raw)) return { ...DEFAULT_SETTINGS };
   const d = DEFAULT_SETTINGS;
   return {
+    theme: asOneOf(raw.theme, THEME_MODES, d.theme),
+    palette: asOneOf(raw.palette, PALETTES, d.palette),
     sidebarWidth: clamp(
       Math.round(asNumber(raw.sidebarWidth, d.sidebarWidth)),
       SIDEBAR_MIN,
@@ -464,7 +478,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     ),
     sidebarCollapsed: asBoolean(raw.sidebarCollapsed, d.sidebarCollapsed),
     accentMode: asOneOf(raw.accentMode, ['space', 'fixed'] as const, d.accentMode),
-    fixedAccent: asOneOf(raw.fixedAccent, ACCENT_COLORS, d.fixedAccent),
+    fixedAccent: asAccent(raw.fixedAccent, d.fixedAccent),
     density: asOneOf(raw.density, ['compact', 'comfortable'] as const, d.density),
     reduceMotion: asBoolean(raw.reduceMotion, d.reduceMotion),
     defaultSpaceId: ids(raw.defaultSpaceId) ? raw.defaultSpaceId : null,

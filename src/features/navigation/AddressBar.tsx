@@ -8,7 +8,7 @@ import {
   Search,
   Server,
   Star,
-} from 'lucide-react';
+} from '../../components/icons';
 import { useNavigation } from '../../app/providers/hostContext';
 import { Favicon } from '../../components/common/Favicon';
 import { IconButton } from '../../components/common/IconButton';
@@ -99,13 +99,13 @@ export function AddressBar() {
     <div className="relative flex min-w-0 flex-1">
       <div
         className={cn(
-          'group flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-lg border pl-2.5 pr-1 transition-ui',
+          'group flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-lg bg-sunk pl-2.5 pr-1 transition-ui',
           draft !== null
-            ? 'border-focus/80 bg-surface shadow-[0_0_0_3px_var(--focus-soft)]'
-            : 'border-transparent bg-canvas/70 hover:border-line hover:bg-canvas',
+            ? 'shadow-[inset_0_0_0_1px_var(--focus),0_0_0_3px_color-mix(in_oklab,var(--focus)_22%,transparent)]'
+            : 'shadow-sunk hover:shadow-[var(--shadow-well),inset_0_0_0_1px_var(--ink-3)]',
         )}
       >
-        <LeadIcon size={14} className="shrink-0 text-fg-3" strokeWidth={2} />
+        <LeadIcon size={14} className="shrink-0 text-fg-3" />
         <input
           ref={input}
           role="combobox"
@@ -166,7 +166,7 @@ export function AddressBar() {
               size="sm"
               icon={Star}
               label={bookmark ? 'Remove bookmark' : 'Bookmark this page'}
-              className={bookmark ? 'text-hint [&_svg]:fill-current' : undefined}
+              className={bookmark ? 'text-brand [&_svg]:fill-current' : undefined}
               onClick={() => {
                 if (bookmark) {
                   removeBookmarkWithUndo(bookmark.id);
@@ -197,7 +197,7 @@ export function AddressBar() {
         <ul
           id="address-suggestions"
           role="listbox"
-          className="absolute inset-x-0 top-[calc(100%+4px)] z-[80] animate-pop rounded-xl bg-elevated p-1 shadow-pop"
+          className="menu absolute inset-x-0 top-[calc(100%+4px)] z-[80]"
           onMouseDown={(e) => e.preventDefault()}
         >
           {suggestions.map((s, i) => (
@@ -209,8 +209,8 @@ export function AddressBar() {
               onMouseMove={() => i !== active && setHighlight(i)}
               onClick={(e) => run(s, e.altKey || e.metaKey)}
               className={cn(
-                'flex h-8 items-center gap-2.5 rounded-md px-2 text-[13px]',
-                i === active ? 'bg-hover text-fg' : 'text-fg-2',
+                'mi h-8 gap-2.5 text-[13px]',
+                i === active ? 'is-hi text-fg' : 'text-fg-2',
               )}
             >
               <SuggestionIcon suggestion={s} />
@@ -238,16 +238,16 @@ export function AddressBar() {
 function SuggestionIcon({ suggestion }: { suggestion: Suggestion }) {
   switch (suggestion.kind) {
     case 'go':
-      return <ArrowRight size={15} className="shrink-0 text-focus" />;
+      return <ArrowRight size={15} className="shrink-0 text-info" />;
     case 'search':
-      return <Search size={15} className="shrink-0 text-focus" />;
+      return <Search size={15} className="shrink-0 text-info" />;
     case 'tab':
       return (
         <span className="relative shrink-0">
           <Favicon url={suggestion.url} />
           <AppWindow
             size={9}
-            className="absolute -bottom-1 -right-1 rounded-sm bg-elevated text-fg-2"
+            className="absolute -bottom-1 -right-1 rounded-sm bg-raised text-fg-2"
           />
         </span>
       );

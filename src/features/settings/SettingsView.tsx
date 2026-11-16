@@ -1,15 +1,16 @@
+import { useMemo, useRef, type ReactNode } from 'react';
 import { NativeBrowserHost } from '../../host/NativeBrowserHost';
 import { askConfirm } from '../../components/common/dialogs';
 import { useUI } from '../../stores/uiStore';
-import { History } from 'lucide-react';
-import { useMemo, useRef, type ReactNode } from 'react';
+import { Download, History, Pencil, RotateCcw, Trash2, Upload } from '../../components/icons';
 import { EntityIcon } from '../../components/common/EntityIcon';
-import { Download, Pencil, RotateCcw, Trash2, Upload } from 'lucide-react';
 import { useBrowserHost } from '../../app/providers/hostContext';
 import { Button } from '../../components/common/Button';
+import { Segmented, Select, Slider, Switch } from '../../components/common/Controls';
 import { IconButton } from '../../components/common/IconButton';
 import { Kbd } from '../../components/common/Kbd';
 import { AccentPicker } from '../../components/common/Pickers';
+import { resolveTheme } from '../../hooks/useAppearance';
 import {
   SIDEBAR_MAX,
   SIDEBAR_MIN,
@@ -18,14 +19,15 @@ import {
 } from '../../stores/persistence';
 import { useSettings } from '../../stores/settingsStore';
 import { useWorkspace } from '../../stores/workspaceStore';
-import { SEARCH_ENGINES } from '../../types/models';
+import { SEARCH_ENGINES, type Palette } from '../../types/models';
 import { cn, MOD_LABEL } from '../../utils/misc';
 import { SEARCH_ENGINE_LABELS } from '../../utils/url';
-import { ACCENTS } from '../workspace/appearance';
+import { hueClass } from '../workspace/appearance';
 import { deleteSpaceFlow, editSpaceFlow } from '../workspace/actions';
 import { sortedSpaces } from '../workspace/selectors';
 import { exportConfiguration, importConfiguration, resetApplicationData } from './dataTransfer';
 
+/** Port UI settings section: title and description on the left, a card on the right. */
 function Section({
   title,
   description,
@@ -36,95 +38,109 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b border-line py-6 last:border-0">
-      <h2 className="text-[14px] font-semibold">{title}</h2>
-      {description && <p className="mt-0.5 text-[12.5px] text-fg-3">{description}</p>}
-      <div className="mt-4 flex flex-col gap-4">{children}</div>
+    <section className="setsec py-5 max-[760px]:grid-cols-1 max-[760px]:gap-3">
+      <header>
+        <h3>{title}</h3>
+        {description && <p>{description}</p>}
+      </header>
+      <div className="setcard bg-surface">{children}</div>
     </section>
   );
 }
 
-function Row({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
+function Row({
+  label,
+  hint,
+  children,
+  column,
+}: {
+  label: string;
+  hint?: ReactNode;
+  children: ReactNode;
+  column?: boolean;
+}) {
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-      <div className="min-w-[180px] flex-1">
-        <div className="text-[13px]">{label}</div>
-        {hint && <div className="text-[12px] text-fg-3">{hint}</div>}
+    <div className={cn('setrow', column && 'col')}>
+      <div>
+        <div className="sl">{label}</div>
+        {hint && <div className="sd">{hint}</div>}
       </div>
-      <div className="flex items-center gap-2">{children}</div>
+      <div className={cn(column ? '' : 'sc2', 'flex items-center gap-2')}>{children}</div>
     </div>
   );
 }
 
-function Segmented<T extends string>({
-  value,
-  options,
-  onChange,
-  label,
-}: {
-  value: T;
-  options: Array<{ value: T; label: string }>;
-  onChange: (value: T) => void;
-  label: string;
-}) {
+const PRESETS: Array<{ id: Palette; name: string; description: string }> = [
+  { id: 'stone', name: 'Stone & Slate', description: 'Warm stone light, cool slate dark' },
+  { id: 'dusk', name: 'Dusk', description: 'Peach paper, plum indigo' },
+  { id: 'signal', name: 'Signal', description: 'Cooler greys, magenta brand' },
+  { id: 'pigment', name: 'Pigment', description: 'Bright paper or ink black, bold hues' },
+  { id: 'contrast', name: 'High contrast', description: 'WCAG AAA text and marks' },
+];
+
+/** A miniature Port window rendered in the preset's own tokens. */
+function PresetPreview({ palette, theme }: { palette: Palette; theme: 'light' | 'dark' }) {
+  return (
+    <span
+      aria-hidden
+      className="port mini"
+      data-theme={theme}
+      data-palette={palette === 'stone' ? undefined : palette}
+      style={{ background: 'var(--surface-0)' }}
+    >
+      <i style={{ background: 'var(--surface-1)' }} />
+      <span className="flex min-w-0 flex-col gap-[3px]">
+        <i className="h-2.5" style={{ background: 'var(--surface-sunk)' }} />
+        <i
+          className="flex-1"
+          style={{ background: 'var(--surface-2)', boxShadow: 'var(--shadow-tile)' }}
+        />
+        <span className="flex gap-[3px]">
+          <i className="h-1.5 w-5" style={{ background: 'var(--brand)' }} />
+          <i className="h-1.5 w-2.5" style={{ background: 'var(--cobalt)' }} />
+          <i className="h-1.5 w-2.5" style={{ background: 'var(--clay)' }} />
+          <i className="h-1.5 w-2.5" style={{ background: 'var(--heather)' }} />
+        </span>
+      </span>
+    </span>
+  );
+}
+
+function PresetPicker() {
+  const palette = useSettings((s) => s.palette);
+  const mode = useSettings((s) => s.theme);
+  const update = useSettings((s) => s.update);
+  const theme = resolveTheme(mode, document.documentElement.dataset.theme !== 'light');
   return (
     <div
       role="radiogroup"
-      aria-label={label}
-      className="flex rounded-lg border border-line bg-surface p-0.5"
+      aria-label="Theme preset"
+      className="grid w-full grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-2"
     >
-      {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
+      {PRESETS.map((p) => (
+        <span
+          key={p.id}
           role="radio"
-          aria-checked={value === o.value}
-          onClick={() => onChange(o.value)}
-          className={cn(
-            'h-7 rounded-md px-3 text-[12.5px] transition-ui',
-            value === o.value ? 'bg-elevated text-fg shadow-lift' : 'text-fg-2 hover:text-fg',
-          )}
+          tabIndex={0}
+          aria-checked={palette === p.id}
+          aria-label={p.name}
+          title={p.description}
+          onClick={() => update({ palette: p.id })}
+          onKeyDown={(e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              update({ palette: p.id });
+            }
+          }}
+          className="preset"
         >
-          {o.label}
-        </button>
+          <PresetPreview palette={p.id} theme={theme} />
+          <span className="lbl2">{p.name}</span>
+        </span>
       ))}
     </div>
   );
 }
-
-function Toggle({
-  checked,
-  onChange,
-  label,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        'relative h-5 w-9 rounded-full transition-ui',
-        checked ? 'bg-brand' : 'bg-elevated',
-      )}
-    >
-      <span
-        className={cn(
-          'absolute left-0 top-0.5 size-4 rounded-full bg-fg shadow transition-transform duration-150',
-          checked ? 'translate-x-[18px]' : 'translate-x-0.5',
-        )}
-      />
-    </button>
-  );
-}
-
-const selectClass =
-  'h-8 rounded-md border border-line-strong bg-surface px-2 text-[13px] text-fg outline-none focus:border-focus/80 focus:shadow-[0_0_0_3px_var(--focus-soft)]';
 
 const SHORTCUTS: Array<{ keys: string; action: string; note?: string }> = [
   { keys: `${MOD_LABEL}+L`, action: 'Focus address bar' },
@@ -164,16 +180,37 @@ export function SettingsView() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="mx-auto max-w-[720px] px-8 pb-16 pt-8">
-        <h1 className="text-[20px] font-semibold tracking-tight">Settings</h1>
-        <p className="mt-1 text-[12.5px] text-fg-3">
-          Stored locally in this browser. Nothing is sent anywhere.
+      <div className="mx-auto max-w-[900px] px-8 pb-16 pt-8">
+        <h1 className="text-[22px] font-semibold leading-7 tracking-[-0.015em]">Settings</h1>
+        <p className="mt-1 text-[12.5px] text-fg-2">
+          Stored locally on this device. Nothing is sent anywhere.
         </p>
 
-        <Section title="Appearance">
-          <Row label="Accent color" hint="Follow the active space, or use one color everywhere.">
+        <Section
+          title="Appearance"
+          description="Light and dark are designed separately. Presets change the whole palette in both."
+        >
+          <Row label="Mode" hint="System follows Windows and switches with it.">
             <Segmented
-              label="Accent mode"
+              label="Mode"
+              value={settings.theme}
+              onChange={(theme) => settings.update({ theme })}
+              options={[
+                { value: 'system', label: 'System' },
+                { value: 'light', label: 'Light' },
+                { value: 'dark', label: 'Dark' },
+              ]}
+            />
+          </Row>
+          <Row label="Preset" column>
+            <PresetPicker />
+          </Row>
+          <Row
+            label="Colour"
+            hint="Selected rows, rails and indicators take the active space's colour, or one colour everywhere."
+          >
+            <Segmented
+              label="Colour mode"
               value={settings.accentMode}
               onChange={(accentMode) => settings.update({ accentMode })}
               options={[
@@ -183,26 +220,26 @@ export function SettingsView() {
             />
           </Row>
           {settings.accentMode === 'fixed' && (
-            <Row label="Fixed accent">
+            <Row label="Fixed colour">
               <AccentPicker
                 value={settings.fixedAccent}
                 onChange={(fixedAccent) => settings.update({ fixedAccent })}
               />
             </Row>
           )}
-          <Row label="Density" hint="Row height in the sidebar.">
+          <Row label="Density" hint="Compact rows are 26px, cozy rows 32px.">
             <Segmented
               label="Density"
               value={settings.density}
               onChange={(density) => settings.update({ density })}
               options={[
                 { value: 'compact', label: 'Compact' },
-                { value: 'comfortable', label: 'Comfortable' },
+                { value: 'comfortable', label: 'Cozy' },
               ]}
             />
           </Row>
-          <Row label="Reduce motion" hint="Turns off transitions and animations.">
-            <Toggle
+          <Row label="Reduce motion" hint="Loops stop and movement becomes fades.">
+            <Switch
               label="Reduce motion"
               checked={settings.reduceMotion}
               onChange={(reduceMotion) => settings.update({ reduceMotion })}
@@ -213,21 +250,25 @@ export function SettingsView() {
         <Section title="Sidebar">
           <Row
             label="Width"
-            hint={`${settings.sidebarWidth}px · you can also drag the sidebar edge`}
+            hint={
+              <>
+                <span className="num">{settings.sidebarWidth}px</span> · you can also drag the
+                sidebar edge
+              </>
+            }
           >
-            <input
-              type="range"
-              aria-label="Sidebar width"
+            <Slider
+              label="Sidebar width"
               min={SIDEBAR_MIN}
               max={SIDEBAR_MAX}
               step={4}
               value={settings.sidebarWidth}
-              onChange={(e) => settings.setSidebarWidth(Number(e.target.value))}
-              className="w-48 accent-[var(--brand)]"
+              onChange={settings.setSidebarWidth}
+              className="w-48"
             />
           </Row>
           <Row label="Show sidebar" hint={`${MOD_LABEL}+B toggles it from anywhere.`}>
-            <Toggle
+            <Switch
               label="Show sidebar"
               checked={!settings.sidebarCollapsed}
               onChange={(show) => settings.update({ sidebarCollapsed: !show })}
@@ -235,25 +276,21 @@ export function SettingsView() {
           </Row>
         </Section>
 
-        <Section title="Spaces & startup">
+        <Section title="Spaces & startup" description="Where Port opens and how it searches.">
           <Row label="Default space" hint="Used when Port starts on the default space.">
-            <select
-              aria-label="Default space"
-              className={selectClass}
+            <Select
+              label="Default space"
               value={
                 settings.defaultSpaceId && spaces[settings.defaultSpaceId]
                   ? settings.defaultSpaceId
                   : ''
               }
-              onChange={(e) => settings.update({ defaultSpaceId: e.target.value || null })}
-            >
-              <option value="">First space ({spaceList[0]?.name})</option>
-              {spaceList.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              onChange={(id) => settings.update({ defaultSpaceId: id || null })}
+              options={[
+                { value: '', label: `First space (${spaceList[0]?.name ?? ''})` },
+                ...spaceList.map((s) => ({ value: s.id, label: s.name })),
+              ]}
+            />
           </Row>
           <Row label="On startup">
             <Segmented
@@ -261,39 +298,32 @@ export function SettingsView() {
               value={settings.restoreBehavior}
               onChange={(restoreBehavior) => settings.update({ restoreBehavior })}
               options={[
-                { value: 'restore', label: 'Restore last session' },
-                { value: 'defaultSpace', label: 'Open default space' },
+                { value: 'restore', label: 'Restore session' },
+                { value: 'defaultSpace', label: 'Default space' },
               ]}
             />
           </Row>
-          <Row label="Search engine" hint="Used for address-bar queries that aren't web addresses.">
-            <select
-              aria-label="Search engine"
-              className={selectClass}
+          <Row label="Search engine" hint="For address-bar text that isn't a web address.">
+            <Select
+              label="Search engine"
               value={settings.searchEngine}
-              onChange={(e) =>
-                settings.update({ searchEngine: e.target.value as typeof settings.searchEngine })
-              }
-            >
-              {SEARCH_ENGINES.map((engine) => (
-                <option key={engine} value={engine}>
-                  {SEARCH_ENGINE_LABELS[engine]}
-                </option>
-              ))}
-            </select>
+              onChange={(searchEngine) => settings.update({ searchEngine })}
+              options={SEARCH_ENGINES.map((engine) => ({
+                value: engine,
+                label: SEARCH_ENGINE_LABELS[engine],
+              }))}
+            />
           </Row>
-          <div className="flex flex-col gap-px rounded-lg border border-line">
-            {spaceList.map((space) => {
-              return (
+          <Row label="Spaces" column>
+            <div className="flex w-full flex-col gap-px">
+              {spaceList.map((space) => (
                 <div
                   key={space.id}
-                  className="flex items-center gap-2.5 px-3 py-2 [&+&]:border-t [&+&]:border-line"
+                  className="flex h-row items-center gap-2.5 rounded-[7px] px-1 hover:bg-hover"
                 >
-                  <EntityIcon
-                    name={space.icon}
-                    size={15}
-                    style={{ color: ACCENTS[space.accent].value }}
-                  />
+                  <span className={cn('icbox size-6', hueClass(space.accent))}>
+                    <EntityIcon name={space.icon} size={14} />
+                  </span>
                   <span className="flex-1 text-[13px]">{space.name}</span>
                   <IconButton
                     size="sm"
@@ -309,9 +339,9 @@ export function SettingsView() {
                     onClick={() => void deleteSpaceFlow(space.id)}
                   />
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          </Row>
         </Section>
 
         <Section
@@ -322,22 +352,17 @@ export function SettingsView() {
               : 'These work even while a page has focus.'
           }
         >
-          <div className="overflow-hidden rounded-lg border border-line">
-            {SHORTCUTS.map((s) => (
-              <div
-                key={s.action}
-                className="flex items-center gap-3 px-3 py-2 text-[13px] [&+&]:border-t [&+&]:border-line"
-              >
-                <span className="flex-1">
-                  {s.action}
-                  {s.note && (host.kind === 'web' || !s.note.includes('reserve')) && (
-                    <span className="ml-2 text-[12px] text-fg-3">{s.note}</span>
-                  )}
-                </span>
-                <Kbd>{s.keys}</Kbd>
-              </div>
-            ))}
-          </div>
+          {SHORTCUTS.map((s) => (
+            <div key={s.action} className="setrow py-2">
+              <span className="text-[12.5px]">
+                {s.action}
+                {s.note && (host.kind === 'web' || !s.note.includes('reserve')) && (
+                  <span className="ml-2 text-[11.5px] text-fg-3">{s.note}</span>
+                )}
+              </span>
+              <Kbd>{s.keys}</Kbd>
+            </div>
+          ))}
         </Section>
 
         <Section
@@ -345,26 +370,26 @@ export function SettingsView() {
           description="Visited pages are kept only on this device, without sign-in codes or tokens from addresses."
         >
           <Row label="Save browsing history" hint="Turning this off keeps existing history.">
-            <Toggle
+            <Switch
               label="Save browsing history"
               checked={settings.recordHistory}
               onChange={(recordHistory) => settings.update({ recordHistory })}
             />
           </Row>
-          <div className="flex flex-wrap gap-2">
+          <Row label="Browsing history">
             <Button icon={History} onClick={() => useUI.getState().setHistoryOpen(true)}>
               Open history
             </Button>
-          </div>
+          </Row>
         </Section>
 
         {host instanceof NativeBrowserHost && (
           <Section
             title="Sleeping tabs"
-            description="Tabs you aren't looking at use less memory right away, go to sleep after a while (they keep their place and wake instantly) and are unloaded later (they reload when you open them; sign-ins stay). Tabs playing audio are left alone and pinned tabs are never unloaded."
+            description="Tabs you aren't looking at go to sleep after a while (they wake instantly) and are unloaded later (they reload when opened; sign-ins stay). Audio tabs are left alone and pinned tabs are never unloaded."
           >
             <Row label="Put inactive tabs to sleep">
-              <Toggle
+              <Switch
                 label="Put inactive tabs to sleep"
                 checked={settings.tabSleep}
                 onChange={(tabSleep) => settings.update({ tabSleep })}
@@ -375,9 +400,9 @@ export function SettingsView() {
                 <Row label="Sleep after" hint="Stops the page running; it wakes instantly.">
                   <Segmented
                     label="Sleep after"
-                    value={String(settings.tabSuspendMinutes)}
-                    options={SUSPEND_OPTIONS.map((m) => ({ value: String(m), label: `${m} min` }))}
-                    onChange={(v) => settings.update({ tabSuspendMinutes: Number(v) })}
+                    value={settings.tabSuspendMinutes}
+                    options={SUSPEND_OPTIONS.map((m) => ({ value: m, label: `${m} min` }))}
+                    onChange={(tabSuspendMinutes) => settings.update({ tabSuspendMinutes })}
                   />
                 </Row>
                 <Row
@@ -386,12 +411,12 @@ export function SettingsView() {
                 >
                   <Segmented
                     label="Unload after"
-                    value={String(settings.tabUnloadMinutes)}
+                    value={settings.tabUnloadMinutes}
                     options={UNLOAD_OPTIONS.map((m) => ({
-                      value: String(m),
+                      value: m,
                       label: m === 0 ? 'Never' : m >= 60 ? `${m / 60} h` : `${m} min`,
                     }))}
-                    onChange={(v) => settings.update({ tabUnloadMinutes: Number(v) })}
+                    onChange={(tabUnloadMinutes) => settings.update({ tabUnloadMinutes })}
                   />
                 </Row>
               </>
@@ -402,51 +427,48 @@ export function SettingsView() {
         {host instanceof NativeBrowserHost && (
           <Section
             title="Sign-ins"
-            description="Each space browses with its own cookies and site data, so you can be signed in to different accounts per space. Sign-ins are kept when Port restarts."
+            description="Each space has its own cookies and site data, so you can be signed in to different accounts per space. Sign-ins are kept when Port restarts."
           >
-            <div className="overflow-hidden rounded-lg border border-line">
-              {spaceList.map((space) => (
-                <div
-                  key={space.id}
-                  className="flex items-center gap-3 px-3 py-2 text-[13px] [&+&]:border-t [&+&]:border-line"
+            {spaceList.map((space) => (
+              <div key={space.id} className="setrow py-2">
+                <span
+                  className={cn('flex items-center gap-2.5 text-[12.5px]', hueClass(space.accent))}
                 >
-                  <span
-                    className="size-2 rounded-full"
-                    style={{ background: ACCENTS[space.accent].value }}
-                  />
-                  <span className="flex-1">{space.name}</span>
-                  <Button
-                    variant="ghost"
-                    onClick={() =>
-                      void askConfirm({
-                        title: `Sign out of all sites in ${space.name}?`,
-                        message:
-                          'Deletes cookies, site storage and cache for this space. Open pages reload signed out. Bookmarks, tabs and history stay.',
-                        confirmLabel: 'Sign out',
-                        danger: true,
-                      }).then(({ ok }) => {
-                        if (ok) host.clearSpaceData(space.id);
-                      })
-                    }
-                  >
-                    Sign out of all sites
-                  </Button>
-                </div>
-              ))}
-            </div>
+                  <span className="dot" />
+                  {space.name}
+                </span>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() =>
+                    void askConfirm({
+                      title: `Sign out of all sites in ${space.name}?`,
+                      message:
+                        'Deletes cookies, site storage and cache for this space. Open pages reload signed out. Bookmarks, tabs and history stay.',
+                      confirmLabel: 'Sign out',
+                      danger: true,
+                    }).then(({ ok }) => {
+                      if (ok) host.clearSpaceData(space.id);
+                    })
+                  }
+                >
+                  Sign out of all sites
+                </Button>
+              </div>
+            ))}
           </Section>
         )}
 
         <Section
-          title="Data management"
-          description="Export or restore your spaces, groups, tabs, dashboards, bookmarks and settings as JSON."
+          title="Data"
+          description="Export or restore spaces, groups, tabs, dashboards, bookmarks and settings as JSON."
         >
-          <div className="flex flex-wrap gap-2">
+          <Row label="Configuration">
             <Button icon={Download} onClick={exportConfiguration}>
-              Export configuration
+              Export
             </Button>
             <Button icon={Upload} onClick={() => fileInput.current?.click()}>
-              Import configuration
+              Import
             </Button>
             <input
               ref={fileInput}
@@ -459,33 +481,27 @@ export function SettingsView() {
                 if (file) void importConfiguration(file);
               }}
             />
-            <span className="flex-1" />
+          </Row>
+          <Row label="Reset" hint="Removes every space, tab, bookmark and setting.">
             <Button variant="danger" icon={RotateCcw} onClick={() => void resetApplicationData()}>
               Reset application data
             </Button>
-          </div>
+          </Row>
         </Section>
 
-        <Section title="Browser runtime">
+        <Section
+          title="Browser runtime"
+          description={
+            host.kind === 'native'
+              ? 'Pages run in Microsoft Edge WebView2. Every tab is a real browser view, and each space has its own profile.'
+              : 'This development build runs inside your browser. Pages show as sandboxed previews only when the site allows embedding; others open in a regular browser tab.'
+          }
+        >
           <Row label="Host" hint={host.label}>
-            <span className="rounded-md border border-line px-2 py-0.5 text-[12px] text-fg-2">
+            <span className={cn('pill', host.kind === 'web' ? 'h-amber' : 'h-mineral')}>
               {host.kind}
             </span>
           </Row>
-          {host.kind === 'native' ? (
-            <p className="text-[12.5px] leading-relaxed text-fg-3">
-              Pages run in Microsoft Edge WebView2. Every tab is a real browser view that keeps
-              running in the background, and each space has its own profile.
-            </p>
-          ) : (
-            <p className="text-[12.5px] leading-relaxed text-fg-3">
-              This development build runs inside your existing browser. Pages are shown as sandboxed
-              previews only when the site allows embedding; many sites refuse, and those open in a
-              regular browser tab instead. Tabs in inactive spaces keep their place and history, but
-              their pages are not kept running in the background. A native host (WebView2) will lift
-              these limits.
-            </p>
-          )}
         </Section>
       </div>
     </div>

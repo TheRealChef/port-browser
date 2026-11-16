@@ -82,7 +82,7 @@ export function Tooltip({ label, shortcut, side = 'bottom', children }: TooltipP
           <div
             ref={tip}
             role="tooltip"
-            className="pointer-events-none fixed z-[100] flex animate-fade items-center gap-2 whitespace-nowrap rounded-md bg-elevated px-2 py-1 text-[11.5px] text-fg shadow-pop"
+            className="tip-surface pointer-events-none fixed z-[100] flex animate-fade items-center gap-1.5 whitespace-nowrap px-2 py-[5px] text-[11.5px] leading-[15px]"
             style={{
               left: Math.max(8, Math.min(pos.x, window.innerWidth - 8)),
               top: pos.y,
@@ -90,7 +90,7 @@ export function Tooltip({ label, shortcut, side = 'bottom', children }: TooltipP
             }}
           >
             {label}
-            {shortcut && <Kbd>{shortcut}</Kbd>}
+            {shortcut && <Kbd onInk>{shortcut}</Kbd>}
           </div>,
           document.body,
         )}

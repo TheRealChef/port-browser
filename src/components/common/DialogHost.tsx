@@ -1,13 +1,13 @@
 import { useState, type FormEvent } from 'react';
 import { EntityIcon } from './EntityIcon';
 import { useUI, type DialogRequest } from '../../stores/uiStore';
-import { ACCENTS } from '../../features/workspace/appearance';
+import { cn } from '../../utils/misc';
 import { Button } from './Button';
+import { Checkbox } from './Controls';
 import { Dialog } from './Dialog';
 import { AccentPicker, IconPicker } from './Pickers';
 
-const inputClass =
-  'h-8 w-full rounded-md border border-line-strong bg-surface px-2.5 text-[13px] text-fg outline-none transition-ui placeholder:text-fg-3 focus:border-focus/80 focus:shadow-[0_0_0_3px_var(--focus-soft)]';
+const inputClass = 'field h-8 w-full px-2.5 text-[13px]';
 
 export function DialogHost() {
   const dialog = useUI((s) => s.dialog);
@@ -57,17 +57,13 @@ function ConfirmDialog({
         </>
       }
     >
-      <p className="text-[13px] leading-relaxed text-fg-2">{request.message}</p>
+      <p className="text-[12.5px] leading-[18px] text-fg-2">{request.message}</p>
       {request.option && (
-        <label className="mt-3 flex items-center gap-2 text-[13px] text-fg-2">
-          <input
-            type="checkbox"
-            checked={option}
-            onChange={(e) => setOption(e.target.checked)}
-            className="size-3.5 accent-[var(--accent)]"
-          />
-          {request.option}
-        </label>
+        <div className="mt-3">
+          <Checkbox checked={option} onChange={setOption}>
+            {request.option}
+          </Checkbox>
+        </div>
       )}
     </Dialog>
   );
@@ -110,7 +106,7 @@ function FormDialog({
       <form onSubmit={submit} className="flex flex-col gap-3">
         {request.fields.map((field, index) => (
           <label key={field.name} className="flex flex-col gap-1.5">
-            <span className="text-[12px] font-medium text-fg-2">{field.label}</span>
+            <span className="tf-l">{field.label}</span>
             {field.type === 'select' ? (
               <select
                 data-autofocus={index === 0 ? true : undefined}
@@ -143,7 +139,7 @@ function FormDialog({
             )}
           </label>
         ))}
-        {error && <p className="text-[12px] text-danger">{error}</p>}
+        {error && <p className="text-[11.5px] text-danger-ink">{error}</p>}
         <div className="mt-1 flex justify-end gap-2">
           <Button variant="ghost" onClick={cancel}>
             Cancel
@@ -183,11 +179,8 @@ function EntityDialog({
     <Dialog title={request.title} onClose={cancel} width="md">
       <form onSubmit={submit} className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
-          <span
-            className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-surface"
-            style={{ color: ACCENTS[accent].value }}
-          >
-            <EntityIcon name={icon} size={20} strokeWidth={1.9} />
+          <span className={cn('icbox size-10 rounded-[10px]', `h-${accent}`)}>
+            <EntityIcon name={icon} size={20} />
           </span>
           <input
             data-autofocus
@@ -201,11 +194,11 @@ function EntityDialog({
           />
         </div>
         <section className="flex flex-col gap-2">
-          <span className="text-[12px] font-medium text-fg-2">Color</span>
+          <span className="tf-l">Color</span>
           <AccentPicker value={accent} onChange={setAccent} />
         </section>
         <section className="flex flex-col gap-2">
-          <span className="text-[12px] font-medium text-fg-2">Icon</span>
+          <span className="tf-l">Icon</span>
           <IconPicker value={icon} accent={accent} onChange={setIcon} />
         </section>
         <div className="flex justify-end gap-2">

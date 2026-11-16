@@ -1,0 +1,37 @@
+/* Port UI — Layout: panels, tiles, bands, settings sections, splitters */
+.port .panel{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--surface-1);border-radius:var(--r-panel);position:relative}
+.port .panel{box-shadow:var(--shadow-tile);background:var(--surface-1)}
+.port .panel.sunk{background:var(--surface-0)}
+.port .ph{display:flex;align-items:center;gap:8px;min-height:36px;padding:0 var(--pad);border-bottom:1px solid var(--line);flex:none}
+.port .pb{flex:1;min-height:0;overflow:auto;padding:6px}
+.port .pb.flush{padding:0}
+.port .ph{border-bottom-color:transparent;min-height:40px}
+.port .tile{background:var(--surface-1);border-radius:var(--r-panel);position:relative;display:flex;flex-direction:column;min-width:0;transition:transform var(--d3) var(--e-spring),box-shadow var(--d3) var(--e-out)}
+.port .tile{box-shadow:var(--shadow-tile);border-radius:14px}
+.port .tile:hover{transform:translateY(-2px);box-shadow:var(--shadow-float)}
+.port .tile-h{padding:12px 14px 10px;display:flex;flex-direction:column;gap:2px}
+.port .tile-b{padding:0 14px 12px;display:flex;flex-direction:column;gap:8px}
+.port .tile.is-current{box-shadow:0 0 0 2px var(--hue),var(--shadow-tile)}
+.port .setl{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 6px;border-bottom:1px solid color-mix(in oklab,var(--line) 60%,transparent);font-size:12.5px}
+.port .setl:last-child{border-bottom:0}
+.port .side-foot{display:flex;align-items:center;gap:6px;padding:6px 8px;border-top:1px solid var(--line)}
+.port .bmain{display:flex;flex-direction:column;overflow:hidden}
+.port .hl{margin:4px 6px 8px;padding:8px 10px;border-radius:var(--r-ctl);background:var(--wash);color:var(--ink);font-size:12px;line-height:17px;position:relative}
+.port .band{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--wash);color:var(--hue-i);font-weight:600;font-size:12px;border-radius:var(--r-ctl)}
+.port .splitter{width:6px;flex:none;cursor:col-resize;position:relative}
+.port .splitter::after{content:"";position:absolute;left:2px;top:30%;bottom:30%;width:2px;border-radius:1px;background:var(--line-strong);transition:background var(--d2),top var(--d3) var(--e-spring),bottom var(--d3) var(--e-spring)}
+.port .splitter:hover::after,.port .splitter.is-drag::after{background:var(--focus);top:8px;bottom:8px}
+.port .dockzone{position:absolute;border-radius:var(--r-panel);background:color-mix(in oklab,var(--hue) 16%,transparent);outline:2px dashed var(--hue);outline-offset:-4px;opacity:0;transition:opacity var(--d2),inset var(--d3) var(--e-spring)}
+.port .dockzone.on{opacity:1}
+.port .setsec{display:grid;grid-template-columns:200px 1fr;gap:20px}
+.port .setsec header h3{margin:0;font-size:13.5px;font-weight:600}
+.port .setsec header p{margin:4px 0 0;font-size:12px;line-height:17px;color:var(--ink-2)}
+.port .setcard{background:var(--surface-1);border-radius:14px;box-shadow:var(--shadow-tile);padding:2px 16px}
+.port .setrow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid color-mix(in oklab,var(--line) 70%,transparent)}
+.port .setrow:last-child{border-bottom:0}
+.port .setrow.col{flex-direction:column;align-items:stretch;gap:10px}
+.port .setrow .sl{font-size:12.5px;font-weight:550}
+.port .setrow .sd{font-size:11.5px;color:var(--ink-2);margin-top:2px;line-height:16px}
+.port .setrow .sc2{flex:none}
+.port .setfoot{display:flex;align-items:center;gap:8px}
+.port .setrow > div:first-child{min-width:0}

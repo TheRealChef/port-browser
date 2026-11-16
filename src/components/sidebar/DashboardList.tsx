@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { LayoutDashboard, Plus } from 'lucide-react';
+import { LayoutDashboard, Plus } from '../icons';
 import { createDashboardFlow } from '../../features/workspace/actions';
 import { buildDashboardMenu } from '../../features/workspace/menus';
 import { activeView, dashboardsOfSpace } from '../../features/workspace/selectors';
@@ -83,17 +83,13 @@ function DashboardRow({ dashboard, active }: { dashboard: Dashboard; active: boo
       }}
       onContextMenu={(e) => showContextMenu(e, buildDashboardMenu(dashboard.id))}
       className={cn(
-        'flex h-row items-center gap-2 rounded-lg px-2 text-left text-[13px] outline-none transition-ui',
-        'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
-        active ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+        'flex h-row items-center gap-2 rounded-[7px] px-2 text-left text-[13px] outline-none transition-ui',
+        'focus-inset',
+        active ? 'bg-selected font-semibold text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
         isDragging && 'opacity-40',
       )}
     >
-      <LayoutDashboard
-        size={15}
-        className={active ? 'text-accent' : 'text-fg-3'}
-        strokeWidth={1.9}
-      />
+      <LayoutDashboard size={15} className={active ? 'text-accent' : 'text-fg-3'} />
       <span className="truncate">{dashboard.name}</span>
     </div>
   );

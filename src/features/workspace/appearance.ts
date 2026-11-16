@@ -27,22 +27,27 @@ import {
   Star,
   Terminal,
   Zap,
-  type LucideIcon,
-} from 'lucide-react';
+  type Icon,
+} from '../../components/icons';
 import type { AccentColor } from '../../types/models';
 
+/** Workspace hues. `hue` is the Port UI class suffix (`h-<hue>`). */
 export const ACCENTS: Record<AccentColor, { label: string; value: string }> = {
-  violet: { label: 'Mauve', value: 'var(--tone-violet)' },
-  blue: { label: 'Steel blue', value: 'var(--tone-blue)' },
-  teal: { label: 'Teal', value: 'var(--tone-teal)' },
-  green: { label: 'Sage', value: 'var(--tone-green)' },
-  amber: { label: 'Amber', value: 'var(--tone-amber)' },
-  orange: { label: 'Clay', value: 'var(--tone-orange)' },
-  rose: { label: 'Rose', value: 'var(--tone-rose)' },
-  slate: { label: 'Stone', value: 'var(--tone-slate)' },
+  brand: { label: 'Port', value: 'var(--brand)' },
+  cobalt: { label: 'Cobalt', value: 'var(--cobalt)' },
+  teal: { label: 'Teal', value: 'var(--teal)' },
+  lichen: { label: 'Lichen', value: 'var(--lichen)' },
+  clay: { label: 'Clay', value: 'var(--clay)' },
+  heather: { label: 'Heather', value: 'var(--heather)' },
+  graphite: { label: 'Graphite', value: 'var(--graphite)' },
 };
 
-export const ICONS: Record<string, LucideIcon> = {
+/** Port UI class that makes an element take a workspace hue (mark, wash, ink). */
+export function hueClass(accent: AccentColor): string {
+  return `h-${accent}`;
+}
+
+export const ICONS: Record<string, Icon> = {
   briefcase: Briefcase,
   home: House,
   book: BookOpen,
@@ -75,10 +80,16 @@ export const ICONS: Record<string, LucideIcon> = {
 
 export const ICON_NAMES = Object.keys(ICONS);
 
-export function iconFor(name: string): LucideIcon {
+export function iconFor(name: string): Icon {
   return ICONS[name] ?? Folder;
 }
 
 export function accentValue(accent: AccentColor): string {
   return ACCENTS[accent].value;
 }
+
+/**
+ * Any Port UI hue: a workspace hue, or a signal (mineral = success,
+ * amber = warning, coral = error, violet = AI only).
+ */
+export type Hue = AccentColor | 'mineral' | 'amber' | 'coral' | 'violet';

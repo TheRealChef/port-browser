@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { EntityIcon } from '../../common/EntityIcon';
-import { ChevronRight, Library, Plus, X } from 'lucide-react';
+import { ChevronRight, Library, Plus, X } from '../../icons';
 import { useNavigation } from '../../../app/providers/hostContext';
 import { askLink } from '../../../features/workspace/actions';
 import {
@@ -84,7 +84,7 @@ export function BookmarksBody({
             style={{ color: ACCENTS[f.accent].value }}
             className="flex size-4 items-center justify-center"
           >
-            <EntityIcon name={f.icon} size={15} strokeWidth={2} />
+            <EntityIcon name={f.icon} size={15} />
           </span>
           <span className="min-w-0 flex-1 truncate text-[13px]">{f.name}</span>
           <span className="text-[11.5px] tabular-nums text-fg-3">
@@ -231,15 +231,9 @@ export function GroupLauncherBody({
             key={g.id}
             type="button"
             onClick={() => nav.openGroup(g.id)}
-            className="flex items-center gap-2.5 rounded-lg border border-line bg-surface/70 px-2.5 py-2 text-left transition-ui hover:border-line-strong hover:bg-hover"
+            className="flex items-center gap-2.5 rounded-[9px] bg-sunk px-2.5 py-2 text-left shadow-sunk transition-ui hover:bg-hover"
           >
-            <EntityIcon
-              name={g.icon}
-              size={16}
-              style={{ color }}
-              strokeWidth={2}
-              className="shrink-0"
-            />
+            <EntityIcon name={g.icon} size={16} style={{ color }} className="shrink-0" />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px]">{g.name}</span>
               <span className="block text-[11px] text-fg-3">{count} tabs</span>

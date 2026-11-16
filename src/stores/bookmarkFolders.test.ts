@@ -15,7 +15,7 @@ const state = () => useWorkspace.getState();
 const workId = () => sortedSpaces(state().spaces)[0]!.id;
 const folderNamed = (name: string) =>
   Object.values(state().bookmarkFolders).find((f) => f.name === name)!;
-const base = { icon: 'folder', accent: 'blue' as const };
+const base = { icon: 'folder', accent: 'cobalt' as const };
 
 beforeEach(() => {
   useWorkspace.setState(createDefaultWorkspace());
@@ -127,11 +127,24 @@ describe('persistence of folders', () => {
   it('moves seeded spaces to their Mineral Slate colors only when unchanged', () => {
     const data = createDefaultWorkspace();
     const [work, personal] = sortedSpaces(data.spaces);
-    work!.accent = 'violet'; // old default
-    personal!.accent = 'rose'; // user's own choice
-    const migrated = migrateWorkspace(JSON.parse(JSON.stringify(data)), 2) as typeof data;
-    expect(migrated.spaces[work!.id]?.accent).toBe('green');
-    expect(migrated.spaces[personal!.id]?.accent).toBe('rose');
+    (work as { accent: string }).accent = 'violet'; // old default
+    (personal as { accent: string }).accent = 'rose'; // user's own choice
+    const migrated = migrateWorkspace(JSON.parse(JSON.stringify(data)), 2) as Record<
+      string,
+      Record<string, { accent: string }>
+    >;
+    expect(migrated.spaces![work!.id]?.accent).toBe('green');
+    expect(migrated.spaces![personal!.id]?.accent).toBe('rose');
+  });
+
+  it('maps colours saved before Port UI to workspace hues', () => {
+    const data = JSON.parse(JSON.stringify(createDefaultWorkspace()));
+    const [work, personal] = sortedSpaces(data.spaces) as Array<{ id: string }>;
+    data.spaces[work!.id].accent = 'violet';
+    data.spaces[personal!.id].accent = 'orange';
+    const result = sanitizeWorkspace(data)!.data;
+    expect(result.spaces[work!.id]?.accent).toBe('heather');
+    expect(result.spaces[personal!.id]?.accent).toBe('clay');
   });
 
   it('migrates v1 data by adding an empty folder table', () => {

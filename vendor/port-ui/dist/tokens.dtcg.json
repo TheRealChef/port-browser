@@ -1,0 +1,657 @@
+{
+  "$description": "Port tokens in W3C Design Tokens (DTCG) format. Colours carry light and dark in $extensions.",
+  "color": {
+    "ground": {
+      "$type": "color",
+      "$value": "#e6e2d9",
+      "$description": "App frame and desktop ground behind windows; Spatial's dot grid sits on it.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#e6e2d9",
+          "dark": "#0c0f10"
+        }
+      }
+    },
+    "surface-0": {
+      "$type": "color",
+      "$value": "#f1eee7",
+      "$description": "Window body; the ground panels sit on.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#f1eee7",
+          "dark": "#131719"
+        }
+      }
+    },
+    "surface-1": {
+      "$type": "color",
+      "$value": "#faf8f4",
+      "$description": "Default panel surface: sidebars, lists, tables.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#faf8f4",
+          "dark": "#1a1f21"
+        }
+      }
+    },
+    "surface-2": {
+      "$type": "color",
+      "$value": "#ffffff",
+      "$description": "Raised: popovers, the active tab, Atelier's lifted tiles.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#ffffff",
+          "dark": "#222829"
+        }
+      }
+    },
+    "surface-sunk": {
+      "$type": "color",
+      "$value": "#e9e5dc",
+      "$description": "Inset wells: address bar, terminal gutters, code blocks.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#e9e5dc",
+          "dark": "#0f1213"
+        }
+      }
+    },
+    "line": {
+      "$type": "color",
+      "$value": "#d8d2c6",
+      "$description": "Hairline dividers and panel borders.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#d8d2c6",
+          "dark": "#2c3436"
+        }
+      }
+    },
+    "line-strong": {
+      "$type": "color",
+      "$value": "#8f877a",
+      "$description": "Control borders and connectors that must read at 3:1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#8f877a",
+          "dark": "#6f7d80"
+        }
+      }
+    },
+    "ink": {
+      "$type": "color",
+      "$value": "#1a1d1b",
+      "$description": "Primary text on every surface.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#1a1d1b",
+          "dark": "#eef0eb"
+        }
+      }
+    },
+    "ink-2": {
+      "$type": "color",
+      "$value": "#4a504b",
+      "$description": "Secondary text and labels on surface-0/1/2.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#4a504b",
+          "dark": "#b4bcb6"
+        }
+      }
+    },
+    "ink-3": {
+      "$type": "color",
+      "$value": "#646a65",
+      "$description": "Metadata and timestamps on surface-0/1/2; never on tints.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#646a65",
+          "dark": "#8f9893"
+        }
+      }
+    },
+    "focus": {
+      "$type": "color",
+      "$value": "#1f4fd6",
+      "$description": "Keyboard focus ring: 2px solid, 2px offset. Reserved for focus only.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#1f4fd6",
+          "dark": "#93b4ff"
+        }
+      }
+    },
+    "on-fill": {
+      "$type": "color",
+      "$value": "#ffffff",
+      "$description": "Text and icons on solid hue fills (buttons, vivid bands).",
+      "$extensions": {
+        "port.modes": {
+          "light": "#ffffff",
+          "dark": "#0d1110"
+        }
+      }
+    },
+    "brand": {
+      "$type": "color",
+      "$value": "#24493d",
+      "$description": "Port's brand: Hub identity, the launch CTA, the active workspace, the cover. A deep bottle-mineral, deliberately darker (light) and paler (dark) than success green so brand never reads as \"passed\". Fills take on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#24493d",
+          "dark": "#cbe7da"
+        }
+      }
+    },
+    "brand-tint": {
+      "$type": "color",
+      "$value": "#dde8e3",
+      "$description": "Brand wash behind the Hub hero, the current workspace and brand-selected rows.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#dde8e3",
+          "dark": "#1c2b26"
+        }
+      }
+    },
+    "brand-ink": {
+      "$type": "color",
+      "$value": "#1d3b31",
+      "$description": "Brand text on brand-tint and surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#1d3b31",
+          "dark": "#d9efe5"
+        }
+      }
+    },
+    "mineral": {
+      "$type": "color",
+      "$value": "#2c7656",
+      "$description": "Success only: passed, done, added lines, connected. No longer the brand. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#2c7656",
+          "dark": "#62c196"
+        }
+      }
+    },
+    "mineral-tint": {
+      "$type": "color",
+      "$value": "#dbeae1",
+      "$description": "Tinted ground for mineral groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#dbeae1",
+          "dark": "#183026"
+        }
+      }
+    },
+    "mineral-ink": {
+      "$type": "color",
+      "$value": "#1b5039",
+      "$description": "Text on mineral-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#1b5039",
+          "dark": "#a3dfc2"
+        }
+      }
+    },
+    "clay": {
+      "$type": "color",
+      "$value": "#a94f31",
+      "$description": "Warmth and grouping; Port Git identity; staged changes. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#a94f31",
+          "dark": "#e38d6d"
+        }
+      }
+    },
+    "clay-tint": {
+      "$type": "color",
+      "$value": "#f3e0d6",
+      "$description": "Tinted ground for clay groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#f3e0d6",
+          "dark": "#36221a"
+        }
+      }
+    },
+    "clay-ink": {
+      "$type": "color",
+      "$value": "#7e3820",
+      "$description": "Text on clay-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#7e3820",
+          "dark": "#f3bba5"
+        }
+      }
+    },
+    "cobalt": {
+      "$type": "color",
+      "$value": "#2d5bcc",
+      "$description": "Information and navigation; Port Browser identity; links. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#2d5bcc",
+          "dark": "#7ea4ff"
+        }
+      }
+    },
+    "cobalt-tint": {
+      "$type": "color",
+      "$value": "#dfe6f9",
+      "$description": "Tinted ground for cobalt groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#dfe6f9",
+          "dark": "#1a2440"
+        }
+      }
+    },
+    "cobalt-ink": {
+      "$type": "color",
+      "$value": "#1d409c",
+      "$description": "Text on cobalt-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#1d409c",
+          "dark": "#b9cdff"
+        }
+      }
+    },
+    "violet": {
+      "$type": "color",
+      "$value": "#6c45c4",
+      "$description": "AI, agents and automation only. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#6c45c4",
+          "dark": "#b39aff"
+        }
+      }
+    },
+    "violet-tint": {
+      "$type": "color",
+      "$value": "#e9e2f9",
+      "$description": "Tinted ground for violet groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#e9e2f9",
+          "dark": "#271f40"
+        }
+      }
+    },
+    "violet-ink": {
+      "$type": "color",
+      "$value": "#51309c",
+      "$description": "Text on violet-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#51309c",
+          "dark": "#d5c7ff"
+        }
+      }
+    },
+    "teal": {
+      "$type": "color",
+      "$value": "#167a7a",
+      "$description": "Integrations, data, sync. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#167a7a",
+          "dark": "#52c9c2"
+        }
+      }
+    },
+    "teal-tint": {
+      "$type": "color",
+      "$value": "#d4ecea",
+      "$description": "Tinted ground for teal groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#d4ecea",
+          "dark": "#132e2d"
+        }
+      }
+    },
+    "teal-ink": {
+      "$type": "color",
+      "$value": "#0f5856",
+      "$description": "Text on teal-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#0f5856",
+          "dark": "#98e4de"
+        }
+      }
+    },
+    "amber": {
+      "$type": "color",
+      "$value": "#8f5c0e",
+      "$description": "Warnings, pending, paused. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#8f5c0e",
+          "dark": "#f0b44c"
+        }
+      }
+    },
+    "amber-tint": {
+      "$type": "color",
+      "$value": "#f7e8cb",
+      "$description": "Tinted ground for amber groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#f7e8cb",
+          "dark": "#372912"
+        }
+      }
+    },
+    "amber-ink": {
+      "$type": "color",
+      "$value": "#6b4408",
+      "$description": "Text on amber-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#6b4408",
+          "dark": "#f7d394"
+        }
+      }
+    },
+    "coral": {
+      "$type": "color",
+      "$value": "#c33a31",
+      "$description": "Errors, deletions, destructive actions. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#c33a31",
+          "dark": "#ff8073"
+        }
+      }
+    },
+    "coral-tint": {
+      "$type": "color",
+      "$value": "#fadedb",
+      "$description": "Tinted ground for coral groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#fadedb",
+          "dark": "#3c1c1a"
+        }
+      }
+    },
+    "coral-ink": {
+      "$type": "color",
+      "$value": "#9a271f",
+      "$description": "Text on coral-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#9a271f",
+          "dark": "#ffb6ad"
+        }
+      }
+    },
+    "lichen": {
+      "$type": "color",
+      "$value": "#5f6e17",
+      "$description": "Added hue: personal and reading workspaces. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#5f6e17",
+          "dark": "#bfce62"
+        }
+      }
+    },
+    "lichen-tint": {
+      "$type": "color",
+      "$value": "#e7ebcd",
+      "$description": "Tinted ground for lichen groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#e7ebcd",
+          "dark": "#282d13"
+        }
+      }
+    },
+    "lichen-ink": {
+      "$type": "color",
+      "$value": "#46520e",
+      "$description": "Text on lichen-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#46520e",
+          "dark": "#dce69e"
+        }
+      }
+    },
+    "heather": {
+      "$type": "color",
+      "$value": "#9d3f71",
+      "$description": "Added hue: design and review workspaces. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#9d3f71",
+          "dark": "#ea8dbb"
+        }
+      }
+    },
+    "heather-tint": {
+      "$type": "color",
+      "$value": "#f4dfe9",
+      "$description": "Tinted ground for heather groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#f4dfe9",
+          "dark": "#391c2b"
+        }
+      }
+    },
+    "heather-ink": {
+      "$type": "color",
+      "$value": "#772a53",
+      "$description": "Text on heather-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#772a53",
+          "dark": "#f6c2db"
+        }
+      }
+    },
+    "graphite": {
+      "$type": "color",
+      "$value": "#2b3134",
+      "$description": "Added hue: Port Terminal identity; dark chrome bands. Solid marks, rails, icons, fills with on-fill text.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#2b3134",
+          "dark": "#c9d1cf"
+        }
+      }
+    },
+    "graphite-tint": {
+      "$type": "color",
+      "$value": "#e1e3e2",
+      "$description": "Tinted ground for graphite groups, selected rows and badges.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#e1e3e2",
+          "dark": "#23292b"
+        }
+      }
+    },
+    "graphite-ink": {
+      "$type": "color",
+      "$value": "#1f2427",
+      "$description": "Text on graphite-tint and on surface-1.",
+      "$extensions": {
+        "port.modes": {
+          "light": "#1f2427",
+          "dark": "#e4e9e7"
+        }
+      }
+    }
+  },
+  "spacing": {
+    "space-1": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Icon-to-badge nudge."
+    },
+    "space-2": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$description": "Inside chips; tree indent ticks."
+    },
+    "space-3": {
+      "$type": "dimension",
+      "$value": "6px",
+      "$description": "Row vertical padding (compact)."
+    },
+    "space-4": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "Control padding; gap in clusters."
+    },
+    "space-5": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$description": "Panel inner padding (compact)."
+    },
+    "space-6": {
+      "$type": "dimension",
+      "$value": "16px",
+      "$description": "Panel inner padding (cozy); card gap."
+    },
+    "space-7": {
+      "$type": "dimension",
+      "$value": "24px",
+      "$description": "Region gap; editorial blocks."
+    },
+    "space-8": {
+      "$type": "dimension",
+      "$value": "40px",
+      "$description": "Hub section rhythm."
+    }
+  },
+  "radius": {
+    "radius-hair": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Spatial controls, kbd keys."
+    },
+    "radius-ctl": {
+      "$type": "dimension",
+      "$value": "9px",
+      "$description": "Buttons, inputs, rows, tabs (Keystone). Drawn as a sharp squircle (corner-shape: squircle) where supported."
+    },
+    "radius-panel": {
+      "$type": "dimension",
+      "$value": "14px",
+      "$description": "Panels and tiles; = radius-window minus the 6px island gap. Sharp squircle."
+    },
+    "radius-tab": {
+      "$type": "dimension",
+      "$value": "13px",
+      "$description": "Top corners of the app tab and active tabs; bottom corners stay square where they meet the edge."
+    },
+    "radius-window": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$description": "Windows; outermost container. Sharp squircle."
+    },
+    "radius-pill": {
+      "$type": "dimension",
+      "$value": "999px",
+      "$description": "Status pills and counters only."
+    }
+  },
+  "font": {
+    "sans": {
+      "$type": "fontFamily",
+      "$value": "\"IBM Plex Sans\", system-ui, sans-serif"
+    },
+    "display": {
+      "$type": "fontFamily",
+      "$value": "\"IBM Plex Sans\", system-ui, sans-serif"
+    },
+    "mono": {
+      "$type": "fontFamily",
+      "$value": "\"IBM Plex Mono\", ui-monospace, monospace"
+    }
+  },
+  "motion": {
+    "d1": {
+      "$type": "duration",
+      "$value": "90ms",
+      "$description": "Press, hover."
+    },
+    "d2": {
+      "$type": "duration",
+      "$value": "160ms",
+      "$description": "Colour, fades."
+    },
+    "d3": {
+      "$type": "duration",
+      "$value": "240ms",
+      "$description": "Selection, chevrons."
+    },
+    "d4": {
+      "$type": "duration",
+      "$value": "380ms",
+      "$description": "Panels, docking."
+    },
+    "e-out": {
+      "$type": "cubicBezier",
+      "$value": "cubic-bezier(.2,.8,.2,1)",
+      "$description": "Default ease-out."
+    },
+    "e-spring": {
+      "$type": "cubicBezier",
+      "$value": "cubic-bezier(.32,1.36,.52,1)",
+      "$description": "Settles with at most ~8% overshoot."
+    },
+    "e-io": {
+      "$type": "cubicBezier",
+      "$value": "cubic-bezier(.6,0,.3,1)",
+      "$description": "Ease-in-out for loops."
+    }
+  },
+  "shadow": {
+    "shadow-tile": {
+      "$type": "shadow",
+      "$value": "0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(40,32,20,0.10), 0 4px 12px rgba(40,32,20,0.06)",
+      "$extensions": {
+        "port.modes": {
+          "light": "0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(40,32,20,0.10), 0 4px 12px rgba(40,32,20,0.06)",
+          "dark": "0 1px 0 rgba(255,255,255,0.05) inset, 0 1px 2px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.35)"
+        }
+      }
+    },
+    "shadow-float": {
+      "$type": "shadow",
+      "$value": "0 10px 30px rgba(40,32,20,0.16), 0 2px 6px rgba(40,32,20,0.08)",
+      "$extensions": {
+        "port.modes": {
+          "light": "0 10px 30px rgba(40,32,20,0.16), 0 2px 6px rgba(40,32,20,0.08)",
+          "dark": "0 14px 40px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.4)"
+        }
+      }
+    },
+    "shadow-well": {
+      "$type": "shadow",
+      "$value": "inset 0 1px 2px rgba(40,32,20,0.12)",
+      "$extensions": {
+        "port.modes": {
+          "light": "inset 0 1px 2px rgba(40,32,20,0.12)",
+          "dark": "inset 0 1px 3px rgba(0,0,0,0.5)"
+        }
+      }
+    }
+  }
+}

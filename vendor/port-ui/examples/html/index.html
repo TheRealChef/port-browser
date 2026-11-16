@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Port UI — plain HTML example</title>
+<link rel="stylesheet" href="../../dist/fonts.css">
+<link rel="stylesheet" href="../../dist/port.css">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body > .port { height: 100%; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .demo-bar { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<!-- 1. Everything Port lives inside a .port root. Port.init() sets theme, platform and wires behaviour. -->
+<div class="port" id="app">
+  <div class="demo-bar">
+    <span class="eyebrow">Example controls</span>
+    <div class="seg" data-seg id="theme"><button data-v="system" aria-pressed="true">System</button><button data-v="light" aria-pressed="false">Light</button><button data-v="dark" aria-pressed="false">Dark</button></div>
+    <div class="seg" data-seg id="preset"><button data-v="stone" aria-pressed="true">Stone &amp; Slate</button><button data-v="dusk" aria-pressed="false">Dusk</button><button data-v="signal" aria-pressed="false">Signal</button><button data-v="pigment" aria-pressed="false">Pigment</button><button data-v="contrast" aria-pressed="false">High contrast</button></div>
+  </div>
+
+  <!-- 2. A window: frameless chrome, panels, rows, groups, table, overlays. -->
+  <div class="win h-clay" style="flex:1;min-height:0">
+    <header class="tb">
+      <span class="mac-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="tb-key"><span data-icon="branch"></span><span class="app-name">Port Git</span></div>
+      <nav class="crumbs" aria-label="Breadcrumb"><a>Port Core</a><span data-icon="chevR"></span><a aria-current="page">port/core</a></nav>
+      <button class="tb-cmd" data-overlay="#cmdk" style="border:0;cursor:pointer"><span data-icon="search" data-size="sm"></span><span class="grow">Jump to anything…</span><span class="kbd" data-keys="mod+k"></span></button>
+      <div class="wctl"><button aria-label="Minimise"><span data-icon="min"></span></button><button aria-label="Maximise"><span data-icon="max"></span></button><button class="cls" aria-label="Close"><span data-icon="x"></span></button></div>
+    </header>
+    <div class="wb" style="padding:8px">
+      <aside class="panel h-clay" style="width:260px;flex:none">
+        <header class="ph"><span class="ttl">Branches</span><span class="grow"></span><span class="tipwrap"><button class="btn icon quiet sm" aria-label="New branch"><span data-icon="plus"></span></button><span class="tip">New branch <span class="kbd" data-keys="mod+shift+b"></span></span></span></header>
+        <div class="pb" data-select-scope="single" role="tree" data-ctx="#branch-menu">
+          <div class="grp h-clay">
+            <div class="grp-h" tabindex="0" role="button" aria-expanded="true" data-collapse><span data-icon="chevD" data-size="sm" class="chev"></span><span class="grow trunc">Local</span><span class="count">3</span></div>
+            <div class="grp-b"><div class="grp-in" role="group">
+              <div class="row is-selected is-active" tabindex="0" role="treeitem"><span data-icon="branch" data-size="sm"></span><span class="lbl">feat/sync-engine</span><span class="meta">↑3 ↓1</span></div>
+              <div class="row" tabindex="0" role="treeitem"><span data-icon="branch" data-size="sm"></span><span class="lbl">main</span></div>
+              <div class="row h-violet is-running" tabindex="0" role="treeitem"><span class="weave"><i></i><i></i><i></i></span><span class="lbl">agent/refactor-ipc</span><span class="pill h-violet">agent</span></div>
+            </div></div>
+          </div>
+          <div class="grp h-teal is-collapsed">
+            <div class="grp-h" tabindex="0" role="button" aria-expanded="false" data-collapse><span data-icon="chevD" data-size="sm" class="chev"></span><span class="grow trunc">origin</span><span class="count">12</span></div>
+            <div class="grp-b"><div class="grp-in" role="group"><div class="row" tabindex="0"><span class="lbl">main</span></div></div></div>
+          </div>
+          <p class="meta" style="margin:8px">Right-click for the branch menu.</p>
+        </div>
+      </aside>
+      <section class="panel" style="flex:1">
+        <header class="ph"><span class="ttl">Issues</span><span class="grow"></span>
+          <div class="dd"><div class="box sel" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" style="min-width:160px"><span class="val">All owners</span><span data-icon="chevD" data-size="sm" class="chev2"></span></div>
+            <div class="menu" role="listbox" hidden><div class="mi" role="option" aria-selected="true"><span class="grow">All owners</span><span data-icon="check" data-size="sm" class="chkm"></span></div><div class="mi" role="option" aria-selected="false"><span class="grow">Mara</span><span data-icon="check" data-size="sm" class="chkm"></span></div><div class="mi" role="option" aria-selected="false"><span class="grow">Jonas</span><span data-icon="check" data-size="sm" class="chkm"></span></div></div></div>
+          <button class="btn primary h-coral" data-overlay="#discard"><span data-icon="x" data-size="sm"></span>Discard…</button>
+        </header>
+        <div class="pb flush">
+          <table class="grid">
+            <thead><tr><th data-sort style="width:110px">Key</th><th data-sort>Title</th><th data-sort style="width:100px">Owner</th></tr></thead>
+            <tbody>
+              <tr class="tgrp h-cobalt"><td colspan="3"><span class="row-flex"><span data-icon="chevD" data-size="sm" class="chev"></span><span class="sglyph s-run h-cobalt" style="--p:50"></span>In progress<span class="count">2</span></span></td></tr>
+              <tr tabindex="0"><td class="mono faint">PORT-311</td><td>Tab restore after crash</td><td>Mara</td></tr>
+              <tr tabindex="0"><td class="mono faint">PORT-318</td><td>Hub launcher keyboard nav</td><td>Jonas</td></tr>
+              <tr class="tgrp h-mineral"><td colspan="3"><span class="row-flex"><span data-icon="chevD" data-size="sm" class="chev"></span><span class="sglyph s-done h-mineral"></span>Done<span class="count">1</span></span></td></tr>
+              <tr tabindex="0"><td class="mono faint">PORT-297</td><td>Debounce terminal resize</td><td>Jonas</td></tr>
+            </tbody>
+          </table>
+          <div style="padding:12px;display:flex;flex-direction:column;gap:12px;max-width:420px">
+            <label class="tf"><span class="tf-l">Commit message</span><span class="box"><input class="inp" value="Guard tombstones until all peers ack"></span><span class="tf-h">Shown in history and pull requests.</span></label>
+            <span class="ck h-clay" role="checkbox" tabindex="0" aria-checked="true"><span class="bx"><span data-icon="check"></span></span><span>Sign commit</span></span>
+            <div class="row-flex"><span style="font-size:12.5px" class="grow">Push after commit</span><span class="toggle h-brand" role="switch" aria-checked="false" tabindex="0"></span></div>
+            <div class="slider h-brand" role="slider" tabindex="0" aria-label="Context lines" aria-valuemin="0" aria-valuemax="10" aria-valuenow="3"><span class="tr"></span><span class="fill"></span><span class="th"></span></div>
+            <button class="btn primary h-clay" data-fx="save"><span data-icon="commit" data-size="sm"></span>Commit</button>
+          </div>
+        </div>
+      </section>
+    </div>
+    <footer class="sb"><span>feat/sync-engine</span><span>↑3 ↓1</span><span class="grow"></span><span>fetched 2m ago</span></footer>
+  </div>
+</div>
+
+<!-- 3. Overlay and menu content lives in <template>s; data-overlay / data-ctx point at them. -->
+<template id="discard">
+  <div class="dlg h-coral" role="alertdialog" aria-labelledby="d-t"><div class="dlg-b"><span class="icbox big"><span data-icon="alert"></span></span><div><h3 id="d-t">Discard 2 unstaged changes?</h3><p>registry.ts and legacy-channels.ts go back to their last commit. Port keeps a copy in Stashes for 7 days.</p></div></div>
+  <div class="dlg-f"><span class="meta grow">esc to cancel</span><button class="btn" data-close>Cancel</button><button class="btn primary h-coral" data-close>Discard changes</button></div></div>
+</template>
+<template id="cmdk">
+  <div class="cmdk" role="dialog" aria-label="Command palette"><div class="cmdk-in"><span data-icon="search"></span><input class="inp" data-cmdk-in placeholder="Search Port, run a command…" aria-label="Command"><span class="kbd">esc</span></div>
+  <div class="cmdk-l" role="listbox"><div class="mlab">Jump to</div>
+    <div class="mi" role="option"><span class="icbox h-clay"><span data-icon="merge" data-size="sm"></span></span><span class="grow">Open PR #482 · sync-engine</span><span class="meta">Git</span></div>
+    <div class="mi" role="option"><span class="icbox h-cobalt"><span data-icon="globe" data-size="sm"></span></span><span class="grow">Tab group · Sync engine research</span><span class="meta">Browser</span></div>
+    <div class="mlab">Actions</div>
+    <div class="mi" role="option"><span class="icbox h-brand"><span data-icon="grid" data-size="sm"></span></span><span class="grow">Switch workspace…</span></div></div></div>
+</template>
+<template id="branch-menu">
+  <div class="menu" role="menu"><div class="mi" role="menuitem"><span data-icon="branch" data-size="sm"></span><span class="grow">Check out</span></div><div class="mi" role="menuitem"><span data-icon="merge" data-size="sm"></span><span class="grow">Merge into current</span></div><div class="msep"></div><div class="mi danger" role="menuitem"><span data-icon="x" data-size="sm"></span><span class="grow">Delete branch</span><span class="sc"><span class="kbd" data-keys="mod+backspace"></span></span></div></div>
+</template>
+
+<script src="../../dist/port.umd.js"></script>
+<script>
+  // Icons: replace <span data-icon> placeholders (or call Port.icon(name) in your own templates).
+  function hydrateIcons(scope) { scope.querySelectorAll("[data-icon]").forEach(function (el) { var t = document.createElement("template"); t.innerHTML = Port.icon(el.dataset.icon, (el.dataset.size || "") + " " + el.className); el.replaceWith(t.content.firstChild); }); }
+  hydrateIcons(document); document.querySelectorAll("template").forEach(function (t) { hydrateIcons(t.content); });
+  var app = Port.init(document.getElementById("app"), { theme: "system" });
+  // ⌘K / Ctrl+K opens the palette
+  document.addEventListener("keydown", function (e) { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); Port.open(app.querySelector(".win"), "#cmdk"); } });
+  app.addEventListener("port-seg", function (e) {
+    if (e.detail.seg.id === "theme") Port.configure(app, { theme: e.detail.value });
+    if (e.detail.seg.id === "preset") { if (e.detail.value === "stone") app.removeAttribute("data-palette"); else Port.configure(app, { palette: e.detail.value }); }
+  });
+  app.querySelector("[data-fx=save]").addEventListener("click", function () { setTimeout(function () { Port.toast(app.querySelector(".win"), { text: "Committed 3 files", hue: "mineral" }); }, 1000); });
+</script>
+</body>
+</html>

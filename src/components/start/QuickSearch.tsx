@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CornerDownLeft, Search } from 'lucide-react';
+import { CornerDownLeft, Search } from '../icons';
 import { useNavigation } from '../../app/providers/hostContext';
 import { useWorkspace } from '../../stores/workspaceStore';
 import { bookmarksOfSpace, tabDisplayTitle, tabsOfSpace } from '../../features/workspace/selectors';
@@ -62,7 +62,7 @@ export function QuickSearch({ spaceId, autoFocus }: { spaceId: ID; autoFocus?: b
 
   return (
     <div className="relative">
-      <div className="flex h-11 items-center gap-2.5 rounded-xl border border-line-strong bg-surface px-3.5 shadow-card transition-ui focus-within:border-focus/80 focus-within:shadow-[0_0_0_3px_var(--focus-soft)]">
+      <div className="field flex h-11 items-center gap-2.5 rounded-xl px-3.5">
         <Search size={16} className="shrink-0 text-fg-3" />
         <input
           autoFocus={autoFocus}

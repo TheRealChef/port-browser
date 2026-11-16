@@ -1,0 +1,48 @@
+/* Port UI — Platform: window chrome, RTL, forced colours, long labels */
+.port .wctl{display:flex;gap:2px}
+.port .wctl button{all:unset;width:30px;height:24px;display:grid;place-items:center;border-radius:7px;color:var(--ink-2);cursor:pointer}
+.port .wctl button:hover{background:color-mix(in oklab,var(--ink) 8%,transparent);color:var(--ink)}
+.port .wctl button.cls:hover{background:var(--coral);color:var(--on-fill)}
+.port .wctl .ic{width:13px;height:13px}
+@media (forced-colors: active){
+  .port .btn,.port .box,.port .panel,.port .menu,.port .dlg,.port .tile,.port .seg,.port .toggle,.port .pill,.port .tag{border:1px solid CanvasText}
+  .port .btn.primary{background:ButtonText;color:ButtonFace;forced-color-adjust:none}
+  .port .row.is-selected,.port .mi.is-hi,.port .mi:hover{outline:2px solid Highlight;outline-offset:-2px}
+  .port .row.is-active{outline:1px solid CanvasText}
+  .port .ck > .bx{border:1px solid CanvasText}
+  .port .ck[aria-checked="true"] > .bx{background:Highlight;forced-color-adjust:none}
+  .port .seg > .thumb{outline:2px solid Highlight}
+  .port :focus-visible{outline:3px solid Highlight !important}
+  .port .sglyph,.port .dot,.port .sq,.port .sw,.port .spinner,.port .fav{forced-color-adjust:none}
+}
+@media (prefers-reduced-transparency: reduce){
+  .port .scrim{backdrop-filter:none;background:color-mix(in oklab,var(--ground) 80%,transparent)}
+}
+.port .tb :is(button,a,input,select,.appdot,.tb-cmd,.seg,.wctl,.avatar,.pill,.tb-key,[role="button"],[tabindex]){-webkit-app-region:no-drag;app-region:no-drag}
+.port .tb > .wctl{order:99;margin-left:2px}
+.port .mac-lights{display:none}
+.port[data-platform="mac"] .tb{padding-left:84px}
+.port[data-platform="mac"] .tb > .wctl{display:none}
+.port[data-platform="mac"] .mac-lights{display:flex;gap:8px;position:absolute;left:14px;top:50%;transform:translateY(-50%)}
+.port[data-platform="mac"] .mac-lights i{width:12px;height:12px;border-radius:50%;border:1px dashed var(--line-strong);opacity:.7}
+.port[data-platform="win"] .tb{padding-right:0}
+.port[data-platform="win"] .tb > .wctl{align-self:stretch;gap:0}
+.port[data-platform="win"] .tb > .wctl button{width:46px;height:100%;border-radius:0}
+.port[data-platform="win"] .tb > .wctl button.cls:hover{background:var(--coral);color:var(--on-fill)}
+.port[data-platform="linux"] .tb > .wctl{gap:8px;margin-left:6px}
+.port[data-platform="linux"] .tb > .wctl button{width:24px;height:24px;border-radius:50%;background:color-mix(in oklab,var(--ink) 8%,transparent)}
+.port[data-platform="linux"] .tb > .wctl button:hover{background:color-mix(in oklab,var(--ink) 16%,transparent)}
+.port[data-platform="linux"] .tb > .wctl .ic{width:11px;height:11px;stroke-width:2}
+.port[data-platform="win"] .ic,.port[data-platform="linux"] .ic{shape-rendering:geometricPrecision}
+.port .row:dir(rtl).is-selected::before{left:auto;right:0}
+.port .kids:dir(rtl){margin-left:0;margin-right:16px}
+.port .kids:dir(rtl)::before{left:auto;right:-7px}
+.port .kids:dir(rtl) > .row > .elb,.port .kids:dir(rtl) > .node > .row > .elb{left:auto;right:-7px}
+.port :dir(rtl) .i-chevR,.port :dir(rtl) .i-back,.port :dir(rtl) .i-fwd,.port :dir(rtl) .i-share{transform:scaleX(-1)}
+.port .grp.is-collapsed:dir(rtl) .grp-h .chev{transform:rotate(90deg)}
+.port .mi:dir(rtl) > .submenu{left:auto;right:calc(100% + 2px)}
+.port .grp-in:dir(rtl){border-left:0}
+.port .banner:dir(rtl) .acts{margin-left:0;margin-right:auto}
+.port .tb-cmd:dir(rtl){margin-left:0;margin-right:auto}
+.port .btn > span.bl{overflow:hidden;text-overflow:ellipsis}
+.port .tab > .tl{overflow:hidden;text-overflow:ellipsis;min-width:0}

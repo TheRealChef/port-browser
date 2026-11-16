@@ -889,7 +889,7 @@ export const useWorkspace = create<WorkspaceState>()(
                   parentId: into,
                   name: node.name,
                   icon: 'folder',
-                  accent: 'slate',
+                  accent: 'graphite',
                   order: folderOrder++,
                   collapsed: true,
                   createdAt: now,

@@ -1,0 +1,60 @@
+/* Port UI — Form controls: fields, checkbox, radio, switch, slider, swatches, presets */
+.port .field{white-space:nowrap;overflow:hidden;display:flex;align-items:center;gap:8px;height:var(--ctl-h);padding:0 10px;border-radius:var(--r-ctl);background:var(--surface-sunk);color:var(--ink-3);font-size:12.5px;box-shadow:var(--shadow-well);border:1px solid transparent}
+.port .toggle{width:30px;height:18px;border-radius:999px;background:var(--line-strong);position:relative;flex:none;cursor:pointer;transition:background var(--d2)}
+.port .toggle::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface-2);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform var(--d3) var(--e-spring)}
+.port .toggle.on{background:var(--hue)}
+.port .toggle.on::after{transform:translateX(12px)}
+.port .tf{display:flex;flex-direction:column;gap:5px;min-width:0}
+.port .tf-l{font-size:12px;font-weight:550;color:var(--ink);display:flex;gap:6px;align-items:baseline}
+.port .tf-l .opt{font-weight:400;color:var(--ink-3);font-size:11px}
+.port .tf-h{font-size:11.5px;color:var(--ink-2);line-height:15px}
+.port .box{display:flex;align-items:center;gap:8px;min-height:var(--ctl-h);padding:0 10px;border-radius:var(--r-ctl);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line-strong);color:var(--ink);transition:box-shadow var(--d2)}
+.port .box{background:var(--surface-sunk);box-shadow:var(--shadow-well),inset 0 0 0 1px color-mix(in oklab,var(--line-strong) 55%,transparent)}
+.port .box:hover{box-shadow:inset 0 0 0 1px var(--ink-3)}
+.port .box:focus-within{box-shadow:inset 0 0 0 1px var(--focus),0 0 0 3px color-mix(in oklab,var(--focus) 22%,transparent)}
+.port .box .affix{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3)}
+.port .inp{all:unset;flex:1;min-width:0;font:inherit;font-size:12.5px;color:var(--ink);height:calc(var(--ctl-h) - 2px);caret-color:var(--focus)}
+.port .inp::placeholder{color:var(--ink-3)}
+.port textarea.inp{height:auto;min-height:64px;padding:7px 0;line-height:18px;white-space:pre-wrap;resize:none;display:block}
+.port .box.ta{align-items:flex-start}
+.port .tf.is-error .box{box-shadow:inset 0 0 0 1.5px var(--coral)}
+.port .tf.is-error .tf-h{color:var(--coral-ink);display:flex;gap:5px;align-items:center}
+.port .tf.is-ok .tf-h{color:var(--mineral-ink);display:flex;gap:5px;align-items:center}
+.port .tf.is-disabled .box{background:transparent;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-3)}
+.port .tf.is-disabled .inp{color:var(--ink-3)}
+.port .stepper{display:flex;flex-direction:column;margin-right:-6px}
+.port .stepper button{all:unset;cursor:pointer;width:18px;height:11px;display:grid;place-items:center;color:var(--ink-3);border-radius:3px}
+.port .stepper button:hover{color:var(--ink);background:color-mix(in oklab,var(--ink) 8%,transparent)}
+.port .tokens{display:flex;flex-wrap:wrap;gap:4px;padding:4px 6px;align-items:center}
+.port .ck{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;user-select:none}
+.port .ck > .bx{width:16px;height:16px;border-radius:5px;flex:none;display:grid;place-items:center;background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--line-strong);transition:background var(--d2),box-shadow var(--d2)}
+.port .ck[aria-checked="true"] > .bx,.port .ck[aria-checked="mixed"] > .bx{background:var(--hue);box-shadow:none}
+.port .ck:hover > .bx{box-shadow:inset 0 0 0 1.5px var(--ink-3)}
+.port .ck:focus-visible{outline:none}
+.port .ck:focus-visible > .bx{outline:2px solid var(--focus);outline-offset:2px}
+.port .ck.radio > .bx{border-radius:50%}
+.port .ck.radio > .bx::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--on-fill);transform:scale(0);transition:transform var(--d3) var(--e-spring)}
+.port .ck.radio[aria-checked="true"] > .bx::after{transform:scale(1)}
+.port .ck[aria-disabled="true"]{color:var(--ink-3);cursor:not-allowed}
+.port .ck[aria-disabled="true"] > .bx{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line)}
+.port .ck .sub{display:block;font-size:11.5px;color:var(--ink-2)}
+.port .slider{position:relative;height:20px;display:flex;align-items:center;cursor:pointer;touch-action:none;min-width:120px}
+.port .slider .tr{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:var(--surface-sunk);box-shadow:inset 0 0 0 1px var(--line)}
+.port .slider .fill{position:absolute;left:0;height:4px;border-radius:2px;background:var(--hue)}
+.port .slider .th{position:absolute;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--surface-2);box-shadow:0 0 0 1px var(--line-strong),0 1px 3px rgba(0,0,0,.2);transition:transform var(--d2) var(--e-spring)}
+.port .slider:active .th{transform:scale(1.15)}
+.port .slider:focus-visible{outline:none}
+.port .slider:focus-visible .th{outline:2px solid var(--focus);outline-offset:2px}
+.port .slider .tick{position:absolute;top:16px;font-family:var(--f-mono);font-size:10px;color:var(--ink-3);transform:translateX(-50%)}
+.port .swatches{display:flex;gap:8px;flex-wrap:wrap}
+.port .sw{width:26px;height:26px;border-radius:8px;cursor:pointer;background:var(--hue);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--ink) 15%,transparent);display:grid;place-items:center;color:var(--on-fill);transition:transform var(--d2) var(--e-spring)}
+.port .sw:hover{transform:scale(1.08)}
+.port .sw[aria-checked="true"]{box-shadow:0 0 0 2px var(--surface-1),0 0 0 4px var(--hue)}
+.port .sw:focus-visible{outline:2px solid var(--focus);outline-offset:4px}
+.port .preset{display:flex;flex-direction:column;gap:6px;padding:6px;border-radius:12px;cursor:pointer;background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--line);transition:box-shadow var(--d2)}
+.port .preset:hover{box-shadow:inset 0 0 0 1px var(--line-strong)}
+.port .preset[aria-checked="true"]{box-shadow:inset 0 0 0 2px var(--brand)}
+.port .preset:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.port .preset .mini{height:64px;border-radius:8px;display:grid;grid-template-columns:22px 1fr;gap:3px;padding:4px;overflow:hidden}
+.port .preset .mini i{border-radius:4px;display:block}
+.port .preset .lbl2{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:550;padding:0 2px}

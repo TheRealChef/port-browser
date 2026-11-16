@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Copy, ExternalLink, Info, ShieldAlert, TriangleAlert } from 'lucide-react';
+import { Copy, ExternalLink, Info, ShieldAlert, TriangleAlert } from '../icons';
 import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
 import { selectContentCovered, useUI } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';

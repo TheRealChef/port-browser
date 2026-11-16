@@ -20,7 +20,7 @@ export async function createSpaceFlow(): Promise<void> {
     initial: {
       name: '',
       icon: 'star',
-      accent: ACCENT_COLORS[(count + 7) % ACCENT_COLORS.length] ?? 'blue',
+      accent: ACCENT_COLORS[(count + 7) % ACCENT_COLORS.length] ?? 'cobalt',
     },
   });
   if (!result) return;
@@ -63,7 +63,7 @@ export async function createGroupFlow(spaceId?: ID): Promise<ID | null> {
   const result = await askEntity({
     title: 'New group',
     submitLabel: 'Create group',
-    initial: { name: '', icon: 'folder', accent: 'blue' },
+    initial: { name: '', icon: 'folder', accent: 'cobalt' },
   });
   if (!result) return null;
   return ws().createGroup({ ...result, spaceId });

@@ -1,4 +1,4 @@
-import { History } from 'lucide-react';
+import { History } from '../../components/icons';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { EntityIcon } from '../../components/common/EntityIcon';
 import { createPortal } from 'react-dom';
@@ -16,7 +16,7 @@ import {
   Search,
   Settings,
   SquarePlus,
-} from 'lucide-react';
+} from '../../components/icons';
 import { useNavigation } from '../../app/providers/hostContext';
 import { Favicon } from '../../components/common/Favicon';
 import { Kbd } from '../../components/common/Kbd';
@@ -327,7 +327,7 @@ function Palette() {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[95] flex animate-fade items-start justify-center bg-black/45 px-4 pt-[12vh]"
+      className="scrim fixed z-[95] flex items-start justify-center px-4 pt-[12vh]"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) setOpen(false);
       }}
@@ -336,9 +336,9 @@ function Palette() {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="flex max-h-[min(560px,72vh)] w-full max-w-[600px] animate-pop flex-col overflow-hidden rounded-2xl bg-elevated shadow-pop"
+        className="cmdk m-0 flex max-h-[min(560px,72vh)] w-full max-w-[620px] flex-col"
       >
-        <div className="flex h-12 shrink-0 items-center gap-2.5 border-b border-line px-4">
+        <div className="cmdk-in shrink-0">
           <Search size={16} className="text-fg-3" />
           <input
             autoFocus
@@ -369,7 +369,7 @@ function Palette() {
                 setOpen(false);
               }
             }}
-            className="h-full flex-1 bg-transparent text-[14px] outline-none placeholder:text-fg-3"
+            className="inp text-[15px]"
           />
           <Kbd>Esc</Kbd>
         </div>
@@ -378,7 +378,7 @@ function Palette() {
           ref={list}
           id="palette-list"
           role="listbox"
-          className="min-h-0 flex-1 overflow-y-auto p-1.5"
+          className="cmdk-l max-h-none min-h-0 flex-1"
         >
           {items.length === 0 && (
             <p className="px-3 py-8 text-center text-[13px] text-fg-3">No results for “{query}”</p>
@@ -387,11 +387,7 @@ function Palette() {
             const header = i === 0 || items[i - 1]?.section !== item.section ? item.section : null;
             return (
               <div key={item.id}>
-                {header && (
-                  <div className="px-2.5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.07em] text-fg-3">
-                    {header}
-                  </div>
-                )}
+                {header && <div className="mlab">{header}</div>}
                 <div
                   id={`palette-${item.id}`}
                   role="option"
@@ -399,10 +395,7 @@ function Palette() {
                   data-index={i}
                   onMouseMove={() => i !== index && setCursor(i)}
                   onClick={() => runItem(item)}
-                  className={cn(
-                    'flex h-9 items-center gap-3 rounded-lg px-2.5',
-                    i === index ? 'bg-hover text-fg' : 'text-fg-2',
-                  )}
+                  className={cn('mi gap-3 px-2.5', i === index ? 'is-hi text-fg' : 'text-fg-2')}
                 >
                   <span className="flex w-4 shrink-0 justify-center text-fg-2">{item.icon}</span>
                   <span className="min-w-0 flex-1 truncate text-[13px]">
@@ -419,7 +412,7 @@ function Palette() {
           })}
         </div>
 
-        <div className="flex h-8 shrink-0 items-center gap-3 border-t border-line px-3 text-[11px] text-fg-3">
+        <div className="cmdk-f shrink-0">
           <span className="flex items-center gap-1">
             <Kbd>↑</Kbd>
             <Kbd>↓</Kbd> navigate

@@ -123,7 +123,7 @@ export async function createFolderFlow(parentId: ID | null, spaceId?: ID): Promi
   const result = await askEntity({
     title: parentId ? `New folder in “${folderLabel(parentId)}”` : 'New folder',
     submitLabel: 'Create folder',
-    initial: { name: '', icon: 'folder', accent: 'violet' },
+    initial: { name: '', icon: 'folder', accent: 'heather' },
   });
   if (!result) return null;
   return ws().createFolder({ ...result, parentId, spaceId });
@@ -203,7 +203,7 @@ export async function openFolderAsGroup(folderId: ID | null, spaceId?: ID): Prom
     spaceId: space,
     name: folder?.name ?? 'Bookmarks',
     icon: folder?.icon ?? 'folder',
-    accent: folder?.accent ?? 'slate',
+    accent: folder?.accent ?? 'graphite',
   });
   let first: ID | null = null;
   for (const bookmark of marks.slice(0, OPEN_ALL_LIMIT)) {

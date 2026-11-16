@@ -9,8 +9,8 @@ import {
   RotateCw,
   Trash2,
   X,
-  type LucideIcon,
-} from 'lucide-react';
+  type Icon,
+} from '../../components/icons';
 import { useBrowserHost } from '../../app/providers/hostContext';
 import { NativeBrowserHost } from '../../host/NativeBrowserHost';
 import type { DownloadAction, DownloadItem } from '../../host/bridge';
@@ -72,7 +72,7 @@ export function DownloadsPanel({ anchor }: { anchor: HTMLElement | null }) {
       ref={panel}
       role="dialog"
       aria-label="Downloads"
-      className="fixed z-[90] flex max-h-[min(520px,80vh)] w-[380px] animate-pop flex-col rounded-2xl bg-elevated shadow-pop"
+      className="menu fixed z-[90] flex max-h-[min(520px,80vh)] w-[380px] flex-col p-0"
       style={{
         top: (rect?.bottom ?? 44) + 6,
         right: Math.max(8, window.innerWidth - (rect?.right ?? window.innerWidth - 8)),
@@ -118,18 +118,18 @@ function DownloadRow({
   const done = item.state === 'completed' && !item.missing;
   const failed = item.state === 'interrupted';
   return (
-    <div className="group flex items-center gap-3 rounded-xl px-2 py-2 transition-ui hover:bg-hover">
+    <div className="group flex items-center gap-3 rounded-[8px] px-2 py-2 transition-ui hover:bg-hover">
       <button
         type="button"
         disabled={!done}
         onClick={() => act(item.id, 'open')}
         title={done ? 'Open' : undefined}
         className={cn(
-          'flex size-9 shrink-0 items-center justify-center rounded-lg border border-line bg-surface',
-          failed || item.missing ? 'text-fg-disabled' : 'text-info',
+          'icbox size-9 shrink-0 rounded-[9px]',
+          failed || item.missing ? 'h-graphite opacity-60' : 'h-cobalt',
         )}
       >
-        <FileIcon size={16} strokeWidth={1.9} />
+        <FileIcon size={16} />
       </button>
       <div className="min-w-0 flex-1">
         <button
@@ -149,18 +149,16 @@ function DownloadRow({
           {item.state === 'completed' && ` · ${relativeTime(item.startedAt)}`}
         </p>
         {(item.state === 'inProgress' || item.state === 'paused') && (
-          <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-line">
-            {progress === null ? (
-              <div className="h-full w-2/5 animate-progress bg-info" />
-            ) : (
-              <div
-                className={cn(
-                  'h-full rounded-full',
-                  item.state === 'paused' ? 'bg-fg-3' : 'bg-info',
-                )}
-                style={{ width: `${Math.round(progress * 100)}%` }}
-              />
+          <div
+            className={cn(
+              'bar mt-1.5',
+              progress === null && 'indet',
+              item.state === 'paused' ? 'h-graphite' : 'h-cobalt',
             )}
+          >
+            <i
+              style={progress === null ? undefined : { width: `${Math.round(progress * 100)}%` }}
+            />
           </div>
         )}
       </div>
@@ -201,7 +199,7 @@ function PanelButton({
   onClick,
   disabled,
 }: {
-  icon: LucideIcon;
+  icon: Icon;
   label: string;
   onClick: () => void;
   disabled?: boolean;
@@ -213,7 +211,7 @@ function PanelButton({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className="flex size-7 items-center justify-center rounded-md text-fg-3 transition-ui hover:bg-hover hover:text-fg disabled:text-fg-disabled disabled:hover:bg-transparent"
+      className="btn icon quiet sm size-7 text-fg-3 disabled:border-transparent disabled:text-fg-disabled"
     >
       <Icon size={14} />
     </button>

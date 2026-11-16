@@ -1,0 +1,40 @@
+/* Port UI — Data display: pills, counts, kbd, tags, avatars, key-value, files, drop zone */
+.port .avatar{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:10.5px;font-weight:650;background:var(--heather-tint);color:var(--heather-ink)}
+.port .pill{display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:var(--r-pill);background:var(--wash);color:var(--hue-i);font-family:var(--f-mono);font-size:10.5px;font-weight:500;white-space:nowrap;flex:none}
+.port .pill.solid{background:var(--hue);color:var(--on-fill)}
+.port .pill.line{background:transparent;box-shadow:inset 0 0 0 1px var(--hue-line)}
+.port .count{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.port .kbd{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:4px;border:1px solid var(--line);border-bottom-width:2px;font-family:var(--f-mono);font-size:10px;color:var(--ink-2);background:var(--surface-1)}
+.port .dot{width:8px;height:8px;border-radius:50%;background:var(--hue);flex:none}
+.port .fav{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;font-size:9.5px;font-weight:700;background:var(--wash);color:var(--hue-i);flex:none;font-family:var(--f-ui)}
+.port .sq{width:10px;height:10px;border-radius:3px;background:var(--hue);flex:none}
+.port .avatar.ai{background:var(--violet-tint);color:var(--violet-ink)}
+.port .fst{width:16px;height:16px;display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;font-weight:700;border-radius:3px;flex:none}
+.port .fs-M{background:var(--amber-tint);color:var(--amber-ink)}
+.port .fs-A{background:var(--mineral-tint);color:var(--mineral-ink)}
+.port .fs-D{background:var(--coral-tint);color:var(--coral-ink)}
+.port .fs-U{background:var(--coral);color:var(--on-fill)}
+.port .ok-ic{color:var(--mineral-ink)}
+.port .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:12px}
+.port .kv dt{color:var(--ink-2)}
+.port .kv dd{margin:0;font-family:var(--f-mono);font-size:11.5px}
+.port .swatch{border-radius:var(--r-chip);display:flex;flex-direction:column;justify-content:flex-end;padding:8px;font-family:var(--f-mono);font-size:10.5px;line-height:14px;min-height:58px}
+.port .tag{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 4px 0 7px;border-radius:calc(var(--r-ctl) - 2px);background:var(--wash);color:var(--hue-i);font-size:11.5px;font-weight:500}
+.port .tag button{all:unset;cursor:pointer;display:grid;place-items:center;width:14px;height:14px;border-radius:3px}
+.port .tag button:hover{background:color-mix(in oklab,var(--hue) 22%,transparent)}
+.port .drop{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px;border-radius:12px;border:1.5px dashed var(--line-strong);color:var(--ink-2);font-size:12.5px;text-align:center;transition:background var(--d2),border-color var(--d2)}
+.port .drop.is-over,.port .drop:hover{border-color:var(--hue);background:var(--wash-2);color:var(--ink)}
+.port .fchip{display:inline-flex;align-items:center;gap:8px;padding:6px 8px 6px 6px;border-radius:10px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);font-size:12px}
+.port .divider{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:11px}
+.port .divider::before,.port .divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.port .avg{display:flex}
+.port .avg .avatar{box-shadow:0 0 0 2px var(--surface-1);margin-left:-6px}
+.port .avg .avatar:first-child{margin-left:0}
+.port .avatar.sq{border-radius:8px}
+.port .avatar.lg{width:36px;height:36px;font-size:13px}
+.port .presence{position:relative}
+.port .presence::after{content:"";position:absolute;right:-1px;bottom:-1px;width:8px;height:8px;border-radius:50%;background:var(--mineral);box-shadow:0 0 0 2px var(--surface-1)}
+.port .note{display:flex;gap:10px;padding:10px;border-radius:12px;position:relative}
+.port .note:hover{background:color-mix(in oklab,var(--ink) 4%,transparent)}
+.port .note.unread::before{content:"";position:absolute;left:-2px;top:16px;width:6px;height:6px;border-radius:50%;background:var(--brand)}
+.port .avatar{flex:none}

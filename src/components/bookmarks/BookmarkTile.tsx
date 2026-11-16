@@ -1,7 +1,7 @@
 import type { KeyboardEvent, MouseEvent } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ExternalLink, MoreHorizontal } from 'lucide-react';
+import { ExternalLink, MoreHorizontal } from '../icons';
 import { useNavigation } from '../../app/providers/hostContext';
 import {
   editBookmarkFlow,
@@ -85,11 +85,11 @@ export function BookmarkTile({ bookmark, size, layout, path, sortable }: Bookmar
       }}
       className={cn(
         'group/tile relative cursor-default select-none outline-none transition-ui',
-        'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+        'focus-inset',
         isDragging && 'z-10 opacity-40',
         layout === 'list'
           ? 'flex h-10 items-center gap-3 rounded-lg px-3 hover:bg-hover'
-          : 'rounded-xl border border-line bg-raised/70 shadow-card hover:border-line-strong hover:bg-hover',
+          : 'rounded-xl bg-surface shadow-card hover:bg-hover',
         layout === 'grid' &&
           size === 'sm' &&
           'flex h-[84px] flex-col items-center justify-center gap-2 px-2',
@@ -130,7 +130,7 @@ export function BookmarkTile({ bookmark, size, layout, path, sortable }: Bookmar
         </>
       ) : size === 'md' ? (
         <>
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-line bg-surface">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-raised shadow-card ring-1 ring-line">
             <Favicon url={bookmark.url} size={18} />
           </span>
           <span className="min-w-0 flex-1 pr-6">
@@ -147,7 +147,7 @@ export function BookmarkTile({ bookmark, size, layout, path, sortable }: Bookmar
               background: `radial-gradient(120% 140% at 0% 0%, color-mix(in oklab, ${hostTint(host)} 34%, transparent), color-mix(in oklab, ${hostTint(host)} 6%, transparent))`,
             }}
           >
-            <span className="flex size-11 items-center justify-center rounded-xl bg-white/90 shadow-card">
+            <span className="flex size-11 items-center justify-center rounded-xl bg-raised shadow-card ring-1 ring-line">
               <Favicon url={bookmark.url} size={24} />
             </span>
           </div>

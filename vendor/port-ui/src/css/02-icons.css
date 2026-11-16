@@ -1,0 +1,25 @@
+/* Port UI — Icons */
+.port .ic{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.port .ic.sm{width:14px;height:14px}
+.port .ic.lg{width:20px;height:20px}
+.port .ic{stroke-width:1.6}
+.port .ic-hue{color:var(--hue)}
+.port .icbox{width:24px;height:24px;display:inline-grid;place-items:center;border-radius:var(--r-chip);background:var(--wash);color:var(--hue-i);flex:none}
+.port .appdot .ic{width:14px;height:14px}
+.port .sb .ic{width:12px;height:12px}
+.port .pill .ic{width:11px;height:11px;stroke-width:2}
+.port .row.is-disabled .fav,.port .row.is-disabled .ic{opacity:.55}
+.port .box > .ic{color:var(--ink-3)}
+.port .stepper .ic{width:10px;height:10px;stroke-width:2}
+.port .tag .ic{width:10px;height:10px;stroke-width:2}
+.port .ck > .bx .ic{width:12px;height:12px;stroke-width:2.25;color:var(--on-fill);opacity:0;transform:scale(.6);transition:opacity var(--d2),transform var(--d3) var(--e-spring)}
+.port .ck[aria-checked="true"] > .bx .ic,.port .ck[aria-checked="mixed"] > .bx .ic{opacity:1;transform:none}
+.port .sw .ic{width:12px;height:12px;stroke-width:2.5;opacity:0}
+.port .sw[aria-checked="true"] .ic{opacity:1}
+.port .mi > .ic{color:var(--ink-2)}
+.port .mi.danger > .ic{color:var(--coral-ink)}
+.port .dlg .icbox.big{width:36px;height:36px;border-radius:10px}
+.port .cmdk-l .mi .icbox{width:22px;height:22px}
+.port .banner > .ic{color:var(--hue-i);margin-top:1px}
+.port .crumbs .ic{color:var(--ink-3);width:12px;height:12px}
+.port .ck.radio > .bx .ic{display:none}

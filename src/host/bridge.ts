@@ -91,7 +91,9 @@ export type UIToHostMessage =
       keepLoaded: ID[];
     }
   /** Signs out of every site in a space by clearing its profile's browsing data. */
-  | { type: 'clearSpaceData'; spaceId: ID };
+  | { type: 'clearSpaceData'; spaceId: ID }
+  /** Port UI theme, so the window frame and pages' color scheme match. Colors are CSS hex. */
+  | { type: 'theme'; dark: boolean; background: string; caption: string; text: string };
 
 /** Messages the native shell sends to the UI. */
 export type HostToUIMessage =

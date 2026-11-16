@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { FolderPlus, Library } from 'lucide-react';
+import { FolderPlus, Library } from '../icons';
 import { createFolderFlow } from '../../features/bookmarks/bookmarkActions';
 import { buildFolderMenu } from '../../features/bookmarks/bookmarkMenu';
 import { ACCENTS } from '../../features/workspace/appearance';
@@ -39,9 +39,9 @@ export function BookmarkList({ spaceId }: { spaceId: ID }) {
 
   const rowClass = (active: boolean) =>
     cn(
-      'flex h-row w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] outline-none transition-ui',
-      'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
-      active ? 'bg-selected text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
+      'flex h-row w-full items-center gap-2 rounded-[7px] px-2 text-left text-[13px] outline-none transition-ui',
+      'focus-inset',
+      active ? 'bg-selected font-semibold text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
     );
 
   return (
@@ -57,13 +57,9 @@ export function BookmarkList({ spaceId }: { spaceId: ID }) {
       </SectionHeader>
       <div className="flex flex-col gap-px">
         <button type="button" onClick={() => open(null)} className={rowClass(openTop === null)}>
-          <Library
-            size={15}
-            strokeWidth={1.9}
-            className={openTop === null ? 'text-accent' : 'text-fg-3'}
-          />
+          <Library size={15} className={openTop === null ? 'text-accent' : 'text-fg-3'} />
           <span className="flex-1 truncate">Library</span>
-          <span className="text-[11px] tabular-nums text-fg-3">{total}</span>
+          <span className="count">{total}</span>
         </button>
         {topLevel.slice(0, VISIBLE_FOLDERS).map((folder) => (
           <button
@@ -74,7 +70,7 @@ export function BookmarkList({ spaceId }: { spaceId: ID }) {
             className={rowClass(openTop === folder.id)}
           >
             <span className="shrink-0" style={{ color: ACCENTS[folder.accent].value }}>
-              <EntityIcon name={folder.icon} size={15} strokeWidth={1.9} />
+              <EntityIcon name={folder.icon} size={15} />
             </span>
             <span className="truncate">{folder.name}</span>
           </button>

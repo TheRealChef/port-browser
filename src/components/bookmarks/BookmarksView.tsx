@@ -22,7 +22,7 @@ import {
   Plus,
   Trash2,
   Upload,
-} from 'lucide-react';
+} from '../icons';
 import {
   addBookmarkFlow,
   createFolderFlow,
@@ -318,7 +318,7 @@ export function BookmarksView({ folderId }: { folderId: ID | null }) {
                       background: `color-mix(in oklab, ${ACCENTS[current.accent].value} 16%, transparent)`,
                     }}
                   >
-                    <EntityIcon name={current.icon} size={16} strokeWidth={2} />
+                    <EntityIcon name={current.icon} size={16} />
                   </span>
                 )}
                 <Breadcrumbs spaceId={spaceId} path={path} />
@@ -406,7 +406,7 @@ export function BookmarksView({ folderId }: { folderId: ID | null }) {
                       No bookmarks directly in this folder.{' '}
                       <button
                         type="button"
-                        className="text-focus hover:underline"
+                        className="text-info-ink underline decoration-[color-mix(in_oklab,var(--cobalt)_40%,transparent)] underline-offset-[3px]"
                         onClick={() => useSettings.getState().update({ bookmarkShowNested: true })}
                       >
                         Show subfolder contents inline
@@ -472,7 +472,7 @@ function NestedSection({ section, children }: { section: NestedSectionData; chil
           <ChevronDown size={14} className={cn('transition-transform', !open && '-rotate-90')} />
         </button>
         <span style={{ color: accent }}>
-          <EntityIcon name={section.folder.icon} size={14} strokeWidth={2} />
+          <EntityIcon name={section.folder.icon} size={14} />
         </span>
         <button
           type="button"
@@ -650,7 +650,7 @@ function DragChip({ data }: { data: BookmarkDragData }) {
       {bookmark && <Favicon url={bookmark.url} size={16} />}
       {folder && (
         <span style={{ color: ACCENTS[folder.accent].value }}>
-          <EntityIcon name={folder.icon} size={15} strokeWidth={2} />
+          <EntityIcon name={folder.icon} size={15} />
         </span>
       )}
       <span className="truncate">{bookmark?.title ?? folder?.name ?? ''}</span>

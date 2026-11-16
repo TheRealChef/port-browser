@@ -10,12 +10,11 @@ import {
   Plus,
   Star,
   Zap,
-  type LucideIcon,
-} from 'lucide-react';
+  type Icon,
+} from '../icons';
 import { useNavigation } from '../../app/providers/hostContext';
 import { createDashboardFlow, createGroupFlow } from '../../features/workspace/actions';
 import { addBookmarkFlow } from '../../features/bookmarks/bookmarkActions';
-import { ACCENTS } from '../../features/workspace/appearance';
 import { buildBookmarkMenu, buildFolderMenu } from '../../features/bookmarks/bookmarkMenu';
 import { buildTabMenu } from '../../features/workspace/menus';
 import {
@@ -31,11 +30,10 @@ import {
 } from '../../features/workspace/selectors';
 import { useUI } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';
-import { MOD_LABEL, relativeTime } from '../../utils/misc';
+import { cn, MOD_LABEL, relativeTime } from '../../utils/misc';
 import { Card, EmptyHint } from '../common/Card';
 import { Favicon } from '../common/Favicon';
 import { Kbd } from '../common/Kbd';
-import { MineralBackdrop } from '../common/MineralBackdrop';
 import { LinkRow } from '../common/LinkRow';
 import { showContextMenu } from '../common/menu';
 import { QuickSearch } from './QuickSearch';
@@ -65,9 +63,8 @@ export function StartPage() {
   );
 
   if (!space) return null;
-  const accent = ACCENTS[space.accent].value;
 
-  const quickActions: Array<{ label: string; icon: LucideIcon; hint?: string; run: () => void }> = [
+  const quickActions: Array<{ label: string; icon: Icon; hint?: string; run: () => void }> = [
     { label: 'New tab', icon: Plus, hint: `${MOD_LABEL}+T`, run: () => nav.newTab() },
     { label: 'New group', icon: FolderPlus, run: () => void createGroupFlow(spaceId) },
     { label: 'New dashboard', icon: LayoutDashboard, run: () => void createDashboardFlow() },
@@ -82,22 +79,21 @@ export function StartPage() {
 
   return (
     <div className="relative h-full overflow-y-auto">
-      <MineralBackdrop className="h-[300px]" />
-      <div className="relative mx-auto flex max-w-[1080px] flex-col gap-6 px-8 pb-12 pt-14">
+      <div className="relative mx-auto flex max-w-[1080px] flex-col gap-6 px-8 pb-12 pt-12">
         <header className="flex items-center gap-4">
           <span
-            className="flex size-12 shrink-0 items-center justify-center rounded-2xl border shadow-card"
-            style={{
-              color: accent,
-              borderColor: `color-mix(in oklab, ${accent} 32%, var(--border))`,
-              background: `color-mix(in oklab, ${accent} 15%, var(--surface))`,
-            }}
+            className={cn(
+              'flex size-12 shrink-0 items-center justify-center rounded-[14px] bg-accent-soft text-accent-ink shadow-card',
+              `h-${space.accent}`,
+            )}
           >
-            <EntityIcon name={space.icon} size={22} strokeWidth={1.9} />
+            <EntityIcon name={space.icon} size={22} />
           </span>
           <div className="min-w-0">
-            <h1 className="truncate text-[26px] font-semibold tracking-[-0.02em]">{space.name}</h1>
-            <p className="tabular text-[12.5px] text-fg-2">
+            <h1 className="truncate text-[28px] font-semibold leading-[34px] tracking-[-0.02em]">
+              {space.name}
+            </h1>
+            <p className="meta">
               {new Date().toLocaleDateString(undefined, {
                 weekday: 'long',
                 month: 'long',
@@ -111,7 +107,7 @@ export function StartPage() {
 
         <QuickSearch spaceId={spaceId} autoFocus={!isBlankTab} />
         <p className="-mt-3 flex items-center gap-1.5 px-1 text-[12px] text-fg-3">
-          <Lightbulb size={13} className="text-hint" strokeWidth={2} />
+          <Lightbulb size={13} />
           Press <Kbd>{MOD_LABEL}+K</Kbd> to jump to any tab, group, folder or bookmark across
           spaces.
         </p>
@@ -119,21 +115,21 @@ export function StartPage() {
         <Card
           title="Pinned sites"
           icon={Star}
-          tone={accent}
+          hue={space.accent}
           variant="accent"
           actions={
             <div className="flex items-center">
               <button
                 type="button"
                 onClick={() => void addBookmarkFlow(spaceId)}
-                className="rounded-md px-2 py-1 text-[12px] text-fg-3 transition-ui hover:bg-hover hover:text-fg"
+                className="btn quiet sm"
               >
                 Add site
               </button>
               <button
                 type="button"
                 onClick={() => showBookmarks(null, spaceId)}
-                className="rounded-md px-2 py-1 text-[12px] text-fg-3 transition-ui hover:bg-hover hover:text-fg"
+                className="btn quiet sm"
               >
                 Open library
               </button>
@@ -151,13 +147,12 @@ export function StartPage() {
                 className="flex flex-col items-center gap-2 rounded-lg px-2 py-3 transition-ui hover:bg-hover"
               >
                 <span
-                  className="flex size-10 items-center justify-center rounded-xl border border-line"
-                  style={{
-                    color: ACCENTS[f.accent].value,
-                    background: `color-mix(in oklab, ${ACCENTS[f.accent].value} 14%, var(--surface))`,
-                  }}
+                  className={cn(
+                    'flex size-10 items-center justify-center rounded-xl bg-accent-soft text-accent-ink',
+                    `h-${f.accent}`,
+                  )}
                 >
-                  <EntityIcon name={f.icon} size={18} strokeWidth={2} />
+                  <EntityIcon name={f.icon} size={18} />
                 </span>
                 <span className="w-full truncate text-center text-[12px] text-fg-2">{f.name}</span>
               </button>
@@ -171,7 +166,7 @@ export function StartPage() {
                 onContextMenu={(e) => showContextMenu(e, buildBookmarkMenu(b.id, nav))}
                 className="flex flex-col items-center gap-2 rounded-lg px-2 py-3 transition-ui hover:bg-hover"
               >
-                <span className="flex size-10 items-center justify-center rounded-xl border border-line bg-surface">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-canvas shadow-[inset_0_0_0_1px_var(--line)]">
                   <Favicon url={b.url} size={20} />
                 </span>
                 <span className="w-full truncate text-center text-[12px] text-fg-2">{b.title}</span>
@@ -191,7 +186,7 @@ export function StartPage() {
         </Card>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Card title="Recent tabs" icon={Clock} tone="var(--info)">
+          <Card title="Recent tabs" icon={Clock}>
             {recent.length === 0 ? (
               <EmptyHint>Tabs you open in this space will show up here.</EmptyHint>
             ) : (
@@ -211,12 +206,11 @@ export function StartPage() {
           <Card
             title="Groups"
             icon={Layers}
-            tone="var(--category)"
             actions={
               <button
                 type="button"
                 onClick={() => void createGroupFlow(spaceId)}
-                className="rounded-md px-2 py-1 text-[12px] text-fg-3 transition-ui hover:bg-hover hover:text-fg"
+                className="btn quiet sm"
               >
                 New group
               </button>
@@ -234,14 +228,8 @@ export function StartPage() {
                     onClick={() => nav.openGroup(g.id)}
                     className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-ui hover:bg-hover"
                   >
-                    <span
-                      className="flex size-7 shrink-0 items-center justify-center rounded-lg"
-                      style={{
-                        color: ACCENTS[g.accent].value,
-                        background: `color-mix(in oklab, ${ACCENTS[g.accent].value} 14%, transparent)`,
-                      }}
-                    >
-                      <EntityIcon name={g.icon} size={14} strokeWidth={2} />
+                    <span className={cn('icbox size-7 rounded-lg', `h-${g.accent}`)}>
+                      <EntityIcon name={g.icon} size={14} />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13px]">{g.name}</span>
@@ -266,7 +254,7 @@ export function StartPage() {
           </Card>
         </div>
 
-        <Card title="Quick actions" icon={Zap} tone="var(--hint)" variant="accent">
+        <Card title="Quick actions" icon={Zap}>
           <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-5">
             {quickActions.map(({ label, icon: Icon, hint, run }) => (
               <button
@@ -275,7 +263,7 @@ export function StartPage() {
                 onClick={run}
                 className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] text-fg-2 transition-ui hover:bg-hover hover:text-fg"
               >
-                <Icon size={15} className="shrink-0 text-hint" strokeWidth={2} />
+                <Icon size={15} className="shrink-0 text-fg-3" />
                 <span className="flex-1 truncate">{label}</span>
                 {hint && <Kbd>{hint}</Kbd>}
               </button>

@@ -21,13 +21,13 @@ export const GRID_COLUMNS: Record<TileSize, string> = {
 };
 
 const PALETTE = [
-  'var(--port-mauve)',
-  'var(--port-steel)',
-  'var(--port-teal)',
-  'var(--port-sage)',
-  'var(--port-amber)',
-  'var(--port-clay)',
-  'var(--port-rose)',
+  'var(--cobalt)',
+  'var(--teal)',
+  'var(--lichen)',
+  'var(--clay)',
+  'var(--heather)',
+  'var(--brand)',
+  'var(--graphite)',
 ];
 
 /** Stable per-host tint used for large card covers. */

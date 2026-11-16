@@ -1,0 +1,61 @@
+/* Port UI — Core: scope, hue helpers, geometry, density, motion, scrollbars */
+.port{--hue: var(--brand); --hue-t: var(--brand-tint); --hue-i: var(--brand-ink);
+  --mix: 100%;
+  --row-h: 28px; --ctl-h: 28px; --pad: 12px; --gap: 8px;
+  --f-ui: var(--font-sans); --f-mono: var(--font-mono); --f-display: var(--font-display);
+  --d1: 90ms; --d2: 160ms; --d3: 240ms; --d4: 380ms;
+  --e-out: cubic-bezier(.2,.8,.2,1); --e-spring: cubic-bezier(.32,1.36,.52,1); --e-io: cubic-bezier(.6,0,.3,1);
+  --conn: var(--line-strong);
+  font-family: var(--f-ui); font-size: 13px; line-height: 18px; color: var(--ink);
+  background: var(--ground); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  box-sizing: border-box;}
+.port *,.port *::before,.port *::after{box-sizing: border-box;}
+.port button{font: inherit; color: inherit;}
+.port .h-mineral,.port.h-mineral{--hue:var(--mineral);--hue-t:var(--mineral-tint);--hue-i:var(--mineral-ink)}
+.port .h-clay,.port.h-clay{--hue:var(--clay);--hue-t:var(--clay-tint);--hue-i:var(--clay-ink)}
+.port .h-cobalt,.port.h-cobalt{--hue:var(--cobalt);--hue-t:var(--cobalt-tint);--hue-i:var(--cobalt-ink)}
+.port .h-violet,.port.h-violet{--hue:var(--violet);--hue-t:var(--violet-tint);--hue-i:var(--violet-ink)}
+.port .h-teal,.port.h-teal{--hue:var(--teal);--hue-t:var(--teal-tint);--hue-i:var(--teal-ink)}
+.port .h-amber,.port.h-amber{--hue:var(--amber);--hue-t:var(--amber-tint);--hue-i:var(--amber-ink)}
+.port .h-coral,.port.h-coral{--hue:var(--coral);--hue-t:var(--coral-tint);--hue-i:var(--coral-ink)}
+.port .h-lichen,.port.h-lichen{--hue:var(--lichen);--hue-t:var(--lichen-tint);--hue-i:var(--lichen-ink)}
+.port .h-heather,.port.h-heather{--hue:var(--heather);--hue-t:var(--heather-tint);--hue-i:var(--heather-ink)}
+.port .h-graphite,.port.h-graphite{--hue:var(--graphite);--hue-t:var(--graphite-tint);--hue-i:var(--graphite-ink)}
+.port,.port [class*="h-"]{--wash: color-mix(in oklab, var(--hue-t) var(--mix), var(--surface-1));
+  --wash-2: color-mix(in oklab, var(--hue-t) calc(var(--mix) * .5), var(--surface-1));
+  --hue-line: color-mix(in oklab, var(--hue) 55%, var(--surface-1));}
+.port[data-density="cozy"]{--row-h:32px;--ctl-h:32px;--pad:16px;--gap:12px}
+.port[data-density="compact"]{--row-h:26px;--ctl-h:26px;--pad:10px;--gap:6px}
+.port{--r-win:18px;--r-panel:12px;--r-ctl:8px;--r-row:7px;--r-chip:6px;--r-pill:999px;--conn:transparent}
+@supports (corner-shape: squircle){
+  .port .win,.port .panel,.port .tile{corner-shape: squircle;}
+}
+@keyframes port-spin{to{transform:rotate(360deg)}}
+@keyframes port-conveyor{to{background-position:28px 0}}
+@keyframes port-blink{50%{opacity:0}}
+@keyframes port-weave{0%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-3px);opacity:1}}
+@keyframes port-pulse{70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@keyframes port-indet{0%{left:-35%}100%{left:100%}}
+@keyframes port-shimmer{to{background-position:-150% 0}}
+@keyframes port-pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes port-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes port-rise{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+.port[data-motion="reduced"] *,.port[data-motion="reduced"] *::before,.port[data-motion="reduced"] *::after{animation-duration:0s !important;animation-iteration-count:1 !important;transition-property:opacity,background-color,color,box-shadow !important;transition-duration:var(--d2) !important}
+.port[data-motion="reduced"] .row.is-running::after,.port[data-motion="reduced"] .is-running > .conveyor{background:repeating-linear-gradient(90deg,var(--hue) 0 3px,transparent 3px 6px)}
+.port[data-motion="reduced"] .spinner{border-style:dotted;border-color:var(--hue)}
+.port[data-motion="reduced"] .weave i{opacity:1}
+@media (prefers-reduced-motion: reduce){
+  .port *,.port *::before,.port *::after{animation-duration:0s !important;animation-iteration-count:1 !important;transition-duration:var(--d1) !important}
+}
+@keyframes port-dash{to{stroke-dashoffset:-11}}
+.port .h-brand,.port.h-brand{--hue:var(--brand);--hue-t:var(--brand-tint);--hue-i:var(--brand-ink)}
+.port,.port *{scrollbar-width:thin;scrollbar-color:color-mix(in oklab,var(--ink) 22%,transparent) transparent}
+.port ::-webkit-scrollbar{width:10px;height:10px}
+.port ::-webkit-scrollbar-track{background:transparent}
+.port ::-webkit-scrollbar-thumb{background:color-mix(in oklab,var(--ink) 20%,transparent);border-radius:999px;border:3px solid transparent;background-clip:content-box}
+.port ::-webkit-scrollbar-thumb:hover{background-color:color-mix(in oklab,var(--ink) 36%,transparent)}
+.port ::selection{background:color-mix(in oklab,var(--focus) 26%,transparent)}
+@keyframes port-menu{from{opacity:0;transform:translateY(-3px) scale(.985)}}
+@keyframes port-fade{from{opacity:0}}
+@keyframes port-dlg{from{opacity:0;transform:translateY(8px) scale(.97)}}
+@keyframes port-sheet{from{transform:translateX(30px);opacity:0}}

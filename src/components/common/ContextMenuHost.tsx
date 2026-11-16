@@ -7,7 +7,7 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { Check, ChevronRight } from 'lucide-react';
+import { Check, ChevronRight } from '../icons';
 import { useUI, type MenuEntry } from '../../stores/uiStore';
 import { cn } from '../../utils/misc';
 
@@ -102,19 +102,16 @@ function MenuList({ items, onClose, onBack, autoFocus, className, style }: MenuL
       ref={listRef}
       role="menu"
       onKeyDown={onKeyDown}
-      className={cn(
-        'min-w-[200px] max-w-[300px] animate-pop rounded-xl bg-elevated p-1 shadow-pop',
-        className,
-      )}
+      className={cn('menu min-w-[220px] max-w-[300px]', className)}
       style={style}
     >
       {items.map((entry) => {
         if (entry.type === 'separator') {
-          return <div key={entry.id} role="separator" className="mx-1 my-1 h-px bg-line" />;
+          return <div key={entry.id} role="separator" className="msep" />;
         }
         if (entry.type === 'label') {
           return (
-            <div key={entry.id} className="px-2 pb-1 pt-1.5 text-[11px] font-medium text-fg-3">
+            <div key={entry.id} className="mlab">
               {entry.label}
             </div>
           );
@@ -130,6 +127,7 @@ function MenuList({ items, onClose, onBack, autoFocus, className, style }: MenuL
               data-menu-id={entry.id}
               tabIndex={-1}
               disabled={entry.disabled}
+              aria-disabled={entry.disabled || undefined}
               aria-haspopup={entry.type === 'submenu' ? 'menu' : undefined}
               aria-expanded={entry.type === 'submenu' ? subOpen : undefined}
               onMouseEnter={() => {
@@ -138,28 +136,21 @@ function MenuList({ items, onClose, onBack, autoFocus, className, style }: MenuL
               }}
               onClick={() => activate(entry, false)}
               className={cn(
-                'flex h-7 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] outline-none',
-                'disabled:opacity-40',
-                entry.type === 'item' && entry.danger ? 'text-danger' : 'text-fg',
-                (isActive || subOpen) && 'bg-hover',
+                'mi w-full text-left',
+                entry.type === 'item' && entry.danger && 'danger',
+                (isActive || subOpen) && 'is-hi',
               )}
             >
-              <span className="flex w-4 shrink-0 justify-center text-fg-2">
+              <span className="flex w-4 shrink-0 justify-center text-fg-2 [.danger_&]:text-danger-ink">
                 {entry.type === 'item' && entry.checked ? (
-                  <Check size={14} className="text-brand" />
+                  <Check size={14} className="text-accent" />
                 ) : (
-                  Icon && (
-                    <Icon
-                      size={14}
-                      strokeWidth={1.9}
-                      className={entry.type === 'item' && entry.danger ? 'text-danger' : undefined}
-                    />
-                  )
+                  Icon && <Icon size={14} />
                 )}
               </span>
-              <span className="flex-1 truncate">{entry.label}</span>
+              <span className="grow truncate">{entry.label}</span>
               {entry.type === 'item' && entry.shortcut && (
-                <span className="text-[11px] text-fg-3">{entry.shortcut}</span>
+                <span className="sc">{entry.shortcut}</span>
               )}
               {entry.type === 'submenu' && <ChevronRight size={14} className="text-fg-3" />}
             </button>

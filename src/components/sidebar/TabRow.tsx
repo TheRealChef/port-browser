@@ -1,7 +1,7 @@
 import { useEffect, useRef, type MouseEvent } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Volume2, VolumeX, X } from 'lucide-react';
+import { Volume2, VolumeX, X } from '../icons';
 import { useBrowserHost, useNavigation } from '../../app/providers/hostContext';
 import { NativeBrowserHost } from '../../host/NativeBrowserHost';
 import { buildTabMenu } from '../../features/workspace/menus';
@@ -86,13 +86,12 @@ export function TabRow({
         }
       }}
       className={cn(
-        'group/tab relative flex h-row items-center gap-2 rounded-lg pl-2 pr-1 text-[13px] outline-none transition-ui',
-        'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
-        active ? 'bg-elevated text-fg shadow-lift' : 'text-fg-2 hover:bg-hover hover:text-fg',
+        'group/tab relative flex h-row items-center gap-2 rounded-[7px] pl-2 pr-1 text-[13px] outline-none transition-ui',
+        'focus-inset',
+        active ? 'bg-selected font-semibold text-fg' : 'text-fg-2 hover:bg-hover hover:text-fg',
         isDragging && 'opacity-40',
       )}
     >
-      {active && <span className="absolute inset-y-1.5 left-0 w-[2px] rounded-full bg-accent" />}
       <Favicon
         url={tab.url}
         icon={tab.favicon}
@@ -199,7 +198,7 @@ function RenameInput({ tab, onDone }: { tab: Tab; onDone: () => void }) {
         if (e.key === 'Escape') commit(null);
       }}
       onBlur={(e) => commit(e.currentTarget.value)}
-      className="h-6 min-w-0 flex-1 rounded-md border border-focus/70 bg-surface px-1.5 text-[13px] text-fg outline-none"
+      className="field h-6 min-w-0 flex-1 px-1.5 text-[13px]"
     />
   );
 }
@@ -229,7 +228,7 @@ export function PinnedTile({ tab, active }: { tab: Tab; active: boolean }) {
         }}
         className={cn(
           'flex h-10 items-center justify-center rounded-lg border outline-none transition-ui',
-          'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+          'focus-inset',
           active
             ? 'border-line-strong bg-elevated shadow-lift'
             : 'border-line bg-surface/60 hover:border-line-strong hover:bg-hover',

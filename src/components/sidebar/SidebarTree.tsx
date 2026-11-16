@@ -5,7 +5,7 @@ import {
   rectSortingStrategy,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Plus } from 'lucide-react';
+import { Plus } from '../icons';
 import { useNavigation } from '../../app/providers/hostContext';
 import { createGroupFlow } from '../../features/workspace/actions';
 import { activeView, containerTabs, groupsOfSpace } from '../../features/workspace/selectors';
@@ -20,9 +20,7 @@ import { PinnedTile, TabRow } from './TabRow';
 export function SectionHeader({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="flex h-7 items-center pl-2 pr-0.5">
-      <h3 className="flex-1 text-[11px] font-semibold uppercase tracking-[0.07em] text-fg-3">
-        {title}
-      </h3>
+      <h3 className="eyebrow-label flex-1">{title}</h3>
       {children}
     </div>
   );
@@ -49,11 +47,7 @@ function DropZone({
   return (
     <div
       ref={setNodeRef}
-      className={cn(
-        'rounded-lg transition-ui',
-        highlighted && 'bg-drop-soft ring-1 ring-[var(--focus-ring)]',
-        className,
-      )}
+      className={cn('rounded-lg transition-ui', highlighted && 'drop-target', className)}
     >
       {children}
     </div>
@@ -89,7 +83,7 @@ export function SidebarTree({ spaceId }: { spaceId: ID }) {
                 ))}
               </div>
             ) : (
-              <div className="flex h-10 items-center justify-center rounded-lg border border-dashed border-line-strong text-[12px] text-fg-3">
+              <div className="flex h-10 items-center justify-center rounded-xl border-[1.5px] border-dashed border-line-strong text-[12px] text-fg-3">
                 Drop here to pin
               </div>
             )}

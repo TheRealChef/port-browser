@@ -1,5 +1,6 @@
 node_modules
 dist
+!vendor/port-ui/dist
 *.local
 .vite
 native/**/bin

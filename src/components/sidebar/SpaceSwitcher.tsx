@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { EntityIcon } from '../common/EntityIcon';
 import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Plus } from 'lucide-react';
+import { Plus } from '../icons';
 import { createSpaceFlow } from '../../features/workspace/actions';
-import { ACCENTS } from '../../features/workspace/appearance';
+import { ACCENTS, hueClass } from '../../features/workspace/appearance';
 import { buildSpaceMenu } from '../../features/workspace/menus';
 import { sortedSpaces } from '../../features/workspace/selectors';
 import { useUI } from '../../stores/uiStore';
@@ -42,25 +42,21 @@ function SpaceButton({ space, index, active }: { space: Space; index: number; ac
         }}
         onContextMenu={(e) => showContextMenu(e, buildSpaceMenu(space.id))}
         className={cn(
-          'relative flex h-8 min-w-8 flex-1 items-center justify-center rounded-lg transition-ui',
-          active ? 'shadow-lift' : 'text-fg-3 hover:bg-hover hover:text-fg-2',
-          isDropTarget && 'ring-2 ring-[var(--focus-ring)]',
+          'relative flex h-7 min-w-8 flex-1 items-center justify-center rounded-lg transition-ui',
+          hueClass(space.accent),
+          active
+            ? 'bg-raised text-accent-ink shadow-card'
+            : 'text-fg-3 hover:bg-hover hover:text-fg-2',
+          isDropTarget && 'drop-target',
           isDragging && 'opacity-40',
         )}
         style={{
           transform: CSS.Translate.toString(transform),
           transition,
-          color: active || isDropTarget ? color : undefined,
-          background: active ? `color-mix(in oklab, ${color} 17%, var(--surface))` : undefined,
+          color: isDropTarget ? color : undefined,
         }}
       >
-        <EntityIcon name={space.icon} size={16} strokeWidth={2} />
-        {active && (
-          <span
-            className="absolute bottom-0.5 h-[2px] w-3 rounded-full"
-            style={{ background: color }}
-          />
-        )}
+        <EntityIcon name={space.icon} size={16} />
       </button>
     </Tooltip>
   );
@@ -74,7 +70,7 @@ export function SpaceSwitcher() {
   return (
     <nav
       aria-label="Spaces"
-      className="flex items-center gap-1 rounded-xl border border-line bg-canvas/55 p-1"
+      className="flex items-center gap-[2px] rounded-[10px] bg-sunk p-[2px] shadow-sunk"
     >
       <SortableContext
         items={list.map((sp) => `space:${sp.id}`)}

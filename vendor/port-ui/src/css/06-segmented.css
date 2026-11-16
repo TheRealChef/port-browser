@@ -1,0 +1,8 @@
+/* Port UI — Segmented control */
+.port .seg{display:inline-flex;position:relative;padding:2px;gap:2px;background:var(--surface-sunk);border-radius:calc(var(--r-ctl) + 2px);isolation:isolate}
+.port .seg > button{position:relative;z-index:1;height:calc(var(--ctl-h) - 4px);padding:0 10px;border:0;background:transparent;border-radius:var(--r-ctl);font-size:12px;font-weight:550;color:var(--ink-2);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:color var(--d2)}
+.port .seg > button:hover{color:var(--ink)}
+.port .seg > button[aria-pressed="true"]{color:var(--ink)}
+.port .seg > .thumb{position:absolute;z-index:0;top:2px;bottom:2px;left:0;width:0;border-radius:var(--r-ctl);background:var(--surface-2);box-shadow:var(--shadow-tile);transition:transform var(--d3) var(--e-spring),width var(--d3) var(--e-spring)}
+.port .seg > button:focus-visible{outline:2px solid var(--focus);outline-offset:0}
+.port .seg.navseg > button{padding:0 7px}

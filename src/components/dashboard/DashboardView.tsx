@@ -12,12 +12,11 @@ import {
   rectSortingStrategy,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { LayoutDashboard, MoreHorizontal, Plus } from 'lucide-react';
+import { LayoutDashboard, MoreHorizontal, Plus } from '../icons';
 import { buildDashboardMenu } from '../../features/workspace/menus';
 import { useWorkspace } from '../../stores/workspaceStore';
 import { WIDGET_KINDS, type Dashboard } from '../../types/models';
 import { Button } from '../common/Button';
-import { MineralBackdrop } from '../common/MineralBackdrop';
 import { IconButton } from '../common/IconButton';
 import { menu, showMenuAt } from '../common/menu';
 import { renameDashboardFlow } from '../../features/workspace/actions';
@@ -56,17 +55,10 @@ function DashboardContent({ dashboard }: { dashboard: Dashboard }) {
 
   return (
     <div className="relative h-full overflow-y-auto">
-      <MineralBackdrop className="h-[200px]" intensity={0.7} />
       <div className="relative mx-auto flex max-w-[1180px] flex-col gap-5 px-8 pb-12 pt-9">
         <header className="flex items-center gap-3.5">
-          <span
-            className="flex size-10 items-center justify-center rounded-xl border text-accent"
-            style={{
-              borderColor: 'color-mix(in oklab, var(--accent) 30%, var(--border))',
-              background: 'color-mix(in oklab, var(--accent) 13%, var(--surface))',
-            }}
-          >
-            <LayoutDashboard size={18} strokeWidth={1.9} />
+          <span className="flex size-10 items-center justify-center rounded-xl bg-accent-soft text-accent-ink shadow-card">
+            <LayoutDashboard size={18} />
           </span>
           <div className="min-w-0 flex-1">
             <button
@@ -96,9 +88,9 @@ function DashboardContent({ dashboard }: { dashboard: Dashboard }) {
         </header>
 
         {dashboard.widgets.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-line-strong bg-surface/40 px-6 py-16 text-center">
-            <p className="text-[14px] font-medium">This dashboard is empty</p>
-            <p className="max-w-sm text-[12.5px] text-fg-3">
+          <div className="empty rounded-[14px] border-[1.5px] border-dashed border-line-strong py-14">
+            <h4>This dashboard is empty</h4>
+            <p>
               Widgets collect bookmarks, quick links, recent tabs and group shortcuts in one place.
             </p>
             <Button

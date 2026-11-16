@@ -1,22 +1,26 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
+import type { HTMLAttributes, ReactNode } from 'react';
+import type { Icon as IconType } from '../icons';
+import type { Hue } from '../../features/workspace/appearance';
 import { cn } from '../../utils/misc';
 
 /**
- * neutral     - default surface card on the canvas
- * elevated    - lifted one step (secondary panels, popover-like content)
- * accent      - tinted with `tone` (decks, highlighted areas)
- * interactive - the whole card is a target: hover lift and focus ring
- * status      - a tone bar on the leading edge (running services, warnings)
+ * Port UI tiles. Colour has a job: cards are neutral unless they are the
+ * screen's headline cell or carry a status.
+ *
+ * neutral     - a tile on the content panel
+ * elevated    - floats above its neighbours
+ * accent      - the screen's headline cell: a wash of the hue at the top
+ * interactive - the whole tile is a target: it lifts on hover
+ * status      - a hue rail on the leading edge
  */
 export type CardVariant = 'neutral' | 'elevated' | 'accent' | 'interactive' | 'status';
 
 interface CardProps {
   title: string;
   description?: string;
-  icon?: LucideIcon;
-  /** Any CSS color, usually a token such as `var(--hint)`. Colors the icon chip. */
-  tone?: string;
+  icon?: IconType;
+  /** Local hue for the icon box, wash and rail. `space` follows the active space; omit for neutral. */
+  hue?: Hue | 'space';
   variant?: CardVariant;
   actions?: ReactNode;
   children: ReactNode;
@@ -24,72 +28,45 @@ interface CardProps {
   headerProps?: HTMLAttributes<HTMLDivElement>;
 }
 
-const VARIANTS: Record<CardVariant, string> = {
-  neutral: 'border-line bg-surface',
-  elevated: 'border-line-strong/70 bg-elevated',
-  accent: 'border-[color:var(--card-tone-border)] bg-surface',
-  interactive:
-    'border-line bg-surface hover:border-line-strong hover:bg-[color-mix(in_oklab,var(--surface),white_3%)] focus-within:border-focus/60',
-  status: 'border-line bg-surface',
-};
-
 export function Card({
   title,
   description,
   icon: Icon,
-  tone = 'var(--text-muted)',
+  hue,
   variant = 'neutral',
   actions,
   children,
   className,
   headerProps,
 }: CardProps) {
-  const style = {
-    '--card-tone': tone,
-    '--card-tone-border': `color-mix(in oklab, ${tone} 28%, var(--border))`,
-    ...(variant === 'accent'
-      ? {
-          backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${tone} 11%, transparent) 0, transparent 88px)`,
-        }
-      : {}),
-  } as CSSProperties;
-
   return (
     <section
-      style={style}
       className={cn(
-        'relative flex min-w-0 flex-col overflow-hidden rounded-xl border shadow-card transition-ui',
-        VARIANTS[variant],
+        'relative flex min-w-0 flex-col overflow-hidden rounded-[14px] bg-surface shadow-card transition-ui',
+        hue && hue !== 'space' && `h-${hue}`,
+        variant === 'accent' && 'bg-[linear-gradient(180deg,var(--wash-2),var(--card)_112px)]',
+        variant === 'elevated' && 'shadow-pop',
+        variant === 'interactive' && 'hover:-translate-y-0.5 hover:shadow-pop',
         className,
       )}
     >
       {variant === 'status' && (
-        <span
-          aria-hidden
-          className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-[var(--card-tone)]"
-        />
+        <span aria-hidden className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-accent" />
       )}
       <div
         {...headerProps}
         className={cn(
-          'flex min-h-11 items-center gap-2.5 pl-3.5 pr-1.5 pt-1',
+          'flex min-h-11 items-center gap-2.5 pl-3.5 pr-2 pt-1',
           headerProps?.className,
         )}
       >
         {Icon && (
-          <span
-            aria-hidden
-            className="flex size-6 shrink-0 items-center justify-center rounded-md"
-            style={{
-              color: tone,
-              background: `color-mix(in oklab, ${tone} 19%, transparent)`,
-            }}
-          >
-            <Icon size={13} strokeWidth={2.1} />
+          <span aria-hidden className={cn('icbox', !hue && 'bg-hover text-fg-2')}>
+            <Icon size={14} />
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-[13.5px] font-semibold tracking-[-0.005em] text-fg">
+          <h2 className="truncate text-[13px] font-semibold tracking-[-0.005em] text-fg">
             {title}
           </h2>
           {description && <p className="truncate text-[11.5px] text-fg-3">{description}</p>}

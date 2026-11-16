@@ -39,12 +39,12 @@ const SEED: SeedSpace[] = [
   {
     name: 'Work',
     icon: 'briefcase',
-    accent: 'green',
+    accent: 'brand',
     groups: [
       {
         name: 'Documentation',
         icon: 'book',
-        accent: 'blue',
+        accent: 'cobalt',
         tabs: [
           { title: 'Confluence', url: 'https://www.atlassian.com/software/confluence' },
           { title: 'Microsoft Learn', url: 'https://learn.microsoft.com/' },
@@ -53,7 +53,7 @@ const SEED: SeedSpace[] = [
       {
         name: 'Local Development',
         icon: 'terminal',
-        accent: 'green',
+        accent: 'brand',
         tabs: [
           { title: 'localhost:3000', url: 'http://localhost:3000/' },
           { title: 'localhost:5000', url: 'http://localhost:5000/' },
@@ -62,7 +62,7 @@ const SEED: SeedSpace[] = [
       {
         name: 'Project Management',
         icon: 'kanban',
-        accent: 'amber',
+        accent: 'lichen',
         tabs: [
           { title: 'Jira', url: 'https://www.atlassian.com/software/jira' },
           { title: 'Azure DevOps', url: 'https://dev.azure.com/' },
@@ -79,13 +79,13 @@ const SEED: SeedSpace[] = [
       {
         name: 'Reference',
         icon: 'library',
-        accent: 'blue',
+        accent: 'cobalt',
         bookmarks: [{ title: 'Can I use', url: 'https://caniuse.com/' }],
         folders: [
           {
             name: 'Frontend',
             icon: 'palette',
-            accent: 'violet',
+            accent: 'heather',
             bookmarks: [
               { title: 'React', url: 'https://react.dev/' },
               { title: 'TypeScript', url: 'https://www.typescriptlang.org/docs/' },
@@ -110,7 +110,7 @@ const SEED: SeedSpace[] = [
       {
         name: 'Tools',
         icon: 'bolt',
-        accent: 'amber',
+        accent: 'lichen',
         bookmarks: [
           { title: 'regex101', url: 'https://regex101.com/' },
           { title: 'JSON Crack', url: 'https://jsoncrack.com/' },
@@ -123,12 +123,12 @@ const SEED: SeedSpace[] = [
   {
     name: 'Personal',
     icon: 'home',
-    accent: 'orange',
+    accent: 'clay',
     groups: [
       {
         name: 'Entertainment',
         icon: 'film',
-        accent: 'rose',
+        accent: 'heather',
         tabs: [
           { title: 'YouTube', url: 'https://www.youtube.com/' },
           { title: 'Spotify', url: 'https://open.spotify.com/' },
@@ -137,7 +137,7 @@ const SEED: SeedSpace[] = [
       {
         name: 'Reading',
         icon: 'library',
-        accent: 'amber',
+        accent: 'lichen',
         tabs: [{ title: 'Wikipedia', url: 'https://en.wikipedia.org/' }],
       },
     ],
@@ -149,7 +149,7 @@ const SEED: SeedSpace[] = [
       {
         name: 'Reading list',
         icon: 'news',
-        accent: 'amber',
+        accent: 'lichen',
         bookmarks: [
           { title: 'Hacker News', url: 'https://news.ycombinator.com/' },
           { title: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/' },

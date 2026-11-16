@@ -1,0 +1,28 @@
+/* Port UI — Code, terminal, diff */
+.port .term{font-family:var(--f-mono);font-size:12px;line-height:18px;padding:10px 12px;white-space:pre;overflow:auto;color:var(--ink);background:var(--surface-1)}
+.port .term .p{color:var(--mineral-ink)}
+.port .term .c{color:var(--cobalt-ink)}
+.port .term .ok{color:var(--mineral-ink)}
+.port .term .bad{color:var(--coral-ink)}
+.port .term .w{color:var(--amber-ink)}
+.port .term .dim{color:var(--ink-3)}
+.port .term .ai{color:var(--violet-ink)}
+.port .term .tag{display:inline-block;padding:0 5px;border-radius:3px;font-weight:600}
+.port .term .tag.ok{background:var(--mineral-tint)}
+.port .term .tag.bad{background:var(--coral-tint)}
+.port .cursor{display:inline-block;width:7px;height:14px;background:var(--ink);vertical-align:-2px;animation:port-blink 1.1s steps(1) infinite}
+.port .diff{font-family:var(--f-mono);font-size:11.5px;line-height:19px}
+.port .diff .ln{display:grid;grid-template-columns:36px 36px 14px 1fr;white-space:pre}
+.port .diff .ln > span:nth-child(-n+2){color:var(--ink-3);text-align:right;padding-right:8px;user-select:none;background:color-mix(in oklab,var(--surface-sunk) 60%,transparent)}
+.port .diff .ln > span:nth-child(3){color:var(--ink-3);text-align:center}
+.port .diff .add{background:color-mix(in oklab,var(--mineral-tint) 85%,transparent)}
+.port .diff .add > span:nth-child(3){color:var(--mineral-ink)}
+.port .diff .del{background:color-mix(in oklab,var(--coral-tint) 85%,transparent)}
+.port .diff .del > span:nth-child(3){color:var(--coral-ink)}
+.port .diff .add mark{background:color-mix(in oklab,var(--mineral) 30%,transparent);color:inherit;border-radius:2px}
+.port .diff .del mark{background:color-mix(in oklab,var(--coral) 28%,transparent);color:inherit;border-radius:2px}
+.port .diff .hunk{padding:3px 10px;background:var(--wash);color:var(--hue-i);font-size:11px}
+.port .diff .k{color:var(--violet-ink)}
+.port .diff .s{color:var(--clay-ink)}
+.port .diff .f{color:var(--cobalt-ink)}
+.port .diff .cm{color:var(--ink-3)}

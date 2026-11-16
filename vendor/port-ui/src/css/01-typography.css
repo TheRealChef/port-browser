@@ -1,0 +1,16 @@
+/* Port UI — Typography primitives */
+.port .mono{font-family:var(--f-mono);font-feature-settings:"zero" 1}
+.port .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.port .eyebrow{font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.port .meta{font-family:var(--f-mono);font-size:11px;line-height:15px;color:var(--ink-3)}
+.port .muted{color:var(--ink-2)}
+.port .faint{color:var(--ink-3)}
+.port .ttl{font-size:13px;font-weight:600;letter-spacing:-.005em}
+.port .disp{font-family:var(--f-display);font-weight:700;letter-spacing:-.022em}
+.port .grow{flex:1;min-width:0}
+.port .row-flex{display:flex;align-items:center;gap:8px}
+.port .trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.port .tb-cmd span.grow{white-space:nowrap}
+.port .ph .ttl{white-space:nowrap}
+.port .mi > .grow{overflow:hidden;text-overflow:ellipsis}
+.port .mi > .grow{min-width:0}

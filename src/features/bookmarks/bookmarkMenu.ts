@@ -12,7 +12,7 @@ import {
   SquareArrowOutUpRight,
   Trash2,
   Upload,
-} from 'lucide-react';
+} from '../../components/icons';
 import { menu } from '../../components/common/menu';
 import { useUI, type MenuEntry } from '../../stores/uiStore';
 import { useWorkspace } from '../../stores/workspaceStore';
